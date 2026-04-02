@@ -178,7 +178,9 @@
                     ${fds.map(fd => `<tr>
                         <td class="p-2">${fmt.format(fd.amount)}</td>
                         <td class="p-2 text-right font-bold text-green-700">${fmt.format(fd.maturityAmount)}</td>
-                        <td class="p-2 whitespace-nowrap text-red-600 font-semibold">${fd.maturityDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
+                        <td class="p-2 whitespace-nowrap text-red-600 font-semibold">
+                            ${new Date(fd.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}
+                        </td>
                         <td class="p-2">${fd.rate}</td>
                     </tr>`).join('')}
                 </tbody>
