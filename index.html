@@ -78,7 +78,8 @@
                 updateStats();
                 renderView();
             } catch (e) {
-                document.getElementById('app-content').innerHTML = `<div class="p-4 text-red-500">Error connecting to Google Sheets. Check API URL.</div>`;
+                console.error("App Crash Details:", e);
+                document.getElementById('app-content').innerHTML = `<div class="p-4 text-red-500 font-bold">App Error: ${e.message}</div>`;
             }
         }
 
