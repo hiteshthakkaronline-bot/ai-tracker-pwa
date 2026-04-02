@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FD Tracker</title>
+    <title>AI Tracker</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .accordion-content.open { max-height: 2000px; }
+    </style>
 </head>
 <body class="bg-gray-50 pb-20">
+
     <div id="pin-overlay" class="fixed inset-0 bg-yellow-600 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xs text-center">
             <div class="mb-6">
@@ -17,82 +22,175 @@
                 <h2 class="text-xl font-bold text-gray-800">Enter PIN</h2>
                 <p class="text-sm text-gray-500">To access HT FDs</p>
             </div>
-            
-            <input type="password" id="pin-input" inputmode="numeric" maxlength="4" 
-                   class="w-full text-center text-3xl tracking-[1em] p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-500 outline-none mb-4"
-                   placeholder="****">
-            
+            <input type="password" id="pin-input" inputmode="numeric" maxlength="4" class="w-full text-center text-3xl tracking-[1em] p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-500 outline-none mb-4" placeholder="****">
             <div id="pin-error" class="text-red-500 text-xs mb-4 hidden">Incorrect PIN. Try again.</div>
-            
-            <button onclick="validatePin()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg active:scale-95 transition-transform">
-                Unlock Tracker
-            </button>
+            <button onclick="validatePin()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg active:scale-95 transition-transform">Unlock Tracker</button>
         </div>
     </div>
-    <header class="bg-yellow-600 p-4 text-white shadow-md sticky top-0 z-10">
+
+    <header class="bg-yellow-600 p-4 text-white shadow-md sticky top-0 z-50">
         <h1 class="text-xl font-bold">AI Tracker</h1>
-        <div id="global-stats" class="text-xs opacity-90 mt-1">Fetching latest data...</div>
+        <div id="global-stats" class="text-xs opacity-90 mt-1">Loading dashboard...</div>
     </header>
 
-    <div class="flex border-b bg-white sticky top-[60px] z-10">
-        <button onclick="showView('maturity')" class="flex-1 p-3 font-bold border-b-2 border-yellow-600" id="btn-maturity">Maturity Timeline</button>
-        <button onclick="showView('bank')" class="flex-1 p-3 font-bold text-gray-400" id="btn-bank">Bank-wise View</button>
+    <div class="flex border-b bg-white sticky top-[60px] z-40">
+        <button onclick="showView('maturity')" class="flex-1 p-3 font-bold border-b-2 border-yellow-600 text-yellow-600" id="btn-maturity">Maturity</button>
+        <button onclick="showView('bank')" class="flex-1 p-3 font-bold text-gray-400" id="btn-bank">Bank-wise</button>
     </div>
 
-    <main id="app-content" class="p-2">
-        </main>
+    <main id="app-content" class="p-2 space-y-4">
+        <div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-600"></div></div>
+    </main>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
-        const SECRET_PIN = "1234"; // Set your 4-digit PIN here
+        const SECRET_PIN = "1234";
+        let rawData = [];
+        let currentView = 'maturity';
 
+        const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+        // --- AUTH LOGIC ---
         function validatePin() {
             const input = document.getElementById('pin-input').value;
-            const errorMsg = document.getElementById('pin-error');
-            const overlay = document.getElementById('pin-overlay');
-        
             if (input === SECRET_PIN) {
-                // Save state so user doesn't have to re-enter during the session
                 sessionStorage.setItem('isUnlocked', 'true');
-                
-                // Visual feedback and hide
-                overlay.classList.add('opacity-0', 'pointer-events-none');
-                
-                // Trigger the data fetch now that it's unlocked
+                document.getElementById('pin-overlay').classList.add('opacity-0', 'pointer-events-none');
                 init(); 
             } else {
-                errorMsg.classList.remove('hidden');
+                document.getElementById('pin-error').classList.remove('hidden');
                 document.getElementById('pin-input').value = "";
             }
         }
 
-// Auto-unlock if already validated this session
-window.onload = () => {
-    if (sessionStorage.getItem('isUnlocked') === 'true') {
-        document.getElementById('pin-overlay').style.display = 'none';
-        init();
-    }
-};
-        
-        let rawData = [];
+        window.onload = () => {
+            if (sessionStorage.getItem('isUnlocked') === 'true') {
+                document.getElementById('pin-overlay').style.display = 'none';
+                init();
+            }
+        };
 
+        // --- DATA FETCHING ---
         async function init() {
             try {
                 const response = await fetch(API_URL);
                 rawData = await response.json();
-                renderMaturityView();
                 updateStats();
+                renderView();
             } catch (e) {
-                document.getElementById('app-content').innerHTML = "Error loading data. Check console.";
+                document.getElementById('app-content').innerHTML = `<div class="p-4 text-red-500">Error connecting to Google Sheets. Check API URL.</div>`;
             }
         }
 
-        // Logic for grouping and rendering would go here (using the logic we discussed)
-        function showView(view) {
-            // UI Toggle Logic
+        function updateStats() {
+            const total = rawData.reduce((sum, fd) => sum + fd.amount, 0);
+            const matTotal = rawData.reduce((sum, fd) => sum + fd.maturityAmount, 0);
+            document.getElementById('global-stats').innerHTML = `Invested: ${fmt.format(total)} | Maturity: ${fmt.format(matTotal)}`;
         }
 
-        init();
+        // --- VIEW CONTROLLER ---
+        function showView(view) {
+            currentView = view;
+            const mBtn = document.getElementById('btn-maturity');
+            const bBtn = document.getElementById('btn-bank');
+            
+            if(view === 'maturity') {
+                mBtn.classList.add('border-yellow-600', 'text-yellow-600');
+                bBtn.classList.remove('border-yellow-600', 'text-yellow-600');
+            } else {
+                bBtn.classList.add('border-yellow-600', 'text-yellow-600');
+                mBtn.classList.remove('border-yellow-600', 'text-yellow-600');
+            }
+            renderView();
+        }
+
+        function renderView() {
+            const container = document.getElementById('app-content');
+            if (currentView === 'maturity') renderMaturityView(container);
+            else renderBankView(container);
+        }
+
+        // --- RENDERERS ---
+        function renderMaturityView(container) {
+            const groups = rawData.reduce((acc, fd) => {
+                const d = new Date(fd.maturityDate);
+                const y = d.getFullYear();
+                const m = d.toLocaleString('default', { month: 'Long' });
+                if(!acc[y]) acc[y] = { months: {}, total: 0 };
+                if(!acc[y].months[m]) acc[y].months[m] = { fds: [], total: 0 };
+                acc[y].months[m].fds.push(fd);
+                acc[y].total += fd.maturityAmount;
+                acc[y].months[m].total += fd.maturityAmount;
+                return acc;
+            }, {});
+
+            let html = '';
+            Object.keys(groups).sort().forEach(year => {
+                html += `<div class="bg-white rounded shadow mb-2 overflow-hidden">
+                    <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-100 flex justify-between font-bold">
+                        <span>Year ${year}</span> <span>${fmt.format(groups[year].total)}</span>
+                    </button>
+                    <div class="accordion-content">`;
+                
+                Object.keys(groups[year].months).forEach(month => {
+                    html += `<div class="border-l-4 border-yellow-500 ml-2">
+                        <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b flex justify-between text-sm font-semibold">
+                            <span>${month}</span> <span class="text-yellow-700">${fmt.format(groups[year].months[month].total)}</span>
+                        </button>
+                        <div class="accordion-content bg-gray-50 overflow-x-auto">
+                            ${renderTable(groups[year].months[month].fds)}
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+            container.innerHTML = html || '<p class="text-center p-10">No active FDs found.</p>';
+        }
+
+        function renderBankView(container) {
+            const groups = rawData.reduce((acc, fd) => {
+                if(!acc[fd.bank]) acc[fd.bank] = { fds: [], total: 0, inv: 0 };
+                acc[fd.bank].fds.push(fd);
+                acc[fd.bank].total += fd.maturityAmount;
+                acc[fd.bank].inv += fd.amount;
+                return acc;
+            }, {});
+
+            let html = '';
+            Object.keys(groups).sort().forEach(bank => {
+                html += `<div class="bg-white rounded shadow mb-4">
+                    <div class="p-3 bg-yellow-500 text-white rounded-t flex justify-between">
+                        <h3 class="font-bold">${bank}</h3>
+                        <div class="text-right text-xs">Inv: ${fmt.format(groups[bank].inv)}<br><b>Mat: ${fmt.format(groups[bank].total)}</b></div>
+                    </div>
+                    <div class="overflow-x-auto">${renderTable(groups[bank].fds)}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function renderTable(fds) {
+            return `<table class="w-full text-[10px] text-left">
+                <thead class="bg-gray-100 text-gray-600 uppercase">
+                    <tr><th class="p-2">Amt</th><th class="p-2 text-right">Mat.Amt</th><th class="p-2">Maturity</th><th class="p-2">Rate</th></tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    ${fds.map(fd => `<tr>
+                        <td class="p-2">${fmt.format(fd.amount)}</td>
+                        <td class="p-2 text-right font-bold text-green-700">${fmt.format(fd.maturityAmount)}</td>
+                        <td class="p-2 whitespace-nowrap text-red-600 font-semibold">${fd.maturityDate.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
+                        <td class="p-2">${fd.rate}</td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`;
+        }
+
+        // --- SERVICE WORKER REGISTRATION ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW Registered'));
+            });
+        }
     </script>
 </body>
 </html>
