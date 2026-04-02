@@ -8,6 +8,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-50 pb-20">
+    <div id="pin-overlay" class="fixed inset-0 bg-yellow-600 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xs text-center">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">Enter PIN</h2>
+                <p class="text-sm text-gray-500">To access HT FDs</p>
+            </div>
+            
+            <input type="password" id="pin-input" inputmode="numeric" maxlength="4" 
+                   class="w-full text-center text-3xl tracking-[1em] p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-500 outline-none mb-4"
+                   placeholder="****">
+            
+            <div id="pin-error" class="text-red-500 text-xs mb-4 hidden">Incorrect PIN. Try again.</div>
+            
+            <button onclick="validatePin()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg active:scale-95 transition-transform">
+                Unlock Tracker
+            </button>
+        </div>
+    </div>
     <header class="bg-yellow-600 p-4 text-white shadow-md sticky top-0 z-10">
         <h1 class="text-xl font-bold">AI Tracker</h1>
         <div id="global-stats" class="text-xs opacity-90 mt-1">Fetching latest data...</div>
@@ -23,6 +44,36 @@
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
+        const SECRET_PIN = "1234"; // Set your 4-digit PIN here
+
+        function validatePin() {
+            const input = document.getElementById('pin-input').value;
+            const errorMsg = document.getElementById('pin-error');
+            const overlay = document.getElementById('pin-overlay');
+        
+            if (input === SECRET_PIN) {
+                // Save state so user doesn't have to re-enter during the session
+                sessionStorage.setItem('isUnlocked', 'true');
+                
+                // Visual feedback and hide
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                
+                // Trigger the data fetch now that it's unlocked
+                init(); 
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('pin-input').value = "";
+            }
+        }
+
+// Auto-unlock if already validated this session
+window.onload = () => {
+    if (sessionStorage.getItem('isUnlocked') === 'true') {
+        document.getElementById('pin-overlay').style.display = 'none';
+        init();
+    }
+};
+        
         let rawData = [];
 
         async function init() {
