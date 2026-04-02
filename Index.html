@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FD Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 pb-20">
+    <header class="bg-yellow-600 p-4 text-white shadow-md sticky top-0 z-10">
+        <h1 class="text-xl font-bold">AI Tracker</h1>
+        <div id="global-stats" class="text-xs opacity-90 mt-1">Fetching latest data...</div>
+    </header>
+
+    <div class="flex border-b bg-white sticky top-[60px] z-10">
+        <button onclick="showView('maturity')" class="flex-1 p-3 font-bold border-b-2 border-yellow-600" id="btn-maturity">Maturity Timeline</button>
+        <button onclick="showView('bank')" class="flex-1 p-3 font-bold text-gray-400" id="btn-bank">Bank-wise View</button>
+    </div>
+
+    <main id="app-content" class="p-2">
+        </main>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
+        let rawData = [];
+
+        async function init() {
+            try {
+                const response = await fetch(API_URL);
+                rawData = await response.json();
+                renderMaturityView();
+                updateStats();
+            } catch (e) {
+                document.getElementById('app-content').innerHTML = "Error loading data. Check console.";
+            }
+        }
+
+        // Logic for grouping and rendering would go here (using the logic we discussed)
+        function showView(view) {
+            // UI Toggle Logic
+        }
+
+        init();
+    </script>
+</body>
+</html>
