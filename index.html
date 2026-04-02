@@ -116,7 +116,7 @@
             const groups = rawData.reduce((acc, fd) => {
                 const d = new Date(fd.maturityDate);
                 const y = d.getFullYear();
-                const m = d.toLocaleString('default', { month: 'Long' });
+                const m = d.toLocaleString('default', { month: 'long' });
                 if(!acc[y]) acc[y] = { months: {}, total: 0 };
                 if(!acc[y].months[m]) acc[y].months[m] = { fds: [], total: 0 };
                 acc[y].months[m].fds.push(fd);
