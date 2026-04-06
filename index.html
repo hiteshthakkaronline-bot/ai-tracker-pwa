@@ -11,24 +11,24 @@
         .accordion-content.open { max-height: 2000px; }
     </style>
 </head>
-<body class="bg-gray-50 pb-20">
+<body class="bg-white pb-20">
 
-    <div id="pin-overlay" class="fixed inset-0 bg-yellow-600 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
+    <div id="pin-overlay" class="fixed inset-0 bg-gray-200 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xs text-center">
             <div class="mb-6">
-                <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                 </div>
                 <h2 class="text-xl font-bold text-gray-800">Enter PIN</h2>
                 <p class="text-sm text-gray-500">Enter PIN</p>
             </div>
             <input type="password" id="pin-input" inputmode="numeric" maxlength="4" class="w-full text-center text-3xl tracking-[1em] p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-500 outline-none mb-4" placeholder="****">
-            <div id="pin-error" class="text-red-500 text-xs mb-4 hidden">Incorrect PIN. Try again.</div>
+            <div id="pin-error" class="text-gray-900 font-bold text-xs mb-4 hidden">Incorrect PIN. Try again.</div>
             <button onclick="validatePin()" class="w-full bg-gray-800 text-white font-bold py-3 rounded-lg active:scale-95 transition-transform">Unlock Tracker</button>
         </div>
     </div>
 
-    <header class="bg-yellow-600 p-4 text-white shadow-md sticky top-0 z-50 flex justify-between items-center">
+    <header class="bg-[#5D6B7F] p-4 text-white shadow-md sticky top-0 z-50 flex justify-between items-center">
         <div>
             <h1 class="text-xl font-bold">AI Tracker</h1>
             <div id="global-stats" class="text-xs opacity-90 mt-1">Loading dashboard...</div>
@@ -41,12 +41,12 @@
     </header>
 
     <div class="flex border-b bg-white sticky top-[60px] z-40">
-        <button onclick="showView('maturity')" class="flex-1 p-3 font-bold border-b-2 border-yellow-600 text-yellow-600" id="btn-maturity">Maturity</button>
+        <button onclick="showView('maturity')" class="flex-1 p-3 font-bold border-b-2 border-gray-900 text-gray-900" id="btn-maturity">Maturity</button>
         <button onclick="showView('bank')" class="flex-1 p-3 font-bold text-gray-400" id="btn-bank">Bank-wise</button>
     </div>
 
     <main id="app-content" class="p-2 space-y-4">
-        <div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-yellow-600"></div></div>
+        <div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]"></div></div>
     </main>
 
     <script>
@@ -66,7 +66,7 @@
             if (isPrivacyMode) {
                 icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
             } else {
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542 7z"></path>`;
             }
             updateStats();
             renderView();
@@ -127,11 +127,11 @@
             const bBtn = document.getElementById('btn-bank');
             
             if(view === 'maturity') {
-                mBtn.classList.add('border-yellow-600', 'text-yellow-600');
-                bBtn.classList.remove('border-yellow-600', 'text-yellow-600');
+                mBtn.classList.add('border-gray-900', 'text-gray-900');
+                bBtn.classList.remove('border-gray-900', 'text-gray-900');
             } else {
-                bBtn.classList.add('border-yellow-600', 'text-yellow-600');
-                mBtn.classList.remove('border-yellow-600', 'text-yellow-600');
+                bBtn.classList.add('border-gray-900', 'text-gray-900');
+                mBtn.classList.remove('border-gray-900', 'text-gray-900');
             }
             renderView();
         }
@@ -143,7 +143,7 @@
         }
 
         // --- RENDERERS ---
-        // UPDATED: Now uses displayMoney() instead of fmt.format()
+        // UPDATED for shades of grey theme
         function renderMaturityView(container) {
             const groups = rawData.reduce((acc, fd) => {
                 const d = new Date(fd.maturityDate);
@@ -159,16 +159,19 @@
 
             let html = '';
             Object.keys(groups).sort().forEach(year => {
+                // Year header: bg-gray-100 -> bg-gray-200. Text dark neutral.
                 html += `<div class="bg-white rounded shadow mb-2 overflow-hidden">
-                    <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-100 flex justify-between font-bold">
+                    <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-200 flex justify-between font-bold text-gray-800">
                         <span>Year ${year}</span> <span>${displayMoney(groups[year].total)}</span>
                     </button>
                     <div class="accordion-content">`;
                 
                 Object.keys(groups[year].months).forEach(month => {
-                    html += `<div class="border-l-4 border-yellow-500 ml-2">
-                        <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b flex justify-between text-sm font-semibold">
-                            <span>${month}</span> <span class="text-yellow-700">${displayMoney(groups[year].months[month].total)}</span>
+                    // Month border: border-yellow-500 -> border-[#5D6B7F] (Slate grey). Text text-yellow-700 -> text-gray-800.
+                    // Month content bg: bg-white -> bg-gray-50
+                    html += `<div class="border-l-4 border-[#5D6B7F] ml-2">
+                        <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b flex justify-between text-sm font-semibold text-gray-800">
+                            <span>${month}</span> <span class="text-gray-800">${displayMoney(groups[year].months[month].total)}</span>
                         </button>
                         <div class="accordion-content bg-gray-50 overflow-x-auto">
                             ${renderTable(groups[year].months[month].fds)}
@@ -180,7 +183,7 @@
             container.innerHTML = html || '<p class="text-center p-10">No active FDs found.</p>';
         }
 
-        // UPDATED: Now uses displayMoney() instead of fmt.format()
+        // UPDATED for shades of grey theme
         function renderBankView(container) {
             const groups = rawData.reduce((acc, fd) => {
                 if(!acc[fd.bank]) acc[fd.bank] = { fds: [], total: 0, inv: 0 };
@@ -192,10 +195,12 @@
 
             let html = '';
             Object.keys(groups).sort().forEach(bank => {
+                // Bank card header: bg-yellow-500 -> bg-gray-200. Text text-white -> text-gray-800.
+                // Text sub-text: text-white -> text-gray-700. font-bold total -> font-bold text-gray-900.
                 html += `<div class="bg-white rounded shadow mb-4">
-                    <div class="p-3 bg-yellow-500 text-white rounded-t flex justify-between">
+                    <div class="p-3 bg-gray-200 text-gray-800 rounded-t flex justify-between">
                         <h3 class="font-bold">${bank}</h3>
-                        <div class="text-right text-xs">Inv: ${displayMoney(groups[bank].inv)}<br><b>Mat: ${displayMoney(groups[bank].total)}</b></div>
+                        <div class="text-right text-xs">Inv: ${displayMoney(groups[bank].inv)}<br><b class="text-gray-900">${displayMoney(groups[bank].total)}</b></div>
                     </div>
                     <div class="overflow-x-auto">${renderTable(groups[bank].fds)}</div>
                 </div>`;
@@ -203,17 +208,20 @@
             container.innerHTML = html;
         }
 
-        // UPDATED: Now uses displayMoney() instead of fmt.format()
+        // UPDATED for shades of grey theme and data cells
         function renderTable(fds) {
+            // Table header: bg-gray-100 text-gray-600 -> bg-gray-200 text-gray-700
+            // Growth text (green): text-green-700 -> text-gray-900 font-bold
+            // Maturity date (red): text-red-600 -> text-gray-800 font-semibold
             return `<table class="w-full text-[10px] text-left">
-                <thead class="bg-gray-100 text-gray-600 uppercase">
+                <thead class="bg-gray-200 text-gray-700 uppercase">
                     <tr><th class="p-2">Amt</th><th class="p-2 text-right">Mat.Amt</th><th class="p-2">Maturity</th><th class="p-2">Rate</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     ${fds.map(fd => `<tr>
                         <td class="p-2">${displayMoney(fd.amount)}</td>
-                        <td class="p-2 text-right font-bold text-green-700">${displayMoney(fd.maturityAmount)}</td>
-                        <td class="p-2 whitespace-nowrap text-red-600 font-semibold">
+                        <td class="p-2 text-right font-bold text-gray-900">${displayMoney(fd.maturityAmount)}</td>
+                        <td class="p-2 whitespace-nowrap text-gray-800 font-semibold">
                             ${new Date(fd.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}
                         </td>
                         <td class="p-2">${fd.rate}</td>
