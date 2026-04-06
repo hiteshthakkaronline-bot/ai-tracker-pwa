@@ -28,9 +28,16 @@
         </div>
     </div>
 
-    <header class="bg-yellow-600 p-4 text-white shadow-md sticky top-0 z-50">
-        <h1 class="text-xl font-bold">AI Tracker</h1>
-        <div id="global-stats" class="text-xs opacity-90 mt-1">Loading dashboard...</div>
+    <header class="bg-yellow-600 p-4 text-white shadow-md sticky top-0 z-50 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-bold">AI Tracker</h1>
+            <div id="global-stats" class="text-xs opacity-90 mt-1">Loading dashboard...</div>
+        </div>
+        <button onclick="togglePrivacy()" class="p-2 bg-yellow-700 rounded-full active:scale-95 transition-transform" aria-label="Toggle Privacy">
+            <svg id="privacy-icon" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+            </svg>
+        </button>
     </header>
 
     <div class="flex border-b bg-white sticky top-[60px] z-40">
@@ -49,6 +56,29 @@
         let currentView = 'maturity';
 
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+
+        // --- PRIVACY MODE LOGIC ---
+        let isPrivacyMode = true; // Default to hidden
+
+        function togglePrivacy() {
+            isPrivacyMode = !isPrivacyMode;
+            const icon = document.getElementById('privacy-icon');
+            if (isPrivacyMode) {
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
+            } else {
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+            }
+            updateStats();
+            renderView();
+        }
+
+        function displayMoney(amount) {
+            const formatted = fmt.format(amount);
+            if (isPrivacyMode) {
+                return formatted.replace(/[0-9]/g, 'X');
+            }
+            return formatted;
+        }
 
         // --- AUTH LOGIC ---
         function validatePin() {
@@ -83,10 +113,11 @@
             }
         }
 
+        // UPDATED: Now uses displayMoney() instead of fmt.format()
         function updateStats() {
             const total = rawData.reduce((sum, fd) => sum + fd.amount, 0);
             const matTotal = rawData.reduce((sum, fd) => sum + fd.maturityAmount, 0);
-            document.getElementById('global-stats').innerHTML = `Invested: ${fmt.format(total)} | Maturity: ${fmt.format(matTotal)}`;
+            document.getElementById('global-stats').innerHTML = `Invested: ${displayMoney(total)} | Maturity: ${displayMoney(matTotal)}`;
         }
 
         // --- VIEW CONTROLLER ---
@@ -112,6 +143,7 @@
         }
 
         // --- RENDERERS ---
+        // UPDATED: Now uses displayMoney() instead of fmt.format()
         function renderMaturityView(container) {
             const groups = rawData.reduce((acc, fd) => {
                 const d = new Date(fd.maturityDate);
@@ -129,14 +161,14 @@
             Object.keys(groups).sort().forEach(year => {
                 html += `<div class="bg-white rounded shadow mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-100 flex justify-between font-bold">
-                        <span>Year ${year}</span> <span>${fmt.format(groups[year].total)}</span>
+                        <span>Year ${year}</span> <span>${displayMoney(groups[year].total)}</span>
                     </button>
                     <div class="accordion-content">`;
                 
                 Object.keys(groups[year].months).forEach(month => {
                     html += `<div class="border-l-4 border-yellow-500 ml-2">
                         <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b flex justify-between text-sm font-semibold">
-                            <span>${month}</span> <span class="text-yellow-700">${fmt.format(groups[year].months[month].total)}</span>
+                            <span>${month}</span> <span class="text-yellow-700">${displayMoney(groups[year].months[month].total)}</span>
                         </button>
                         <div class="accordion-content bg-gray-50 overflow-x-auto">
                             ${renderTable(groups[year].months[month].fds)}
@@ -148,6 +180,7 @@
             container.innerHTML = html || '<p class="text-center p-10">No active FDs found.</p>';
         }
 
+        // UPDATED: Now uses displayMoney() instead of fmt.format()
         function renderBankView(container) {
             const groups = rawData.reduce((acc, fd) => {
                 if(!acc[fd.bank]) acc[fd.bank] = { fds: [], total: 0, inv: 0 };
@@ -162,7 +195,7 @@
                 html += `<div class="bg-white rounded shadow mb-4">
                     <div class="p-3 bg-yellow-500 text-white rounded-t flex justify-between">
                         <h3 class="font-bold">${bank}</h3>
-                        <div class="text-right text-xs">Inv: ${fmt.format(groups[bank].inv)}<br><b>Mat: ${fmt.format(groups[bank].total)}</b></div>
+                        <div class="text-right text-xs">Inv: ${displayMoney(groups[bank].inv)}<br><b>Mat: ${displayMoney(groups[bank].total)}</b></div>
                     </div>
                     <div class="overflow-x-auto">${renderTable(groups[bank].fds)}</div>
                 </div>`;
@@ -170,6 +203,7 @@
             container.innerHTML = html;
         }
 
+        // UPDATED: Now uses displayMoney() instead of fmt.format()
         function renderTable(fds) {
             return `<table class="w-full text-[10px] text-left">
                 <thead class="bg-gray-100 text-gray-600 uppercase">
@@ -177,8 +211,8 @@
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     ${fds.map(fd => `<tr>
-                        <td class="p-2">${fmt.format(fd.amount)}</td>
-                        <td class="p-2 text-right font-bold text-green-700">${fmt.format(fd.maturityAmount)}</td>
+                        <td class="p-2">${displayMoney(fd.amount)}</td>
+                        <td class="p-2 text-right font-bold text-green-700">${displayMoney(fd.maturityAmount)}</td>
                         <td class="p-2 whitespace-nowrap text-red-600 font-semibold">
                             ${new Date(fd.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}
                         </td>
