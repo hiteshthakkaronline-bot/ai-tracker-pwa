@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class', // Enables class-based dark mode
+            darkMode: 'class', 
         }
     </script>
     <style>
@@ -28,6 +28,21 @@
         </div>
     </div>
 
+    <header class="bg-[#5D6B7F] dark:bg-[#2D3748] p-4 text-white shadow-md sticky top-0 z-50 grid grid-cols-[40px_1fr_40px] items-center text-center">
+        <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full transition-colors flex justify-center items-center">
+            <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+        </button>
+        
+        <div>
+            <h1 id="header-title" class="text-lg font-bold">Hitesh FD's</h1>
+            <div id="global-stats" class="text-[10px] opacity-90">Loading stats...</div>
+        </div>
+        
+        <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full transition-colors flex justify-center items-center">
+            <svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
+        </button>
+    </header>
+
     <section id="view-home" class="hidden-view p-6 text-center text-gray-500 dark:text-gray-400">
         <h2 class="text-2xl font-bold mt-20">Home Dashboard</h2>
         <p>Your financial summary will appear here.</p>
@@ -39,27 +54,13 @@
     </section>
 
     <section id="view-fds">
-        <header class="bg-[#5D6B7F] dark:bg-[#2D3748] p-4 text-white shadow-md sticky top-0 z-50 grid grid-cols-[40px_1fr_40px] items-center text-center">
-            <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
-                <svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
-            </button>
-            
-            <div>
-                <h1 class="text-lg font-bold">Hitesh FD's</h1>
-                <div id="global-stats" class="text-[10px] opacity-90">Loading stats...</div>
-            </div>
-            
-            <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
-                <svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg>
-            </button>
-        </header>
-
         <div class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40">
             <button onclick="showSubView('maturity')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white" id="btn-maturity">Maturity</button>
             <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500" id="btn-bank">Bank-wise</button>
         </div>
-
-        <main id="app-content" class="p-2 space-y-4"></main>
+        <main id="app-content" class="p-2 space-y-4">
+             <div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]"></div></div>
+        </main>
     </section>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-around items-center z-50 shadow-2xl transition-colors">
@@ -87,7 +88,7 @@
         function applyInitialTheme() {
             const stored = localStorage.getItem('theme');
             const hour = new Date().getHours();
-            const isNight = hour >= 18 || hour < 6; // Dark mode after 6 PM or before 6 AM
+            const isNight = hour >= 18 || hour < 6; 
             const theme = stored || (isNight ? 'dark' : 'light');
             setTheme(theme);
         }
@@ -110,19 +111,20 @@
             const themeIcon = document.getElementById('theme-icon');
             const privacyIcon = document.getElementById('privacy-icon');
             
-            // Sun/Moon Icon
             themeIcon.innerHTML = isDark 
                 ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />` 
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
 
-            // Privacy Icon
             privacyIcon.innerHTML = isPrivacyMode 
                 ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>` 
-                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
-        // --- NAVIGATION & VIEWS ---
+        // --- NAVIGATION LOGIC ---
         function switchMainTab(tab) {
+            const titles = { 'home': 'Home', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s' };
+            document.getElementById('header-title').innerText = titles[tab];
+
             ['home', 'fds', 'nct'].forEach(t => {
                 document.getElementById('view-' + t).classList.toggle('hidden-view', t !== tab);
                 const nav = document.getElementById('nav-' + t);
@@ -214,7 +216,7 @@
                 });
                 html += `</div></div>`;
             });
-            container.innerHTML = html;
+            container.innerHTML = html || '<p class="text-center p-10 dark:text-gray-400">No active FDs.</p>';
         }
 
         function renderBank(container) {
@@ -228,7 +230,7 @@
             Object.keys(groups).sort().forEach(bank => {
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow border dark:border-gray-700 mb-4 overflow-hidden">
                     <div class="p-3 bg-gray-100 dark:bg-gray-700 flex justify-between dark:text-white">
-                        <h3 class="font-bold">${bank}</h3>
+                        <h3 class="font-bold text-sm">${bank}</h3>
                         <div class="text-[10px] text-right">Inv: ${displayMoney(groups[bank].inv)}<br><b>Mat: ${displayMoney(groups[bank].total)}</b></div>
                     </div>
                     <div class="overflow-x-auto">${renderTable(groups[bank].fds)}</div>
