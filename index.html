@@ -9,11 +9,10 @@
     <style>
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .accordion-content.open { max-height: 2000px; }
+        .hidden-view { display: none; }
     </style>
 </head>
-<body class="bg-white pb-20">
-
-    <div id="pin-overlay" class="fixed inset-0 bg-gray-200 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
+<body class="bg-white pb-24"> <div id="pin-overlay" class="fixed inset-0 bg-gray-200 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-xs text-center">
             <div class="mb-6">
                 <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -28,45 +27,104 @@
         </div>
     </div>
 
-    <header class="bg-[#5D6B7F] p-4 text-white shadow-md sticky top-0 z-50 flex justify-between items-center">
-        <div>
-            <h1 class="text-xl font-bold">AI Tracker</h1>
-            <div id="global-stats" class="text-xs opacity-90 mt-1">Loading dashboard...</div>
+    <section id="view-home" class="hidden-view p-6 text-center">
+        <div class="mt-20">
+            <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800">Welcome Home</h2>
+            <p class="text-gray-500 mt-2">Home dashboard is under construction.</p>
         </div>
-        <button onclick="togglePrivacy()" class="p-2 bg-yellow-700 rounded-full active:scale-95 transition-transform" aria-label="Toggle Privacy">
-            <svg id="privacy-icon" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
-            </svg>
+    </section>
+
+    <section id="view-fds">
+        <header class="bg-[#5D6B7F] p-4 text-white shadow-md sticky top-0 z-50 flex justify-between items-center">
+            <div>
+                <h1 class="text-xl font-bold">Hitesh FD's</h1>
+                <div id="global-stats" class="text-xs opacity-90 mt-1">Loading dashboard...</div>
+            </div>
+            <button onclick="togglePrivacy()" class="p-2 bg-gray-700/50 rounded-full active:scale-95 transition-transform" aria-label="Toggle Privacy">
+                <svg id="privacy-icon" class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>
+                </svg>
+            </button>
+        </header>
+
+        <div class="flex border-b bg-white sticky top-[68px] z-40">
+            <button onclick="showSubView('maturity')" class="flex-1 p-3 font-bold border-b-2 border-gray-900 text-gray-900" id="btn-maturity">Maturity</button>
+            <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400" id="btn-bank">Bank-wise</button>
+        </div>
+
+        <main id="app-content" class="p-2 space-y-4">
+            <div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]"></div></div>
+        </main>
+    </section>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 h-20 flex justify-around items-center z-50">
+        <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 transition-colors">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+            <span class="text-[10px] mt-1 font-bold">Home</span>
         </button>
-    </header>
-
-    <div class="flex border-b bg-white sticky top-[60px] z-40">
-        <button onclick="showView('maturity')" class="flex-1 p-3 font-bold border-b-2 border-gray-900 text-gray-900" id="btn-maturity">Maturity</button>
-        <button onclick="showView('bank')" class="flex-1 p-3 font-bold text-gray-400" id="btn-bank">Bank-wise</button>
-    </div>
-
-    <main id="app-content" class="p-2 space-y-4">
-        <div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]"></div></div>
-    </main>
+        <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 transition-colors">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+            <span class="text-[10px] mt-1 font-bold">Hitesh FD's</span>
+        </button>
+    </nav>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
         const SECRET_PIN = "1549";
         let rawData = [];
-        let currentView = 'maturity';
-
+        let currentSubView = 'maturity';
+        let isPrivacyMode = true; 
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
 
-        // --- PRIVACY MODE LOGIC ---
-        let isPrivacyMode = true; // Default to hidden
+        // --- MAIN NAVIGATION LOGIC ---
+        function switchMainTab(tab) {
+            const homeView = document.getElementById('view-home');
+            const fdView = document.getElementById('view-fds');
+            const navHome = document.getElementById('nav-home');
+            const navFds = document.getElementById('nav-fds');
 
+            if (tab === 'home') {
+                homeView.classList.remove('hidden-view');
+                fdView.classList.add('hidden-view');
+                navHome.classList.replace('text-gray-400', 'text-gray-900');
+                navFds.classList.replace('text-gray-900', 'text-gray-400');
+            } else {
+                homeView.classList.add('hidden-view');
+                fdView.classList.remove('hidden-view');
+                navFds.classList.replace('text-gray-400', 'text-gray-900');
+                navHome.classList.replace('text-gray-900', 'text-gray-400');
+            }
+        }
+
+        // --- SUB-VIEW CONTROLLER (Maturity vs Bank) ---
+        function showSubView(view) {
+            currentSubView = view;
+            const mBtn = document.getElementById('btn-maturity');
+            const bBtn = document.getElementById('btn-bank');
+            
+            if(view === 'maturity') {
+                mBtn.classList.add('border-gray-900', 'text-gray-900');
+                bBtn.classList.remove('border-gray-900', 'text-gray-900');
+                bBtn.classList.add('text-gray-400');
+            } else {
+                bBtn.classList.add('border-gray-900', 'text-gray-900');
+                mBtn.classList.remove('border-gray-900', 'text-gray-900');
+                mBtn.classList.add('text-gray-400');
+            }
+            renderView();
+        }
+
+        // --- PRIVACY MODE LOGIC ---
         function togglePrivacy() {
             isPrivacyMode = !isPrivacyMode;
             const icon = document.getElementById('privacy-icon');
             if (isPrivacyMode) {
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
             } else {
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542 7z"></path>`;
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
             }
             updateStats();
             renderView();
@@ -74,10 +132,7 @@
 
         function displayMoney(amount) {
             const formatted = fmt.format(amount);
-            if (isPrivacyMode) {
-                return formatted.replace(/[0-9]/g, 'X');
-            }
-            return formatted;
+            return isPrivacyMode ? formatted.replace(/[0-9]/g, 'X') : formatted;
         }
 
         // --- AUTH LOGIC ---
@@ -113,37 +168,19 @@
             }
         }
 
-        // UPDATED: Now uses displayMoney() instead of fmt.format()
         function updateStats() {
             const total = rawData.reduce((sum, fd) => sum + fd.amount, 0);
             const matTotal = rawData.reduce((sum, fd) => sum + fd.maturityAmount, 0);
             document.getElementById('global-stats').innerHTML = `Invested: ${displayMoney(total)} | Maturity: ${displayMoney(matTotal)}`;
         }
 
-        // --- VIEW CONTROLLER ---
-        function showView(view) {
-            currentView = view;
-            const mBtn = document.getElementById('btn-maturity');
-            const bBtn = document.getElementById('btn-bank');
-            
-            if(view === 'maturity') {
-                mBtn.classList.add('border-gray-900', 'text-gray-900');
-                bBtn.classList.remove('border-gray-900', 'text-gray-900');
-            } else {
-                bBtn.classList.add('border-gray-900', 'text-gray-900');
-                mBtn.classList.remove('border-gray-900', 'text-gray-900');
-            }
-            renderView();
-        }
-
         function renderView() {
             const container = document.getElementById('app-content');
-            if (currentView === 'maturity') renderMaturityView(container);
+            if (currentSubView === 'maturity') renderMaturityView(container);
             else renderBankView(container);
         }
 
         // --- RENDERERS ---
-        // UPDATED for shades of grey theme
         function renderMaturityView(container) {
             const groups = rawData.reduce((acc, fd) => {
                 const d = new Date(fd.maturityDate);
@@ -159,16 +196,13 @@
 
             let html = '';
             Object.keys(groups).sort().forEach(year => {
-                // Year header: bg-gray-100 -> bg-gray-200. Text dark neutral.
-                html += `<div class="bg-white rounded shadow mb-2 overflow-hidden">
-                    <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-200 flex justify-between font-bold text-gray-800">
+                html += `<div class="bg-white rounded shadow mb-2 overflow-hidden border border-gray-100">
+                    <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 flex justify-between font-bold text-gray-800">
                         <span>Year ${year}</span> <span>${displayMoney(groups[year].total)}</span>
                     </button>
                     <div class="accordion-content">`;
                 
                 Object.keys(groups[year].months).forEach(month => {
-                    // Month border: border-yellow-500 -> border-[#5D6B7F] (Slate grey). Text text-yellow-700 -> text-gray-800.
-                    // Month content bg: bg-white -> bg-gray-50
                     html += `<div class="border-l-4 border-[#5D6B7F] ml-2">
                         <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b flex justify-between text-sm font-semibold text-gray-800">
                             <span>${month}</span> <span class="text-gray-800">${displayMoney(groups[year].months[month].total)}</span>
@@ -183,7 +217,6 @@
             container.innerHTML = html || '<p class="text-center p-10">No active FDs found.</p>';
         }
 
-        // UPDATED for shades of grey theme
         function renderBankView(container) {
             const groups = rawData.reduce((acc, fd) => {
                 if(!acc[fd.bank]) acc[fd.bank] = { fds: [], total: 0, inv: 0 };
@@ -195,12 +228,10 @@
 
             let html = '';
             Object.keys(groups).sort().forEach(bank => {
-                // Bank card header: bg-yellow-500 -> bg-gray-200. Text text-white -> text-gray-800.
-                // Text sub-text: text-white -> text-gray-700. font-bold total -> font-bold text-gray-900.
-                html += `<div class="bg-white rounded shadow mb-4">
-                    <div class="p-3 bg-gray-200 text-gray-800 rounded-t flex justify-between">
+                html += `<div class="bg-white rounded shadow mb-4 border border-gray-100">
+                    <div class="p-3 bg-gray-100 text-gray-800 rounded-t flex justify-between border-b">
                         <h3 class="font-bold">${bank}</h3>
-                        <div class="text-right text-xs">Inv: ${displayMoney(groups[bank].inv)}<br><b class="text-gray-900">${displayMoney(groups[bank].total)}</b></div>
+                        <div class="text-right text-[10px] leading-tight text-gray-600">Inv: ${displayMoney(groups[bank].inv)}<br><b class="text-gray-900">${displayMoney(groups[bank].total)}</b></div>
                     </div>
                     <div class="overflow-x-auto">${renderTable(groups[bank].fds)}</div>
                 </div>`;
@@ -208,29 +239,22 @@
             container.innerHTML = html;
         }
 
-        // UPDATED for shades of grey theme and data cells
         function renderTable(fds) {
-            // Table header: bg-gray-100 text-gray-600 -> bg-gray-200 text-gray-700
-            // Growth text (green): text-green-700 -> text-gray-900 font-bold
-            // Maturity date (red): text-red-600 -> text-gray-800 font-semibold
             return `<table class="w-full text-[10px] text-left">
-                <thead class="bg-gray-200 text-gray-700 uppercase">
+                <thead class="bg-gray-100 text-gray-500 uppercase">
                     <tr><th class="p-2">Amt</th><th class="p-2 text-right">Mat.Amt</th><th class="p-2">Maturity</th><th class="p-2">Rate</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
                     ${fds.map(fd => `<tr>
-                        <td class="p-2">${displayMoney(fd.amount)}</td>
+                        <td class="p-2 text-gray-600">${displayMoney(fd.amount)}</td>
                         <td class="p-2 text-right font-bold text-gray-900">${displayMoney(fd.maturityAmount)}</td>
-                        <td class="p-2 whitespace-nowrap text-gray-800 font-semibold">
-                            ${new Date(fd.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}
-                        </td>
-                        <td class="p-2">${fd.rate}</td>
+                        <td class="p-2 whitespace-nowrap text-gray-800 font-semibold">${new Date(fd.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
+                        <td class="p-2 text-gray-500">${fd.rate}</td>
                     </tr>`).join('')}
                 </tbody>
             </table>`;
         }
 
-        // --- SERVICE WORKER REGISTRATION ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW Registered'));
