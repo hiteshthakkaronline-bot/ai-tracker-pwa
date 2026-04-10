@@ -6,9 +6,7 @@
     <title>AI Tracker</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <style>
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .accordion-content.open { max-height: 2000px; }
@@ -40,35 +38,37 @@
         <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none" id="btn-bank">Bank-wise</button>
     </div>
 
-    <section id="view-home" class="hidden-view p-10 text-center text-gray-400 font-bold mt-20">HOME DASHBOARD CONTENT GOES HERE</section>
+    <section id="view-home" class="hidden-view p-10 text-center text-gray-400 font-bold mt-20">HOME DASHBOARD CONTENT</section>
     
-    <main id="app-content" class="p-2 space-y-4">
-        <div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]"></div></div>
-    </main>
+    <main id="app-content" class="p-2 space-y-4"></main>
 
     <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-around items-center z-50 shadow-2xl transition-colors">
-        <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400">
+        <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 w-1/4">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
             <span class="text-[9px] mt-1 font-bold">HOME</span>
         </button>
-        <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white">
+        <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white w-1/4">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
             <span class="text-[9px] mt-1 font-bold">HT FDs</span>
         </button>
-        <button onclick="switchMainTab('nct')" id="nav-nct" class="flex flex-col items-center text-gray-400">
+        <button onclick="switchMainTab('nct')" id="nav-nct" class="flex flex-col items-center text-gray-400 w-1/4">
             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
             <span class="text-[9px] mt-1 font-bold">NCT FDs</span>
+        </button>
+        <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 w-1/4">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+            <span class="text-[9px] mt-1 font-bold">HT NCDs</span>
         </button>
     </nav>
 
     <script>
-        // IF YOU GOT A NEW URL FROM GOOGLE APPS SCRIPT, PASTE IT HERE:
-        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
+        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; // <-- PASTE NEW URL HERE
         const SECRET_PIN = "1549";
         
         let activeData = [];
         let currentTab = 'fds', currentSubView = 'maturity', isPrivacyMode = true;
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
+        const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         // --- THEME ENGINE ---
         function applyInitialTheme() {
@@ -88,8 +88,7 @@
         }
 
         function toggleTheme() {
-            const isDark = document.documentElement.classList.contains('dark');
-            setTheme(isDark ? 'light' : 'dark');
+            setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
         }
 
         function updateIcons() {
@@ -106,24 +105,27 @@
         // --- NAVIGATION LOGIC ---
         async function switchMainTab(tab) {
             currentTab = tab;
-            const titles = { 'home': 'Home', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s' };
+            const titles = { 'home': 'Home', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s' };
             document.getElementById('header-title').innerText = titles[tab];
+            
+            // Adjust Sub-Nav Label for NCDs
+            document.getElementById('btn-bank').innerText = (tab === 'ncd') ? 'Company-wise' : 'Bank-wise';
             
             document.getElementById('sub-nav').style.display = tab === 'home' ? 'none' : 'flex';
             document.getElementById('view-home').style.display = tab === 'home' ? 'block' : 'none';
             document.getElementById('app-content').style.display = tab === 'home' ? 'none' : 'block';
 
-            ['home', 'fds', 'nct'].forEach(t => {
+            ['home', 'fds', 'nct', 'ncd'].forEach(t => {
                 const btn = document.getElementById('nav-' + t);
-                btn.className = `flex flex-col items-center transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
+                btn.className = `flex flex-col items-center w-1/4 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
-            if (tab === 'fds' || tab === 'nct') {
+            if (tab !== 'home') {
                 document.getElementById('app-content').innerHTML = '<div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]"></div></div>';
                 document.getElementById('global-stats').innerHTML = 'Fetching data...';
                 
                 try {
-                    const userParam = tab === 'fds' ? 'HT' : 'NCT';
+                    const userParam = tab === 'fds' ? 'HT' : (tab === 'nct' ? 'NCT' : 'NCD');
                     const response = await fetch(`${API_URL}?user=${userParam}`);
                     const data = await response.json();
                     
@@ -134,7 +136,7 @@
                     renderView();
                 } catch (e) {
                     console.error("App Crash Details:", e);
-                    document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 dark:bg-red-900/20 rounded-lg text-sm font-bold border border-red-200 dark:border-red-800">Connection Error:<br>${e.message}<br><br>Check your API URL and ensure Google Apps Script is deployed to 'Anyone'.</div>`;
+                    document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">Connection Error:<br>${e.message}</div>`;
                     document.getElementById('global-stats').innerHTML = 'Error loading';
                 }
             }
@@ -178,28 +180,36 @@
         function init() { switchMainTab('fds'); }
 
         function updateStats() {
-            const total = activeData.reduce((s, f) => s + f.amount, 0);
-            const mat = activeData.reduce((s, f) => s + f.maturityAmount, 0);
-            document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)} | Mat: ${displayMoney(mat)}`;
+            const total = activeData.reduce((s, item) => s + item.amount, 0);
+            
+            // For NCDs, we don't have a 'Maturity Amount' column from the script, so we just show Investment
+            if (currentTab === 'ncd') {
+                document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
+            } else {
+                const mat = activeData.reduce((s, f) => s + f.maturityAmount, 0);
+                document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)} | Mat: ${displayMoney(mat)}`;
+            }
         }
 
         function renderView() {
             const container = document.getElementById('app-content');
             if (currentSubView === 'maturity') renderMaturity(container);
-            else renderBank(container);
+            else renderBankOrCompany(container);
         }
 
         function renderMaturity(container) {
-            const groups = activeData.reduce((acc, fd) => {
-                const d = new Date(fd.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
+            const groups = activeData.reduce((acc, item) => {
+                const d = new Date(item.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
                 if(!acc[y]) acc[y] = { months: {}, total: 0 };
-                if(!acc[y].months[m]) acc[y].months[m] = { fds: [], total: 0 };
-                acc[y].months[m].fds.push(fd); acc[y].total += fd.maturityAmount; acc[y].months[m].total += fd.maturityAmount;
+                if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
+                acc[y].months[m].items.push(item);
+                
+                // If it's an NCD, we track amount. If FD, maturityAmount.
+                const valToAdd = currentTab === 'ncd' ? item.amount : item.maturityAmount;
+                acc[y].total += valToAdd; 
+                acc[y].months[m].total += valToAdd;
                 return acc;
             }, {});
-
-            // Reference array for correct chronological sorting
-            const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
             let html = '';
             Object.keys(groups).sort().forEach(y => {
@@ -209,70 +219,85 @@
                     </button>
                     <div class="accordion-content">`;
                 
-                // SORTING LOGIC ADDED HERE: Sort months chronologically based on the monthOrder array
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
-                    
-                    // Extra Polish: Sort the FDs within each month by exact date (ascending)
-                    groups[y].months[m].fds.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+                    groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
 
                     html += `<div class="border-l-4 border-[#5D6B7F] ml-2">
                         <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200">
                             <span>${m}</span> <span>${displayMoney(groups[y].months[m].total)}</span>
                         </button>
-                        <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[y].months[m].fds)}</div>
+                        <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[y].months[m].items)}</div>
                     </div>`;
                 });
                 html += `</div></div>`;
             });
-            container.innerHTML = html || '<p class="text-center p-10 dark:text-gray-400">No active FDs found.</p>';
+            container.innerHTML = html || '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>';
         }
 
-        function renderBank(container) {
-            const groups = activeData.reduce((acc, fd) => {
-                if(!acc[fd.bank]) acc[fd.bank] = { fds: [], total: 0, inv: 0 };
-                acc[fd.bank].fds.push(fd); acc[fd.bank].total += fd.maturityAmount; acc[fd.bank].inv += fd.amount;
+        function renderBankOrCompany(container) {
+            const groups = activeData.reduce((acc, item) => {
+                // Determine if we group by Bank or Company
+                const groupKey = currentTab === 'ncd' ? item.company : item.bank;
+                
+                if(!acc[groupKey]) acc[groupKey] = { items: [], total: 0, inv: 0 };
+                acc[groupKey].items.push(item); 
+                
+                acc[groupKey].inv += item.amount;
+                if (currentTab !== 'ncd') acc[groupKey].total += item.maturityAmount;
+                
                 return acc;
             }, {});
 
             let html = '';
-            Object.keys(groups).sort().forEach(bank => {
-                
-                // SORTING LOGIC ADDED HERE: Ascending by Maturity Date
-                groups[bank].fds.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+            Object.keys(groups).sort().forEach(key => {
+                groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+
+                const statsHtml = currentTab === 'ncd' 
+                    ? `Inv: <b class="text-gray-900 dark:text-white">${displayMoney(groups[key].inv)}</b>`
+                    : `Inv: ${displayMoney(groups[key].inv)}<br><b class="text-gray-900 dark:text-white">Mat: ${displayMoney(groups[key].total)}</b>`;
 
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow border dark:border-gray-700 mb-4 overflow-hidden">
                     <div class="p-3 bg-gray-100 dark:bg-gray-700 flex justify-between dark:text-white">
-                        <h3 class="font-bold text-sm">${bank}</h3>
-                        <div class="text-[10px] text-right">Inv: ${displayMoney(groups[bank].inv)}<br><b>Mat: ${displayMoney(groups[bank].total)}</b></div>
+                        <h3 class="font-bold text-sm w-2/3 truncate pr-2">${key}</h3>
+                        <div class="text-[10px] text-right w-1/3">${statsHtml}</div>
                     </div>
-                    <div class="overflow-x-auto">${renderTable(groups[bank].fds)}</div>
+                    <div class="overflow-x-auto">${renderTable(groups[key].items)}</div>
                 </div>`;
             });
             container.innerHTML = html;
         }
 
-        function renderTable(fds) {
-            // ALL HEADERS AND DATA CELLS UPDATED TO 'text-center'
+        function renderTable(items) {
+            // Adjust table header based on if it's NCD or FD
+            const secondColHeader = currentTab === 'ncd' ? 'Company' : 'Mat.Amt';
+            
             return `<table class="w-full text-[10px] dark:text-gray-300">
                 <thead class="bg-gray-50 dark:bg-gray-700 text-gray-500 uppercase">
                     <tr>
                         <th class="p-2 text-center">Amt</th>
-                        <th class="p-2 text-center">Maturity</th>
+                        <th class="p-2 text-center">${secondColHeader}</th>
                         <th class="p-2 text-center">Date</th>
                         <th class="p-2 text-center">Rate</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y dark:divide-gray-700">
-                    ${fds.map(fd => `<tr>
-                        <td class="p-2 text-center">${displayMoney(fd.amount)}</td>
-                        <td class="p-2 text-center font-bold text-gray-900 dark:text-white">${displayMoney(fd.maturityAmount)}</td>
-                        <td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400">${new Date(fd.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
-                        <td class="p-2 text-center">${fd.rate}</td>
-                    </tr>`).join('')}
+                    ${items.map(item => {
+                        // Adjust row data based on NCD vs FD
+                        const secondColData = currentTab === 'ncd' 
+                            ? `<span class="truncate block w-20 mx-auto">${item.company}</span>` 
+                            : `${displayMoney(item.maturityAmount)}`;
+                            
+                        return `<tr>
+                            <td class="p-2 text-center">${displayMoney(item.amount)}</td>
+                            <td class="p-2 text-center font-bold text-gray-900 dark:text-white">${secondColData}</td>
+                            <td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
+                            <td class="p-2 text-center">${item.rate}%</td>
+                        </tr>`;
+                    }).join('')}
                 </tbody>
             </table>`;
         }
-        
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
         }
