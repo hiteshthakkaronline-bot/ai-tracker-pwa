@@ -62,7 +62,7 @@
     </nav>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; // <-- PASTE NEW URL HERE
+        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; // <-- PASTE YOUR LATEST URL HERE
         const SECRET_PIN = "1549";
         
         let activeData = [];
@@ -108,8 +108,8 @@
             const titles = { 'home': 'Home', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s' };
             document.getElementById('header-title').innerText = titles[tab];
             
-            // Adjust Sub-Nav Label for NCDs
-            document.getElementById('btn-bank').innerText = (tab === 'ncd') ? 'Company-wise' : 'Bank-wise';
+            // UPDATED: Dynamically change "Bank-wise" to "NCD-wise" when on the NCD tab
+            document.getElementById('btn-bank').innerText = (tab === 'ncd') ? 'NCD-wise' : 'Bank-wise';
             
             document.getElementById('sub-nav').style.display = tab === 'home' ? 'none' : 'flex';
             document.getElementById('view-home').style.display = tab === 'home' ? 'block' : 'none';
@@ -182,7 +182,6 @@
         function updateStats() {
             const total = activeData.reduce((s, item) => s + item.amount, 0);
             
-            // For NCDs, we don't have a 'Maturity Amount' column from the script, so we just show Investment
             if (currentTab === 'ncd') {
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
             } else {
@@ -204,7 +203,6 @@
                 if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
                 acc[y].months[m].items.push(item);
                 
-                // If it's an NCD, we track amount. If FD, maturityAmount.
                 const valToAdd = currentTab === 'ncd' ? item.amount : item.maturityAmount;
                 acc[y].total += valToAdd; 
                 acc[y].months[m].total += valToAdd;
@@ -236,7 +234,6 @@
 
         function renderBankOrCompany(container) {
             const groups = activeData.reduce((acc, item) => {
-                // Determine if we group by Bank or Company
                 const groupKey = currentTab === 'ncd' ? item.company : item.bank;
                 
                 if(!acc[groupKey]) acc[groupKey] = { items: [], total: 0, inv: 0 };
@@ -268,32 +265,39 @@
         }
 
         function renderTable(items) {
-            // Adjust table header based on if it's NCD or FD
-            const secondColHeader = currentTab === 'ncd' ? 'Company' : 'Mat.Amt';
+            const isNCD = currentTab === 'ncd';
             
+            // UPDATED: Dynamically generate headers (drop the second column if NCD)
+            let theadHtml = `
+                <tr>
+                    <th class="p-2 text-center w-1/3">Amt</th>
+                    ${!isNCD ? '<th class="p-2 text-center w-1/3">Mat.Amt</th>' : ''}
+                    <th class="p-2 text-center">Date</th>
+                    <th class="p-2 text-center">Rate</th>
+                </tr>
+            `;
+
+            // UPDATED: Dynamically generate rows (drop the second column if NCD)
+            let tbodyHtml = items.map(item => {
+                
+                // Safety check to ensure we format the rate properly, avoiding double '%' signs
+                let formattedRate = String(item.rate);
+                if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
+
+                return `<tr>
+                    <td class="p-2 text-center">${displayMoney(item.amount)}</td>
+                    ${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white">${displayMoney(item.maturityAmount)}</td>` : ''}
+                    <td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
+                    <td class="p-2 text-center">${formattedRate}</td>
+                </tr>`;
+            }).join('');
+
             return `<table class="w-full text-[10px] dark:text-gray-300">
                 <thead class="bg-gray-50 dark:bg-gray-700 text-gray-500 uppercase">
-                    <tr>
-                        <th class="p-2 text-center">Amt</th>
-                        <th class="p-2 text-center">${secondColHeader}</th>
-                        <th class="p-2 text-center">Date</th>
-                        <th class="p-2 text-center">Rate</th>
-                    </tr>
+                    ${theadHtml}
                 </thead>
                 <tbody class="divide-y dark:divide-gray-700">
-                    ${items.map(item => {
-                        // Adjust row data based on NCD vs FD
-                        const secondColData = currentTab === 'ncd' 
-                            ? `<span class="truncate block w-20 mx-auto">${item.company}</span>` 
-                            : `${displayMoney(item.maturityAmount)}`;
-                            
-                        return `<tr>
-                            <td class="p-2 text-center">${displayMoney(item.amount)}</td>
-                            <td class="p-2 text-center font-bold text-gray-900 dark:text-white">${secondColData}</td>
-                            <td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
-                            <td class="p-2 text-center">${item.rate}</td>
-                        </tr>`;
-                    }).join('')}
+                    ${tbodyHtml}
                 </tbody>
             </table>`;
         }
