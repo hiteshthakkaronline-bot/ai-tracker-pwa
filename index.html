@@ -62,7 +62,7 @@
     </nav>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; // <-- PASTE YOUR LATEST URL HERE
+        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; // <-- PASTE YOUR GOOGLE SCRIPT URL HERE
         const SECRET_PIN = "1549";
         
         let activeData = [];
@@ -108,7 +108,6 @@
             const titles = { 'home': 'Home', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s' };
             document.getElementById('header-title').innerText = titles[tab];
             
-            // UPDATED: Dynamically change "Bank-wise" to "NCD-wise" when on the NCD tab
             document.getElementById('btn-bank').innerText = (tab === 'ncd') ? 'NCD-wise' : 'Bank-wise';
             
             document.getElementById('sub-nav').style.display = tab === 'home' ? 'none' : 'flex';
@@ -236,10 +235,21 @@
             const groups = activeData.reduce((acc, item) => {
                 const groupKey = currentTab === 'ncd' ? item.company : item.bank;
                 
-                if(!acc[groupKey]) acc[groupKey] = { items: [], total: 0, inv: 0 };
-                acc[groupKey].items.push(item); 
+                // Initialize the group if it doesn't exist, adding a variable for weighted rate calculations
+                if(!acc[groupKey]) {
+                    acc[groupKey] = { items: [], total: 0, inv: 0, weightedRateSum: 0, weightedInv: 0 };
+                }
                 
+                acc[groupKey].items.push(item); 
                 acc[groupKey].inv += item.amount;
+                
+                // Calculate components for Weighted Average Rate
+                let rateNum = parseFloat(String(item.rate).replace('%', ''));
+                if (!isNaN(rateNum)) {
+                    acc[groupKey].weightedRateSum += (item.amount * rateNum);
+                    acc[groupKey].weightedInv += item.amount;
+                }
+
                 if (currentTab !== 'ncd') acc[groupKey].total += item.maturityAmount;
                 
                 return acc;
@@ -249,14 +259,20 @@
             Object.keys(groups).sort().forEach(key => {
                 groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
 
+                // Calculate the final Weighted Average Rate
+                const weightedAvgRate = (groups[key].weightedInv > 0) 
+                    ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' 
+                    : 'N/A';
+
+                // Display formatting: Commas separating Inv and Rate for NCDs
                 const statsHtml = currentTab === 'ncd' 
-                    ? `Inv: <b class="text-gray-900 dark:text-white">${displayMoney(groups[key].inv)}</b>`
+                    ? `Inv: <b class="text-gray-900 dark:text-white">${displayMoney(groups[key].inv)}</b>, <b class="text-gray-900 dark:text-white">${weightedAvgRate}</b>`
                     : `Inv: ${displayMoney(groups[key].inv)}<br><b class="text-gray-900 dark:text-white">Mat: ${displayMoney(groups[key].total)}</b>`;
 
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow border dark:border-gray-700 mb-4 overflow-hidden">
                     <div class="p-3 bg-gray-100 dark:bg-gray-700 flex justify-between dark:text-white">
-                        <h3 class="font-bold text-sm w-2/3 truncate pr-2">${key}</h3>
-                        <div class="text-[10px] text-right w-1/3">${statsHtml}</div>
+                        <h3 class="font-bold text-sm w-1/2 truncate pr-2">${key}</h3>
+                        <div class="text-[10px] text-right w-1/2 leading-tight">${statsHtml}</div>
                     </div>
                     <div class="overflow-x-auto">${renderTable(groups[key].items)}</div>
                 </div>`;
@@ -267,7 +283,6 @@
         function renderTable(items) {
             const isNCD = currentTab === 'ncd';
             
-            // UPDATED: Dynamically generate headers (drop the second column if NCD)
             let theadHtml = `
                 <tr>
                     <th class="p-2 text-center w-1/3">Amt</th>
@@ -277,16 +292,17 @@
                 </tr>
             `;
 
-            // UPDATED: Dynamically generate rows (drop the second column if NCD)
             let tbodyHtml = items.map(item => {
-                
-                // Safety check to ensure we format the rate properly, avoiding double '%' signs
                 let formattedRate = String(item.rate);
                 if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
 
+                const secondColData = currentTab === 'ncd' 
+                    ? `<span class="truncate block w-20 mx-auto">${item.company}</span>` 
+                    : `${displayMoney(item.maturityAmount)}`;
+                    
                 return `<tr>
                     <td class="p-2 text-center">${displayMoney(item.amount)}</td>
-                    ${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white">${displayMoney(item.maturityAmount)}</td>` : ''}
+                    ${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white">${secondColData}</td>` : ''}
                     <td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
                     <td class="p-2 text-center">${formattedRate}</td>
                 </tr>`;
