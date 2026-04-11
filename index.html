@@ -232,6 +232,9 @@
         }
 
         function renderBankOrCompany(container) {
+            // Calculate grand total to determine % of investment
+            const grandTotalInv = activeData.reduce((sum, item) => sum + item.amount, 0);
+
             const groups = activeData.reduce((acc, item) => {
                 const groupKey = currentTab === 'ncd' ? item.company : item.bank;
                 
@@ -261,11 +264,19 @@
                     ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' 
                     : 'N/A';
 
-                const statsHtml = currentTab === 'ncd' 
-                    ? `Inv: <b class="text-gray-900 dark:text-white">${displayMoney(groups[key].inv)}</b>, <b class="text-gray-900 dark:text-white">${weightedAvgRate}</b>`
-                    : `Inv: ${displayMoney(groups[key].inv)}<br><b class="text-gray-900 dark:text-white">Mat: ${displayMoney(groups[key].total)}</b>`;
+                const percentOfTotal = (grandTotalInv > 0)
+                    ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%'
+                    : '0.0%';
 
-                // UPDATED: Replaced 'truncate w-1/2' with a responsive wrapped element (w-1/3 whitespace-normal)
+                // UPDATED: Added percentages and weighted average for FD Views
+                let statsHtml = '';
+                if (currentTab === 'ncd') {
+                    statsHtml = `Inv: <b class="text-gray-900 dark:text-white">${displayMoney(groups[key].inv)}</b>, <b class="text-gray-900 dark:text-white">${weightedAvgRate}</b>`;
+                } else {
+                    statsHtml = `Inv: ${displayMoney(groups[key].inv)} <span class="text-gray-500 dark:text-gray-400">(${percentOfTotal})</span><br>
+                                 <b class="text-gray-900 dark:text-white">Mat: ${displayMoney(groups[key].total)} <span class="text-gray-500 dark:text-gray-400">(${weightedAvgRate})</span></b>`;
+                }
+
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between dark:text-white text-left items-center">
                         <h3 class="font-bold text-sm w-1/3 pr-2 whitespace-normal break-words leading-tight">${key}</h3>
@@ -279,14 +290,11 @@
             container.innerHTML = html;
         }
 
-        // UPDATED: Dynamically adjusts columns based on Maturity vs Bank-wise view and applies text wrapping
         function renderTable(items) {
             const isNCD = currentTab === 'ncd';
             const isMaturity = currentSubView === 'maturity';
             
             let theadHtml = `<tr>`;
-            
-            // Limit the NBFC header to 1/3 width to prevent it from overwhelming the screen
             if (isMaturity) {
                 theadHtml += `<th class="p-2 text-center w-1/3">NBFC</th>`;
             }
@@ -306,7 +314,6 @@
                 
                 let rowHtml = `<tr>`;
                 
-                // Allow the NBFC name to wrap natively within its column constraints
                 if (isMaturity) {
                     rowHtml += `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto">${nbfcName}</span></td>`;
                 }
