@@ -1,5 +1,5 @@
 // Change the version number (e.g., v1, v2) every time you update your code/CSS
-const CACHE_NAME = 'ai-tracker-v1.7';
+const CACHE_NAME = 'ai-tracker-v1.8';
 
 // List all the static files you want to work offline
 const ASSETS_TO_CACHE = [
@@ -44,13 +44,31 @@ self.addEventListener('fetch', (event) => {
   // Check if the request is for your Google Apps Script API
   // We want the API to ALWAYS go to the network for fresh data
   if (event.request.url.includes('script.google.com')) {
-    return event.respondWith(fetch(event.request));
+    event.respondWith(fetch(event.request));
+    return;
   }
 
-  // For everything else (HTML, Icons, Tailwind), serve from cache first
+  // For everything else (HTML, Icons, Tailwind), use Cache First with a Dynamic Fallback
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    caches.match(event.request).then((cachedResponse) => {
+      // If the file is in the cache, serve it instantly
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      
+      // If the file is NOT in the cache, fetch it from the internet...
+      return fetch(event.request).then((networkResponse) => {
+        // ...and dynamically save a copy to the cache so we have it for next time!
+        return caches.open(CACHE_NAME).then((cache) => {
+          // Only cache valid responses to prevent caching errors
+          if (networkResponse && networkResponse.status === 200) {
+            cache.put(event.request, networkResponse.clone());
+          }
+          return networkResponse;
+        });
+      }).catch((error) => {
+        console.error('[Service Worker] Network request failed:', error);
+      });
     })
   );
 });
