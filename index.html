@@ -210,7 +210,6 @@
 
             let html = '';
             Object.keys(groups).sort().forEach(y => {
-                // UPDATED: Removed the word "Year" from the header
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg">
                         <span>${y}</span> <span>${displayMoney(groups[y].total)}</span>
@@ -266,10 +265,11 @@
                     ? `Inv: <b class="text-gray-900 dark:text-white">${displayMoney(groups[key].inv)}</b>, <b class="text-gray-900 dark:text-white">${weightedAvgRate}</b>`
                     : `Inv: ${displayMoney(groups[key].inv)}<br><b class="text-gray-900 dark:text-white">Mat: ${displayMoney(groups[key].total)}</b>`;
 
+                // UPDATED: Replaced 'truncate w-1/2' with a responsive wrapped element (w-1/3 whitespace-normal)
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between dark:text-white text-left items-center">
-                        <h3 class="font-bold text-sm w-1/2 truncate pr-2">${key}</h3>
-                        <div class="text-[10px] text-right w-1/2 leading-tight">${statsHtml}</div>
+                        <h3 class="font-bold text-sm w-1/3 pr-2 whitespace-normal break-words leading-tight">${key}</h3>
+                        <div class="text-[10px] text-right w-2/3 leading-tight">${statsHtml}</div>
                     </button>
                     <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">
                         ${renderTable(groups[key].items)}
@@ -279,14 +279,16 @@
             container.innerHTML = html;
         }
 
-        // UPDATED: Dynamically adjusts columns based on Maturity vs Bank-wise view
+        // UPDATED: Dynamically adjusts columns based on Maturity vs Bank-wise view and applies text wrapping
         function renderTable(items) {
             const isNCD = currentTab === 'ncd';
             const isMaturity = currentSubView === 'maturity';
             
             let theadHtml = `<tr>`;
+            
+            // Limit the NBFC header to 1/3 width to prevent it from overwhelming the screen
             if (isMaturity) {
-                theadHtml += `<th class="p-2 text-center">NBFC</th>`;
+                theadHtml += `<th class="p-2 text-center w-1/3">NBFC</th>`;
             }
             theadHtml += `<th class="p-2 text-center">Amt</th>`;
             if (!isNCD) {
@@ -304,19 +306,19 @@
                 
                 let rowHtml = `<tr>`;
                 
-                // Add the NBFC column only in the Maturity sub-view
+                // Allow the NBFC name to wrap natively within its column constraints
                 if (isMaturity) {
-                    rowHtml += `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200"><span class="truncate block w-16 mx-auto" title="${nbfcName}">${nbfcName}</span></td>`;
+                    rowHtml += `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto">${nbfcName}</span></td>`;
                 }
                 
-                rowHtml += `<td class="p-2 text-center">${displayMoney(item.amount)}</td>`;
+                rowHtml += `<td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>`;
                 
                 if (!isNCD) {
-                    rowHtml += `<td class="p-2 text-center font-bold text-gray-900 dark:text-white">${displayMoney(item.maturityAmount)}</td>`;
+                    rowHtml += `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>`;
                 }
                 
-                rowHtml += `<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>`;
-                rowHtml += `<td class="p-2 text-center">${formattedRate}</td>`;
+                rowHtml += `<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>`;
+                rowHtml += `<td class="p-2 text-center align-middle">${formattedRate}</td>`;
                 rowHtml += `</tr>`;
 
                 return rowHtml;
