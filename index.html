@@ -291,7 +291,7 @@
                             <td class="p-2 text-center">${displayMoney(item.amount)}</td>
                             <td class="p-2 text-center font-bold text-gray-900 dark:text-white">${secondColData}</td>
                             <td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
-                            <td class="p-2 text-center">${item.rate}%</td>
+                            <td class="p-2 text-center">${item.rate}</td>
                         </tr>`;
                     }).join('')}
                 </tbody>
