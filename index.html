@@ -12,6 +12,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
         window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -95,10 +97,7 @@
             <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
         </header>
 
-        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40" style="display: none;">
-            <button onclick="showSubView('maturity')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white" id="btn-maturity">Maturity</button>
-            <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none" id="btn-bank">Bank-wise</button>
-        </div>
+        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40"></div>
 
         <main id="app-content" class="p-2 space-y-4"></main>
 
@@ -106,7 +105,7 @@
             <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform" aria-label="Scroll to Top">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </button>
-            <button id="fab-back" onclick="switchMainTab('home')" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform" aria-label="Back to Home">
+            <button id="fab-back" onclick="switchMainTab('home')" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform" aria-label="Back to Home" style="display: none;">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m7 7l-7-7 7-7"></path></svg>
             </button>
         </div>
@@ -132,7 +131,6 @@
     </div>
 
     <script>
-        // Removes Splash Screen once Tailwind has processed the HTML
         window.addEventListener('DOMContentLoaded', () => {
             const root = document.getElementById('app-root');
             const splash = document.getElementById('native-splash');
@@ -141,11 +139,13 @@
             setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
         });
 
-        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; // <-- REPLACE IF NEEDED
+        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; 
         const SECRET_PIN = "1549";
         
         let activeData = [];
-        let currentTab = 'home', currentSubView = 'maturity', isPrivacyMode = true;
+        let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
+        let assetChartInstance = null; // Used to prevent chart duplication
+        
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -164,6 +164,11 @@
             else el.classList.remove('dark');
             localStorage.setItem('theme', theme);
             updateIcons();
+            
+            // Re-render dashboard if active to update chart colors
+            if (currentTab === 'home' && currentSubView === 'dashboard' && activeData.length > 0) {
+                renderView();
+            }
         }
 
         function toggleTheme() {
@@ -186,12 +191,25 @@
             currentTab = tab;
             const titles = { 'home': 'Net Worth', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s' };
             document.getElementById('header-title').innerText = titles[tab];
-            document.getElementById('btn-bank').innerText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
             
-            // Toggle the visibility of the sub-nav via inline style so it successfully overrides standard behavior
-            document.getElementById('sub-nav').style.display = tab === 'home' ? 'none' : 'flex';
+            const subNav = document.getElementById('sub-nav');
             
-            // Back button logic
+            // Generate Sub-Nav Buttons Dynamically
+            if (tab === 'home') {
+                currentSubView = 'dashboard';
+                subNav.innerHTML = `
+                    <button onclick="showSubView('dashboard')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors" id="btn-dashboard">Dashboard</button>
+                    <button onclick="showSubView('networth')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-networth">Net Worth</button>
+                `;
+            } else {
+                currentSubView = 'maturity';
+                const bankText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
+                subNav.innerHTML = `
+                    <button onclick="showSubView('maturity')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors" id="btn-maturity">Maturity</button>
+                    <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-bank">${bankText}</button>
+                `;
+            }
+
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
 
@@ -200,12 +218,10 @@
                 btn.className = `flex flex-col items-center w-1/4 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
-            // Fetch data for ALL tabs (including Home)
             document.getElementById('app-content').innerHTML = '<div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div></div>';
             document.getElementById('global-stats').innerHTML = 'Fetching data...';
             
             try {
-                // Map the tab string to the exact parameter our script expects
                 const paramMap = { 'home': 'HOME', 'fds': 'HT', 'nct': 'NCT', 'ncd': 'NCD' };
                 const response = await fetch(`${API_URL}?user=${paramMap[tab]}`);
                 const data = await response.json();
@@ -224,24 +240,25 @@
 
         function showSubView(view) {
             currentSubView = view;
-            const mBtn = document.getElementById('btn-maturity');
-            const bBtn = document.getElementById('btn-bank');
-            const active = "flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white";
-            const inactive = "flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none";
+            const active = "flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
+            const inactive = "flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
             
-            mBtn.className = view === 'maturity' ? active : inactive;
-            bBtn.className = view === 'bank' ? active : inactive;
+            if (currentTab === 'home') {
+                document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
+                document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
+            } else {
+                document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
+                document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
+            }
             renderView();
         }
 
-        // --- AUTH & DATA ---
         function togglePrivacy() { isPrivacyMode = !isPrivacyMode; updateIcons(); updateStats(); renderView(); }
         function displayMoney(amt) { return isPrivacyMode ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); }
 
         function validatePin() {
             const pinInput = document.getElementById('pin-input');
             if (pinInput.value === SECRET_PIN) {
-                // Blur the input field to force the mobile keyboard to close
                 pinInput.blur();
                 sessionStorage.setItem('isUnlocked', 'true');
                 document.getElementById('pin-overlay').classList.add('opacity-0', 'pointer-events-none');
@@ -278,19 +295,106 @@
         function renderView() {
             const container = document.getElementById('app-content');
             if (currentTab === 'home') {
-                renderHome(container);
-            } else if (currentSubView === 'maturity') {
-                renderMaturity(container);
+                if (currentSubView === 'dashboard') renderDashboard(container);
+                else renderHome(container); // The original Net Worth view
             } else {
-                renderBankOrCompany(container);
+                if (currentSubView === 'maturity') renderMaturity(container);
+                else renderBankOrCompany(container);
             }
         }
 
-        // --- RENDER FUNCTIONS ---
+        // --- DASHBOARD VIEW (Asset Allocation Chart) ---
+        function renderDashboard(container) {
+            const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
+            
+            // Group and sum amounts by Asset Class
+            const classTotals = activeData.reduce((acc, item) => {
+                const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
+                acc[aClass] = (acc[aClass] || 0) + item.amount;
+                return acc;
+            }, {});
+
+            // Sort classes so largest is first
+            const sortedClasses = Object.keys(classTotals).sort((a, b) => classTotals[b] - classTotals[a]);
+            const data = sortedClasses.map(key => classTotals[key]);
+
+            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
+
+            let html = `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
+                    <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4 uppercase tracking-wider">Asset Allocation</h2>
+                    <div class="relative w-full max-w-[280px] aspect-square">
+                        <canvas id="assetChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
+                    <ul class="divide-y dark:divide-gray-700">
+            `;
+            
+            // Custom Legend
+            sortedClasses.forEach((label, i) => {
+                const amount = classTotals[label];
+                const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
+                const color = bgColors[i % bgColors.length];
+                
+                html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200">
+                    <div class="flex items-center gap-3 w-1/2">
+                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${color}"></span>
+                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate">${label}</span>
+                    </div>
+                    <div class="w-1/2 text-right flex flex-col">
+                        <span class="font-bold text-base leading-tight">${displayMoney(amount)}</span>
+                        <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${percent}</span>
+                    </div>
+                </li>`;
+            });
+            html += `</ul></div>`;
+            
+            container.innerHTML = html;
+
+            // Render Chart.js Donut
+            const ctx = document.getElementById('assetChart').getContext('2d');
+            
+            if (assetChartInstance) {
+                assetChartInstance.destroy();
+            }
+            
+            // Make the label tooltips respect privacy mode
+            assetChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: sortedClasses,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: bgColors,
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.raw;
+                                    const pct = grandTotal > 0 ? (val / grandTotal * 100).toFixed(1) + '%' : '0%';
+                                    return ` ${context.label}: ${displayMoney(val)} (${pct})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- NET WORTH LIST VIEW ---
         function renderHome(container) {
             const totalAmount = activeData.reduce((sum, item) => sum + item.amount, 0);
-
-            // Sort strictly descending by amount/percentage
             activeData.sort((a, b) => b.amount - a.amount);
 
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
