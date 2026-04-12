@@ -144,7 +144,7 @@
         
         let activeData = [];
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
-        let assetChartInstance = null; // Used to prevent chart duplication
+        let currentChartInstance = null; // Reusable chart instance for all tabs
         
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -165,8 +165,8 @@
             localStorage.setItem('theme', theme);
             updateIcons();
             
-            // Re-render dashboard if active to update chart colors
-            if (currentTab === 'home' && currentSubView === 'dashboard' && activeData.length > 0) {
+            // Re-render view if active to update chart colors on theme toggle
+            if (activeData.length > 0) {
                 renderView();
             }
         }
@@ -194,7 +194,6 @@
             
             const subNav = document.getElementById('sub-nav');
             
-            // Generate Sub-Nav Buttons Dynamically
             if (tab === 'home') {
                 currentSubView = 'dashboard';
                 subNav.innerHTML = `
@@ -292,47 +291,89 @@
             }
         }
 
+        // --- GLOBAL CHART RENDERER ---
+        function renderSharedChart(canvasId, labels, data, totalValue) {
+            const ctx = document.getElementById(canvasId);
+            if (!ctx) return;
+            
+            if (currentChartInstance) {
+                currentChartInstance.destroy();
+            }
+            
+            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4', '#84CC16', '#6366F1'];
+            
+            currentChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: bgColors.slice(0, labels.length),
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const val = context.raw;
+                                    const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%';
+                                    return ` ${context.label}: ${displayMoney(val)} (${pct})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
         function renderView() {
             const container = document.getElementById('app-content');
+            if (activeData.length === 0) {
+                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>';
+                return;
+            }
+
             if (currentTab === 'home') {
                 if (currentSubView === 'dashboard') renderDashboard(container);
-                else renderHome(container); // The original Net Worth view
+                else renderHome(container); 
             } else {
                 if (currentSubView === 'maturity') renderMaturity(container);
                 else renderBankOrCompany(container);
             }
         }
 
-        // --- DASHBOARD VIEW (Asset Allocation Chart) ---
+        // --- DASHBOARD VIEW (Home Tab) ---
         function renderDashboard(container) {
             const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
             
-            // Group and sum amounts by Asset Class
             const classTotals = activeData.reduce((acc, item) => {
                 const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
                 acc[aClass] = (acc[aClass] || 0) + item.amount;
                 return acc;
             }, {});
 
-            // Sort classes so largest is first
             const sortedClasses = Object.keys(classTotals).sort((a, b) => classTotals[b] - classTotals[a]);
-            const data = sortedClasses.map(key => classTotals[key]);
-
+            const chartData = sortedClasses.map(key => classTotals[key]);
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
 
             let html = `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
-                    <h2 class="text-lg font-bold text-gray-800 dark:text-white mb-4 uppercase tracking-wider">Asset Allocation</h2>
-                    <div class="relative w-full max-w-[280px] aspect-square">
-                        <canvas id="assetChart"></canvas>
+                    <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
+                    <div class="relative w-full max-w-[240px] aspect-square">
+                        <canvas id="tabChart"></canvas>
                     </div>
                 </div>
-                
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
                     <ul class="divide-y dark:divide-gray-700">
             `;
             
-            // Custom Legend
             sortedClasses.forEach((label, i) => {
                 const amount = classTotals[label];
                 const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
@@ -349,53 +390,15 @@
                     </div>
                 </li>`;
             });
-            html += `</ul></div>`;
             
-            container.innerHTML = html;
-
-            // Render Chart.js Donut
-            const ctx = document.getElementById('assetChart').getContext('2d');
-            
-            if (assetChartInstance) {
-                assetChartInstance.destroy();
-            }
-            
-            // Make the label tooltips respect privacy mode
-            assetChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: sortedClasses,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: bgColors,
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '65%',
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const val = context.raw;
-                                    const pct = grandTotal > 0 ? (val / grandTotal * 100).toFixed(1) + '%' : '0%';
-                                    return ` ${context.label}: ${displayMoney(val)} (${pct})`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+            container.innerHTML = html + `</ul></div>`;
+            renderSharedChart('tabChart', sortedClasses, chartData, grandTotal);
         }
 
-        // --- NET WORTH LIST VIEW ---
+        // --- NET WORTH LIST VIEW (Home Tab) ---
         function renderHome(container) {
             const totalAmount = activeData.reduce((sum, item) => sum + item.amount, 0);
-            activeData.sort((a, b) => b.amount - a.amount);
+            const sortedData = [...activeData].sort((a, b) => b.amount - a.amount);
 
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
                 <div class="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center dark:text-white border-b dark:border-gray-600 gap-2">
@@ -405,7 +408,7 @@
                 </div>
                 <ul class="divide-y dark:divide-gray-700">`;
 
-            activeData.forEach(item => {
+            sortedData.forEach(item => {
                 const percent = totalAmount > 0 ? (item.amount / totalAmount * 100).toFixed(2) + '%' : '0.00%';
                 const assetClass = item.assetClass || '-';
                 
@@ -419,10 +422,10 @@
                 </li>`;
             });
 
-            html += `</ul></div>`;
-            container.innerHTML = html || '<p class="text-center p-10 dark:text-gray-400">No assets found.</p>';
+            container.innerHTML = html + `</ul></div>`;
         }
 
+        // --- MATURITY VIEW ---
         function renderMaturity(container) {
             const grandTotalVal = activeData.reduce((sum, item) => sum + (currentTab === 'ncd' ? item.amount : item.maturityAmount), 0);
 
@@ -438,7 +441,25 @@
                 return acc;
             }, {});
 
-            let html = '';
+            // Prepare Chart Data (Grouped by Year)
+            const chartLabels = [];
+            const chartData = [];
+            Object.keys(groups).sort().forEach(y => {
+                chartLabels.push(y);
+                chartData.push(groups[y].total);
+            });
+
+            // Inject Dashboard Chart at Top
+            let html = `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
+                    <h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2>
+                    <div class="relative w-full max-w-[200px] aspect-square">
+                        <canvas id="tabChart"></canvas>
+                    </div>
+                </div>
+            `;
+
+            // Build Accordion List
             Object.keys(groups).sort().forEach(y => {
                 const yearlyTotal = groups[y].total;
                 const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
@@ -464,18 +485,18 @@
                 });
                 html += `</div></div>`;
             });
-            container.innerHTML = html || '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>';
+            
+            container.innerHTML = html;
+            renderSharedChart('tabChart', chartLabels, chartData, grandTotalVal);
         }
 
+        // --- BANK OR COMPANY VIEW ---
         function renderBankOrCompany(container) {
             const grandTotalInv = activeData.reduce((sum, item) => sum + item.amount, 0);
 
             const groups = activeData.reduce((acc, item) => {
                 const groupKey = currentTab === 'ncd' ? item.company : item.bank;
-                
-                if(!acc[groupKey]) {
-                    acc[groupKey] = { items: [], total: 0, inv: 0, weightedRateSum: 0, weightedInv: 0 };
-                }
+                if(!acc[groupKey]) { acc[groupKey] = { items: [], total: 0, inv: 0, weightedRateSum: 0, weightedInv: 0 }; }
                 
                 acc[groupKey].items.push(item); 
                 acc[groupKey].inv += item.amount;
@@ -487,11 +508,26 @@
                 }
 
                 if (currentTab !== 'ncd') acc[groupKey].total += item.maturityAmount;
-                
                 return acc;
             }, {});
 
-            let html = '';
+            // Prepare Chart Data (Grouped by Bank/NBFC, Sorted by Inv Amount)
+            const sortedBanks = Object.keys(groups).sort((a, b) => groups[b].inv - groups[a].inv);
+            const chartLabels = sortedBanks;
+            const chartData = sortedBanks.map(k => groups[k].inv);
+            const chartTitle = currentTab === 'ncd' ? 'NBFC Allocation' : 'Bank Allocation';
+
+            // Inject Dashboard Chart at Top
+            let html = `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
+                    <h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">${chartTitle}</h2>
+                    <div class="relative w-full max-w-[200px] aspect-square">
+                        <canvas id="tabChart"></canvas>
+                    </div>
+                </div>
+            `;
+
+            // Build Accordion List (Sorted alphabetically originally, maintaining that or switching to amount sort? Let's keep original alphabetical for list predictability)
             Object.keys(groups).sort().forEach(key => {
                 groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
 
@@ -520,7 +556,9 @@
                     </div>
                 </div>`;
             });
+            
             container.innerHTML = html;
+            renderSharedChart('tabChart', chartLabels, chartData, grandTotalInv);
         }
 
         function renderTable(items) {
