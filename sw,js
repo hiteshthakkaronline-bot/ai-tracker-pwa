@@ -1,13 +1,12 @@
 // Change the version number (e.g., v1, v2) every time you update your code/CSS
-const CACHE_NAME = 'ai-tracker-v1.9';
+const CACHE_NAME = 'ai-tracker-v2.0';
 
 // List all the static files you want to work offline
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './icons/rupee.png',
-  'https://cdn.tailwindcss.com'
+  './icons/rupee.png'
 ];
 
 // 1. Install Event: Saves the 'App Shell' to the phone's storage
