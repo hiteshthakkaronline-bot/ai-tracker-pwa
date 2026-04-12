@@ -67,19 +67,17 @@
         <header class="bg-[#5D6B7F] dark:bg-[#2D3748] p-4 text-white shadow-md sticky top-0 z-50 grid grid-cols-[40px_1fr_40px] items-center text-center">
             <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
             <div>
-                <h1 id="header-title" class="text-lg font-bold uppercase tracking-tight">HT FDs</h1>
+                <h1 id="header-title" class="text-lg font-bold uppercase tracking-tight">Home</h1>
                 <div id="global-stats" class="text-[10px] opacity-90">Initializing...</div>
             </div>
             <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
         </header>
 
-        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40">
+        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40 hidden-view">
             <button onclick="showSubView('maturity')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white" id="btn-maturity">Maturity</button>
             <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none" id="btn-bank">Bank-wise</button>
         </div>
 
-        <section id="view-home" class="hidden-view p-10 text-center text-gray-400 font-bold mt-20">HOME DASHBOARD CONTENT</section>
-        
         <main id="app-content" class="p-2 space-y-4"></main>
 
         <div class="fixed bottom-24 right-4 flex flex-col gap-3 z-40">
@@ -119,7 +117,7 @@
             setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
         });
 
-        const API_URL = "YOUR_NEW_WEB_APP_URL"; // <-- PASTE YOUR LATEST GOOGLE SCRIPT URL HERE
+        const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; // <-- REPLACE IF NEEDED
         const SECRET_PIN = "1549";
         
         let activeData = [];
@@ -127,16 +125,19 @@
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
+        // --- THEME ENGINE ---
         function applyInitialTheme() {
             const stored = localStorage.getItem('theme');
             const hour = new Date().getHours();
-            const theme = stored || ((hour >= 18 || hour < 6) ? 'dark' : 'light');
+            const isNight = hour >= 18 || hour < 6; 
+            const theme = stored || (isNight ? 'dark' : 'light');
             setTheme(theme);
         }
 
         function setTheme(theme) {
             const el = document.documentElement;
-            theme === 'dark' ? el.classList.add('dark') : el.classList.remove('dark');
+            if (theme === 'dark') el.classList.add('dark');
+            else el.classList.remove('dark');
             localStorage.setItem('theme', theme);
             updateIcons();
         }
@@ -156,16 +157,17 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
+        // --- NAVIGATION LOGIC ---
         async function switchMainTab(tab) {
             currentTab = tab;
             const titles = { 'home': 'Net Worth', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s' };
             document.getElementById('header-title').innerText = titles[tab];
             document.getElementById('btn-bank').innerText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
             
+            // Sub-nav is hidden on Home Tab
             document.getElementById('sub-nav').style.display = tab === 'home' ? 'none' : 'flex';
-            document.getElementById('view-home').style.display = tab === 'home' ? 'block' : 'none';
-            document.getElementById('app-content').style.display = tab === 'home' ? 'none' : 'block';
-
+            
+            // Back button logic
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
 
@@ -174,16 +176,23 @@
                 btn.className = `flex flex-col items-center w-1/4 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
-            document.getElementById('app-content').innerHTML = '<div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]"></div></div>';
+            // Fetch data for ALL tabs (including Home)
+            document.getElementById('app-content').innerHTML = '<div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div></div>';
             document.getElementById('global-stats').innerHTML = 'Fetching data...';
             
             try {
+                // Map the tab string to the exact parameter our script expects
                 const paramMap = { 'home': 'HOME', 'fds': 'HT', 'nct': 'NCT', 'ncd': 'NCD' };
                 const response = await fetch(`${API_URL}?user=${paramMap[tab]}`);
                 const data = await response.json();
+                
                 if (data.error) throw new Error(data.error);
-                activeData = data; updateStats(); renderView();
+                
+                activeData = data;
+                updateStats();
+                renderView();
             } catch (e) {
+                console.error("App Crash Details:", e);
                 document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">Connection Error:<br>${e.message}</div>`;
                 document.getElementById('global-stats').innerHTML = 'Error loading';
             }
@@ -191,19 +200,24 @@
 
         function showSubView(view) {
             currentSubView = view;
+            const mBtn = document.getElementById('btn-maturity');
+            const bBtn = document.getElementById('btn-bank');
             const active = "flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white";
             const inactive = "flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none";
-            document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
-            document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
+            
+            mBtn.className = view === 'maturity' ? active : inactive;
+            bBtn.className = view === 'bank' ? active : inactive;
             renderView();
         }
 
+        // --- AUTH & DATA ---
         function togglePrivacy() { isPrivacyMode = !isPrivacyMode; updateIcons(); updateStats(); renderView(); }
         function displayMoney(amt) { return isPrivacyMode ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); }
 
         function validatePin() {
             const pinInput = document.getElementById('pin-input');
             if (pinInput.value === SECRET_PIN) {
+                // Blur the input field to force the mobile keyboard to close
                 pinInput.blur();
                 sessionStorage.setItem('isUnlocked', 'true');
                 document.getElementById('pin-overlay').classList.add('opacity-0', 'pointer-events-none');
@@ -226,9 +240,12 @@
 
         function updateStats() {
             const total = activeData.reduce((s, item) => s + item.amount, 0);
-            if (currentTab === 'home') document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
-            else if (currentTab === 'ncd') document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
-            else {
+            
+            if (currentTab === 'home') {
+                document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
+            } else if (currentTab === 'ncd') {
+                document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
+            } else {
                 const mat = activeData.reduce((s, f) => s + f.maturityAmount, 0);
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)} | Mat: ${displayMoney(mat)}`;
             }
@@ -236,40 +253,57 @@
 
         function renderView() {
             const container = document.getElementById('app-content');
-            if (currentTab === 'home') renderHome(container);
-            else if (currentSubView === 'maturity') renderMaturity(container);
-            else renderBankOrCompany(container);
+            if (currentTab === 'home') {
+                renderHome(container);
+            } else if (currentSubView === 'maturity') {
+                renderMaturity(container);
+            } else {
+                renderBankOrCompany(container);
+            }
         }
 
+        // --- RENDER FUNCTIONS ---
         function renderHome(container) {
             const totalAmount = activeData.reduce((sum, item) => sum + item.amount, 0);
+
+            // Sort strictly descending by amount/percentage
             activeData.sort((a, b) => b.amount - a.amount);
+
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
                 <div class="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between dark:text-white border-b dark:border-gray-600">
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/2">Asset Class</h3>
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/2 text-right">Allocation</h3>
-                </div><ul class="divide-y dark:divide-gray-700">`;
+                </div>
+                <ul class="divide-y dark:divide-gray-700">`;
+
             activeData.forEach(item => {
                 const percent = totalAmount > 0 ? (item.amount / totalAmount * 100).toFixed(2) + '%' : '0.00%';
+                
                 html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <div class="font-semibold text-gray-800 dark:text-white w-1/2 pr-2 leading-tight">${item.asset}</div>
                     <div class="w-1/2 text-right flex flex-col justify-center">
                         <span class="font-bold text-lg leading-tight">${displayMoney(item.amount)}</span>
                         <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400 mt-1">${percent}</span>
-                    </div></li>`;
+                    </div>
+                </li>`;
             });
-            container.innerHTML = html + `</ul></div>` || '<p class="text-center p-10 dark:text-gray-400">No assets found.</p>';
+
+            html += `</ul></div>`;
+            container.innerHTML = html || '<p class="text-center p-10 dark:text-gray-400">No assets found.</p>';
         }
 
         function renderMaturity(container) {
             const grandTotalVal = activeData.reduce((sum, item) => sum + (currentTab === 'ncd' ? item.amount : item.maturityAmount), 0);
+
             const groups = activeData.reduce((acc, item) => {
                 const d = new Date(item.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
                 if(!acc[y]) acc[y] = { months: {}, total: 0 };
                 if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
                 acc[y].months[m].items.push(item);
+                
                 const valToAdd = currentTab === 'ncd' ? item.amount : item.maturityAmount;
-                acc[y].total += valToAdd; acc[y].months[m].total += valToAdd;
+                acc[y].total += valToAdd; 
+                acc[y].months[m].total += valToAdd;
                 return acc;
             }, {});
 
@@ -277,15 +311,19 @@
             Object.keys(groups).sort().forEach(y => {
                 const yearlyTotal = groups[y].total;
                 const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
+
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg">
                         <span>${y}</span> <span>${yearPercent}%, ${displayMoney(yearlyTotal)}</span>
-                    </button><div class="accordion-content">`;
+                    </button>
+                    <div class="accordion-content">`;
                 
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
                     groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+
                     const monthlyTotal = groups[y].months[m].total;
                     const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
+
                     html += `<div class="border-l-4 border-[#5D6B7F] ml-2">
                         <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200">
                             <span>${m}</span> <span>${percent}%, ${displayMoney(monthlyTotal)}</span>
@@ -300,61 +338,114 @@
 
         function renderBankOrCompany(container) {
             const grandTotalInv = activeData.reduce((sum, item) => sum + item.amount, 0);
+
             const groups = activeData.reduce((acc, item) => {
                 const groupKey = currentTab === 'ncd' ? item.company : item.bank;
-                if(!acc[groupKey]) acc[groupKey] = { items: [], total: 0, inv: 0, weightedRateSum: 0, weightedInv: 0 };
-                acc[groupKey].items.push(item); acc[groupKey].inv += item.amount;
+                
+                if(!acc[groupKey]) {
+                    acc[groupKey] = { items: [], total: 0, inv: 0, weightedRateSum: 0, weightedInv: 0 };
+                }
+                
+                acc[groupKey].items.push(item); 
+                acc[groupKey].inv += item.amount;
+                
                 let rateNum = parseFloat(String(item.rate).replace('%', ''));
-                if (!isNaN(rateNum)) { acc[groupKey].weightedRateSum += (item.amount * rateNum); acc[groupKey].weightedInv += item.amount; }
+                if (!isNaN(rateNum)) {
+                    acc[groupKey].weightedRateSum += (item.amount * rateNum);
+                    acc[groupKey].weightedInv += item.amount;
+                }
+
                 if (currentTab !== 'ncd') acc[groupKey].total += item.maturityAmount;
+                
                 return acc;
             }, {});
 
             let html = '';
             Object.keys(groups).sort().forEach(key => {
                 groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
-                const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
-                const percentOfTotal = (grandTotalInv > 0) ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%' : '0.0%';
 
-                let statsHtml = currentTab === 'ncd' 
-                    ? `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`
-                    : `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
+                const weightedAvgRate = (groups[key].weightedInv > 0) 
+                    ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' 
+                    : 'N/A';
+
+                const percentOfTotal = (grandTotalInv > 0)
+                    ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%'
+                    : '0.0%';
+
+                let statsHtml = '';
+                if (currentTab === 'ncd') {
+                    statsHtml = `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
+                } else {
+                    statsHtml = `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
+                }
 
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex flex-col items-start dark:text-white text-left">
                         <h3 class="font-bold text-sm w-full pr-2 whitespace-normal break-words leading-tight mb-1">${key}</h3>
                         <div class="text-[10px] w-full leading-tight text-gray-500 dark:text-gray-400">${statsHtml}</div>
                     </button>
-                    <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[key].items)}</div>
+                    <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">
+                        ${renderTable(groups[key].items)}
+                    </div>
                 </div>`;
             });
             container.innerHTML = html;
         }
 
         function renderTable(items) {
-            const isNCD = currentTab === 'ncd', isMaturity = currentSubView === 'maturity';
-            let theadHtml = `<tr>${isMaturity ? '<th class="p-2 text-center w-1/3">NBFC</th>' : ''}<th class="p-2 text-center">Amt</th>${!isNCD ? '<th class="p-2 text-center">Mat.Amt</th>' : ''}<th class="p-2 text-center">Date</th><th class="p-2 text-center">Rate</th></tr>`;
+            const isNCD = currentTab === 'ncd';
+            const isMaturity = currentSubView === 'maturity';
+            
+            let theadHtml = `<tr>`;
+            if (isMaturity) {
+                theadHtml += `<th class="p-2 text-center w-1/3">NBFC</th>`;
+            }
+            theadHtml += `<th class="p-2 text-center">Amt</th>`;
+            if (!isNCD) {
+                theadHtml += `<th class="p-2 text-center">Mat.Amt</th>`;
+            }
+            theadHtml += `<th class="p-2 text-center">Date</th>`;
+            theadHtml += `<th class="p-2 text-center">Rate</th>`;
+            theadHtml += `</tr>`;
 
             let tbodyHtml = items.map(item => {
                 let formattedRate = String(item.rate);
                 if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
+
                 const nbfcName = isNCD ? item.company : item.bank;
                 
                 let rowHtml = `<tr>`;
-                if (isMaturity) rowHtml += `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto">${nbfcName}</span></td>`;
+                
+                if (isMaturity) {
+                    rowHtml += `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto">${nbfcName}</span></td>`;
+                }
+                
                 rowHtml += `<td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>`;
-                if (!isNCD) rowHtml += `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>`;
+                
+                if (!isNCD) {
+                    rowHtml += `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>`;
+                }
+                
                 rowHtml += `<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>`;
-                rowHtml += `<td class="p-2 text-center align-middle">${formattedRate}</td></tr>`;
+                rowHtml += `<td class="p-2 text-center align-middle">${formattedRate}</td>`;
+                rowHtml += `</tr>`;
+
                 return rowHtml;
             }).join('');
 
             return `<table class="w-full text-[10px] dark:text-gray-300">
-                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">${theadHtml}</thead>
-                <tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
+                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">
+                    ${theadHtml}
+                </thead>
+                <tbody class="divide-y dark:divide-gray-700">
+                    ${tbodyHtml}
+                </tbody>
+            </table>`;
         }
 
-        if ('serviceWorker' in navigator) window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+        }
     </script>
 </body>
 </html>
