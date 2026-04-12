@@ -7,7 +7,7 @@ const ASSETS_TO_CACHE = [
   './index.html',
   './manifest.json',
   './icons/rupee.png',
-  'https://cdn.tailwindcss.com'
+  'https://cdn.tailwindcss.com',
   './icons/rupee.png'
 ];
 
