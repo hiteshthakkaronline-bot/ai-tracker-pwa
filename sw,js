@@ -3,9 +3,11 @@ const CACHE_NAME = 'ai-tracker-v2.0';
 
 // List all the static files you want to work offline
 const ASSETS_TO_CACHE = [
-  './',
+ './',
   './index.html',
   './manifest.json',
+  './icons/rupee.png',
+  'https://cdn.tailwindcss.com'
   './icons/rupee.png'
 ];
 
