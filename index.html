@@ -66,7 +66,6 @@
         /* Accordion logic */
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .accordion-content.open { max-height: 2000px; }
-        .hidden-view { display: none !important; }
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-300 pb-24 relative">
@@ -96,7 +95,7 @@
             <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
         </header>
 
-        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40 hidden-view">
+        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40" style="display: none;">
             <button onclick="showSubView('maturity')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white" id="btn-maturity">Maturity</button>
             <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none" id="btn-bank">Bank-wise</button>
         </div>
@@ -189,7 +188,7 @@
             document.getElementById('header-title').innerText = titles[tab];
             document.getElementById('btn-bank').innerText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
             
-            // Sub-nav is hidden on Home Tab
+            // Toggle the visibility of the sub-nav via inline style so it successfully overrides standard behavior
             document.getElementById('sub-nav').style.display = tab === 'home' ? 'none' : 'flex';
             
             // Back button logic
