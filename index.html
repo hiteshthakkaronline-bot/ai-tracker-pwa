@@ -17,21 +17,18 @@
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
-                // ⚠️ IMPORTANT: If you created a new app in the OneSignal Dashboard for this tracker, paste the new App ID here. 
                 appId: "18d1e593-4b61-4987-befb-c5933694288b", 
                 safari_web_id: "web.onesignal.auto.220e9b0b-02d4-465b-a5d3-49d3d287ceee", 
                 
                 notifyButton: {
                     enable: true,
-                    position: 'bottom-left', // 👇 NEW: Forces the bell to the left side
-                    // 👇 NEW: Pushes the bell 85px up so it floats above the nav bar
+                    position: 'bottom-left', 
                     offset: {
                       bottom: '85px', 
                       right: '15px'
                     }
                 },
                 
-                // 👇 UPDATED TO MATCH YOUR CURRENT GITHUB FOLDER 👇
                 serviceWorkerParam: { scope: "/ai-tracker-pwa/" },
                 serviceWorkerPath: "ai-tracker-pwa/OneSignalSDKWorker.js"
             });
@@ -39,7 +36,7 @@
     </script>
     
     <style>
-        /* NATIVE SPLASH SCREEN (Fixes the ugly flash of unstyled content) */
+        /* NATIVE SPLASH SCREEN */
         #native-splash {
             position: fixed; inset: 0; z-index: 999999;
             background-color: #ffffff; display: flex; flex-direction: column;
@@ -133,7 +130,9 @@
                 <span class="text-[9px] mt-1 font-bold">HT NCDs</span>
             </button>
         </nav>
-    </div> <script>
+    </div>
+
+    <script>
         // Removes Splash Screen once Tailwind has processed the HTML
         window.addEventListener('DOMContentLoaded', () => {
             const root = document.getElementById('app-root');
@@ -296,19 +295,22 @@
             activeData.sort((a, b) => b.amount - a.amount);
 
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
-                <div class="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between dark:text-white border-b dark:border-gray-600">
-                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/2">Asset Class</h3>
-                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/2 text-right">Allocation</h3>
+                <div class="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center dark:text-white border-b dark:border-gray-600 gap-2">
+                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5">Asset</h3>
+                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/5 text-center">Class</h3>
+                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5 text-right">Allocation</h3>
                 </div>
                 <ul class="divide-y dark:divide-gray-700">`;
 
             activeData.forEach(item => {
                 const percent = totalAmount > 0 ? (item.amount / totalAmount * 100).toFixed(2) + '%' : '0.00%';
+                const assetClass = item.assetClass || '-';
                 
-                html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <div class="font-semibold text-gray-800 dark:text-white w-1/2 pr-2 leading-tight">${item.asset}</div>
-                    <div class="w-1/2 text-right flex flex-col justify-center">
-                        <span class="font-bold text-lg leading-tight">${displayMoney(item.amount)}</span>
+                html += `<li class="p-3 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors gap-2">
+                    <div class="font-semibold text-gray-800 dark:text-white w-2/5 leading-tight break-words">${item.asset}</div>
+                    <div class="text-[10px] font-bold text-[#5D6B7F] dark:text-gray-400 w-1/5 text-center leading-tight uppercase tracking-wide break-words">${assetClass}</div>
+                    <div class="w-2/5 text-right flex flex-col justify-center">
+                        <span class="font-bold text-sm leading-tight">${displayMoney(item.amount)}</span>
                         <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400 mt-1">${percent}</span>
                     </div>
                 </li>`;
