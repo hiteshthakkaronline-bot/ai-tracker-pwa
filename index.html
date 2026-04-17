@@ -104,7 +104,7 @@
         <main id="app-content" class="p-2 space-y-4"></main>
 
         <div class="fixed bottom-24 right-4 flex flex-col gap-3 z-40">
-            <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform" aria-label="Scroll to Top">
+            <button id="fab-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all duration-300 opacity-0 pointer-events-none translate-y-4" aria-label="Scroll to Top">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </button>
             <button id="fab-back" onclick="switchMainTab('home')" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform" aria-label="Back to Home" style="display: none;">
@@ -133,7 +133,6 @@
     </div>
 
     <script>
-        // --- NATIVE SWIPE GESTURE VARIABLES ---
         let touchstartX = 0;
         let touchendX = 0;
         let touchstartY = 0;
@@ -146,7 +145,6 @@
             root.style.opacity = '1';
             setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
 
-            // --- ATTACH SWIPE LISTENERS TO MAIN CONTENT ---
             const contentBlock = document.getElementById('app-content');
             
             contentBlock.addEventListener('touchstart', e => {
@@ -158,7 +156,6 @@
                 touchendX = e.changedTouches[0].screenX;
                 touchendY = e.changedTouches[0].screenY;
                 
-                // Prevent swiping if the user is scrolling horizontally inside a table (like the Tickers tab)
                 const isScrollableTable = e.target.closest('.overflow-x-auto');
                 if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) {
                     return; 
@@ -166,33 +163,40 @@
 
                 handleSwipeDirection();
             }, {passive: true});
+
+            // --- NEW: SCROLL EVENT LISTENER FOR FAB TOP BUTTON ---
+            window.addEventListener('scroll', () => {
+                const fabTop = document.getElementById('fab-top');
+                if (!fabTop) return;
+                
+                if (window.scrollY > 150) {
+                    fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    fabTop.classList.add('opacity-100', 'translate-y-0');
+                } else {
+                    fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                    fabTop.classList.remove('opacity-100', 'translate-y-0');
+                }
+            }, { passive: true });
         });
 
-        // --- SWIPE LOGIC ---
         function handleSwipeDirection() {
             const dx = touchendX - touchstartX;
             const dy = touchendY - touchstartY;
             
-            // If the swipe was more vertical than horizontal, ignore it (user is scrolling down the page)
             if (Math.abs(dy) > Math.abs(dx)) return;
             
-            // Determine the available sub-views based on the current main tab
             const homeViews = ['dashboard', 'networth', 'tickers'];
             const otherViews = ['maturity', 'bank'];
             const activeViews = currentTab === 'home' ? homeViews : otherViews;
             
             const currentIndex = activeViews.indexOf(currentSubView);
-            
-            // Minimum distance to be considered a swipe (in pixels)
             const swipeThreshold = 50; 
             
             if (dx < -swipeThreshold) { 
-                // Swiped Left (Go to NEXT view)
                 if (currentIndex < activeViews.length - 1) {
                     showSubView(activeViews[currentIndex + 1]);
                 }
             } else if (dx > swipeThreshold) { 
-                // Swiped Right (Go to PREVIOUS view)
                 if (currentIndex > 0) {
                     showSubView(activeViews[currentIndex - 1]);
                 }
@@ -311,17 +315,16 @@
             renderView();
         }
 
-        // --- NEW PIN TOGGLE FUNCTION ---
         function togglePinVisibility() {
             const input = document.getElementById('pin-input');
             const icon = document.getElementById('pin-eye-icon');
             
             if (input.type === 'password') {
-                input.type = 'tel'; // Changes to text while keeping the number pad on mobile
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`; // Eye Off (Slash)
+                input.type = 'tel';
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
             } else {
                 input.type = 'password';
-                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`; // Eye On
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
             }
         }
 
