@@ -25,14 +25,11 @@
                 notifyButton: {
                     enable: true,
                     position: 'bottom-left', 
-                    offset: {
-                      bottom: '85px', 
-                      right: '15px'
-                    }
+                    offset: { bottom: '85px', right: '15px' }
                 },
                 
                 serviceWorkerParam: { scope: "/ai-tracker-pwa/" },
-                serviceWorkerPath: "ai-tracker-pwa/OneSignalSDKWorker.js"
+                serviceWorkerPath: "ai-tracker-pwa/sw.js"
             });
         });
     </script>
@@ -55,7 +52,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* Dark mode support for the splash screen */
         @media (prefers-color-scheme: dark) {
             #native-splash { background-color: #111827; }
             .spinner-ring { border-color: #374151; border-top-color: #9ca3af; }
@@ -64,8 +60,6 @@
 
         /* App visibility control */
         #app-root { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
-        
-        /* Accordion logic */
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .accordion-content.open { max-height: 2000px; }
     </style>
@@ -97,7 +91,7 @@
             <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
         </header>
 
-        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40"></div>
+        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40 text-[11px] sm:text-sm"></div>
 
         <main id="app-content" class="p-2 space-y-4"></main>
 
@@ -143,32 +137,26 @@
         const SECRET_PIN = "1549";
         
         let activeData = [];
+        let tickerData = { headers: [], rows: [] };
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
-        let currentChartInstance = null; // Reusable chart instance for all tabs
+        let currentChartInstance = null;
         
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-        // --- THEME ENGINE ---
         function applyInitialTheme() {
             const stored = localStorage.getItem('theme');
             const hour = new Date().getHours();
-            const isNight = hour >= 18 || hour < 6; 
-            const theme = stored || (isNight ? 'dark' : 'light');
+            const theme = stored || ((hour >= 18 || hour < 6) ? 'dark' : 'light');
             setTheme(theme);
         }
 
         function setTheme(theme) {
             const el = document.documentElement;
-            if (theme === 'dark') el.classList.add('dark');
-            else el.classList.remove('dark');
+            theme === 'dark' ? el.classList.add('dark') : el.classList.remove('dark');
             localStorage.setItem('theme', theme);
             updateIcons();
-            
-            // Re-render view if active to update chart colors on theme toggle
-            if (activeData.length > 0) {
-                renderView();
-            }
+            if (activeData.length > 0 || tickerData.rows.length > 0) renderView();
         }
 
         function toggleTheme() {
@@ -186,7 +174,6 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
-        // --- NAVIGATION LOGIC ---
         async function switchMainTab(tab) {
             currentTab = tab;
             const titles = { 'home': 'Net Worth', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s' };
@@ -197,8 +184,9 @@
             if (tab === 'home') {
                 currentSubView = 'dashboard';
                 subNav.innerHTML = `
-                    <button onclick="showSubView('dashboard')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors" id="btn-dashboard">Dashboard</button>
-                    <button onclick="showSubView('networth')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-networth">Net Worth</button>
+                    <button onclick="showSubView('dashboard')" class="flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors" id="btn-dashboard">Dashboard</button>
+                    <button onclick="showSubView('networth')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-networth">Net Worth</button>
+                    <button onclick="showSubView('tickers')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-tickers">Tickers</button>
                 `;
             } else {
                 currentSubView = 'maturity';
@@ -213,8 +201,7 @@
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
 
             ['home', 'fds', 'nct', 'ncd'].forEach(t => {
-                const btn = document.getElementById('nav-' + t);
-                btn.className = `flex flex-col items-center w-1/4 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
+                document.getElementById('nav-' + t).className = `flex flex-col items-center w-1/4 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
             document.getElementById('app-content').innerHTML = '<div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div></div>';
@@ -224,14 +211,19 @@
                 const paramMap = { 'home': 'HOME', 'fds': 'HT', 'nct': 'NCT', 'ncd': 'NCD' };
                 const response = await fetch(`${API_URL}?user=${paramMap[tab]}`);
                 const data = await response.json();
-                
                 if (data.error) throw new Error(data.error);
                 
-                activeData = data;
+                if (tab === 'home') {
+                    activeData = data.assets || [];
+                    tickerData = data.tickers || { headers: [], rows: [] };
+                } else {
+                    activeData = data;
+                    tickerData = { headers: [], rows: [] };
+                }
+
                 updateStats();
                 renderView();
             } catch (e) {
-                console.error("App Crash Details:", e);
                 document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">Connection Error:<br>${e.message}</div>`;
                 document.getElementById('global-stats').innerHTML = 'Error loading';
             }
@@ -239,12 +231,13 @@
 
         function showSubView(view) {
             currentSubView = view;
-            const active = "flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
-            const inactive = "flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
+            const active = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
+            const inactive = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
             
             if (currentTab === 'home') {
                 document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
                 document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
+                document.getElementById('btn-tickers').className = view === 'tickers' ? active : inactive;
             } else {
                 document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
@@ -280,7 +273,6 @@
 
         function updateStats() {
             const total = activeData.reduce((s, item) => s + item.amount, 0);
-            
             if (currentTab === 'home') {
                 document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
             } else if (currentTab === 'ncd') {
@@ -291,14 +283,10 @@
             }
         }
 
-        // --- GLOBAL CHART RENDERER ---
         function renderSharedChart(canvasId, labels, data, totalValue) {
             const ctx = document.getElementById(canvasId);
             if (!ctx) return;
-            
-            if (currentChartInstance) {
-                currentChartInstance.destroy();
-            }
+            if (currentChartInstance) currentChartInstance.destroy();
             
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4', '#84CC16', '#6366F1'];
             
@@ -306,17 +294,10 @@
                 type: 'doughnut',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: bgColors.slice(0, labels.length),
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
+                    datasets: [{ data: data, backgroundColor: bgColors.slice(0, labels.length), borderWidth: 0, hoverOffset: 4 }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '65%',
+                    responsive: true, maintainAspectRatio: true, cutout: '65%',
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -335,24 +316,27 @@
 
         function renderView() {
             const container = document.getElementById('app-content');
-            if (activeData.length === 0) {
+            
+            // Exception: Don't show empty state if we are on the tickers tab and we DO have tickers
+            const hasTickers = currentTab === 'home' && currentSubView === 'tickers' && tickerData.rows.length > 0;
+            if (activeData.length === 0 && !hasTickers) {
                 container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>';
                 return;
             }
 
             if (currentTab === 'home') {
                 if (currentSubView === 'dashboard') renderDashboard(container);
-                else renderHome(container); 
+                else if (currentSubView === 'networth') renderHome(container); 
+                else if (currentSubView === 'tickers') renderTickers(container);
             } else {
                 if (currentSubView === 'maturity') renderMaturity(container);
                 else renderBankOrCompany(container);
             }
         }
 
-        // --- DASHBOARD VIEW (Home Tab) ---
+        // --- DASHBOARD VIEW ---
         function renderDashboard(container) {
             const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
-            
             const classTotals = activeData.reduce((acc, item) => {
                 const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
                 acc[aClass] = (acc[aClass] || 0) + item.amount;
@@ -366,36 +350,30 @@
             let html = `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
                     <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
-                    <div class="relative w-full max-w-[240px] aspect-square">
-                        <canvas id="tabChart"></canvas>
-                    </div>
+                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="tabChart"></canvas></div>
                 </div>
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
-                    <ul class="divide-y dark:divide-gray-700">
-            `;
+                    <ul class="divide-y dark:divide-gray-700">`;
             
             sortedClasses.forEach((label, i) => {
                 const amount = classTotals[label];
                 const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
-                const color = bgColors[i % bgColors.length];
-                
                 html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200">
                     <div class="flex items-center gap-3 w-1/2">
-                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${color}"></span>
+                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
                         <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate">${label}</span>
                     </div>
                     <div class="w-1/2 text-right flex flex-col">
                         <span class="font-bold text-base leading-tight">${displayMoney(amount)}</span>
                         <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${percent}</span>
-                    </div>
-                </li>`;
+                    </div></li>`;
             });
             
             container.innerHTML = html + `</ul></div>`;
             renderSharedChart('tabChart', sortedClasses, chartData, grandTotal);
         }
 
-        // --- NET WORTH LIST VIEW (Home Tab) ---
+        // --- NET WORTH VIEW ---
         function renderHome(container) {
             const totalAmount = activeData.reduce((sum, item) => sum + item.amount, 0);
             const sortedData = [...activeData].sort((a, b) => b.amount - a.amount);
@@ -405,215 +383,198 @@
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5">Asset</h3>
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/5 text-center">Class</h3>
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5 text-right">Allocation</h3>
-                </div>
-                <ul class="divide-y dark:divide-gray-700">`;
+                </div><ul class="divide-y dark:divide-gray-700">`;
 
             sortedData.forEach(item => {
                 const percent = totalAmount > 0 ? (item.amount / totalAmount * 100).toFixed(2) + '%' : '0.00%';
-                const assetClass = item.assetClass || '-';
-                
                 html += `<li class="p-3 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors gap-2">
                     <div class="font-semibold text-gray-800 dark:text-white w-2/5 leading-tight break-words">${item.asset}</div>
-                    <div class="text-[10px] font-bold text-[#5D6B7F] dark:text-gray-400 w-1/5 text-center leading-tight uppercase tracking-wide break-words">${assetClass}</div>
+                    <div class="text-[10px] font-bold text-[#5D6B7F] dark:text-gray-400 w-1/5 text-center leading-tight uppercase tracking-wide break-words">${item.assetClass || '-'}</div>
                     <div class="w-2/5 text-right flex flex-col justify-center">
                         <span class="font-bold text-sm leading-tight">${displayMoney(item.amount)}</span>
                         <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400 mt-1">${percent}</span>
-                    </div>
-                </li>`;
+                    </div></li>`;
             });
-
             container.innerHTML = html + `</ul></div>`;
+        }
+
+        // --- NEW TICKERS VIEW ---
+        function renderTickers(container) {
+            if (!tickerData || !tickerData.rows || tickerData.rows.length === 0) {
+                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No ticker data found.</p>';
+                return;
+            }
+
+            let theadHtml = `<tr><th class="p-3 text-left w-2/5">TICKER</th>`;
+            for (let i = 1; i < tickerData.headers.length; i++) {
+                theadHtml += `<th class="p-3 text-right">${String(tickerData.headers[i]).toUpperCase()}</th>`;
+            }
+            theadHtml += `</tr>`;
+
+            let tbodyHtml = tickerData.rows.map(row => {
+                let rowHtml = `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <td class="p-3 text-left font-bold text-gray-800 dark:text-white align-middle">${row.ticker}</td>`;
+                
+                row.values.forEach((val, idx) => {
+                    const headerName = String(tickerData.headers[idx + 1]).toUpperCase();
+                    let displayVal = val;
+                    let colorClass = "text-gray-800 dark:text-gray-200 font-semibold";
+                    
+                    if (headerName.includes('%')) {
+                        let num = parseFloat(val);
+                        if (!isNaN(num)) {
+                            // Ensure percentage format (Handles raw 0.05 from Sheets or "5%" string)
+                            if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) {
+                                displayVal = (num * 100).toFixed(2) + '%';
+                            }
+                            
+                            if (num > 0) {
+                                colorClass = "text-green-600 dark:text-green-400 font-bold";
+                                if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal;
+                            } else if (num < 0) {
+                                colorClass = "text-red-600 dark:text-red-400 font-bold";
+                            } else {
+                                colorClass = "text-gray-500 font-bold";
+                            }
+                        }
+                    } else if (typeof val === 'number') {
+                         displayVal = Number.isInteger(val) ? val : parseFloat(val).toFixed(2);
+                    }
+
+                    rowHtml += `<td class="p-3 text-right ${colorClass} align-middle">${displayVal}</td>`;
+                });
+                rowHtml += `</tr>`;
+                return rowHtml;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-8 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-xs border-b dark:border-gray-600">
+                                ${theadHtml}
+                            </thead>
+                            <tbody class="divide-y dark:divide-gray-700">
+                                ${tbodyHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
         }
 
         // --- MATURITY VIEW ---
         function renderMaturity(container) {
             const grandTotalVal = activeData.reduce((sum, item) => sum + (currentTab === 'ncd' ? item.amount : item.maturityAmount), 0);
-
             const groups = activeData.reduce((acc, item) => {
                 const d = new Date(item.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
                 if(!acc[y]) acc[y] = { months: {}, total: 0 };
                 if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
                 acc[y].months[m].items.push(item);
-                
                 const valToAdd = currentTab === 'ncd' ? item.amount : item.maturityAmount;
-                acc[y].total += valToAdd; 
-                acc[y].months[m].total += valToAdd;
+                acc[y].total += valToAdd; acc[y].months[m].total += valToAdd;
                 return acc;
             }, {});
 
-            // Prepare Chart Data (Grouped by Year)
-            const chartLabels = [];
-            const chartData = [];
-            Object.keys(groups).sort().forEach(y => {
-                chartLabels.push(y);
-                chartData.push(groups[y].total);
-            });
+            const chartLabels = []; const chartData = [];
+            Object.keys(groups).sort().forEach(y => { chartLabels.push(y); chartData.push(groups[y].total); });
 
-            // Inject Dashboard Chart at Top
             let html = `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
                     <h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2>
-                    <div class="relative w-full max-w-[200px] aspect-square">
-                        <canvas id="tabChart"></canvas>
-                    </div>
-                </div>
-            `;
+                    <div class="relative w-full max-w-[200px] aspect-square"><canvas id="tabChart"></canvas></div>
+                </div>`;
 
-            // Build Accordion List
             Object.keys(groups).sort().forEach(y => {
                 const yearlyTotal = groups[y].total;
                 const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
-
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg">
                         <span>${y}</span> <span>${yearPercent}%, ${displayMoney(yearlyTotal)}</span>
-                    </button>
-                    <div class="accordion-content">`;
+                    </button><div class="accordion-content">`;
                 
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
                     groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
-
                     const monthlyTotal = groups[y].months[m].total;
                     const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
-
                     html += `<div class="border-l-4 border-[#5D6B7F] ml-2">
                         <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200">
                             <span>${m}</span> <span>${percent}%, ${displayMoney(monthlyTotal)}</span>
-                        </button>
-                        <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[y].months[m].items)}</div>
+                        </button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[y].months[m].items)}</div>
                     </div>`;
                 });
                 html += `</div></div>`;
             });
             
-            container.innerHTML = html;
-            renderSharedChart('tabChart', chartLabels, chartData, grandTotalVal);
+            container.innerHTML = html; renderSharedChart('tabChart', chartLabels, chartData, grandTotalVal);
         }
 
         // --- BANK OR COMPANY VIEW ---
         function renderBankOrCompany(container) {
             const grandTotalInv = activeData.reduce((sum, item) => sum + item.amount, 0);
-
             const groups = activeData.reduce((acc, item) => {
                 const groupKey = currentTab === 'ncd' ? item.company : item.bank;
                 if(!acc[groupKey]) { acc[groupKey] = { items: [], total: 0, inv: 0, weightedRateSum: 0, weightedInv: 0 }; }
-                
-                acc[groupKey].items.push(item); 
-                acc[groupKey].inv += item.amount;
-                
+                acc[groupKey].items.push(item); acc[groupKey].inv += item.amount;
                 let rateNum = parseFloat(String(item.rate).replace('%', ''));
-                if (!isNaN(rateNum)) {
-                    acc[groupKey].weightedRateSum += (item.amount * rateNum);
-                    acc[groupKey].weightedInv += item.amount;
-                }
-
+                if (!isNaN(rateNum)) { acc[groupKey].weightedRateSum += (item.amount * rateNum); acc[groupKey].weightedInv += item.amount; }
                 if (currentTab !== 'ncd') acc[groupKey].total += item.maturityAmount;
                 return acc;
             }, {});
 
-            // Prepare Chart Data (Grouped by Bank/NBFC, Sorted by Inv Amount)
             const sortedBanks = Object.keys(groups).sort((a, b) => groups[b].inv - groups[a].inv);
-            const chartLabels = sortedBanks;
-            const chartData = sortedBanks.map(k => groups[k].inv);
+            const chartLabels = sortedBanks; const chartData = sortedBanks.map(k => groups[k].inv);
             const chartTitle = currentTab === 'ncd' ? 'NBFC Allocation' : 'Bank Allocation';
 
-            // Inject Dashboard Chart at Top
             let html = `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
                     <h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">${chartTitle}</h2>
-                    <div class="relative w-full max-w-[200px] aspect-square">
-                        <canvas id="tabChart"></canvas>
-                    </div>
-                </div>
-            `;
+                    <div class="relative w-full max-w-[200px] aspect-square"><canvas id="tabChart"></canvas></div>
+                </div>`;
 
-            // Build Accordion List (Sorted alphabetically originally, maintaining that or switching to amount sort? Let's keep original alphabetical for list predictability)
             Object.keys(groups).sort().forEach(key => {
                 groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+                const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
+                const percentOfTotal = (grandTotalInv > 0) ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%' : '0.0%';
 
-                const weightedAvgRate = (groups[key].weightedInv > 0) 
-                    ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' 
-                    : 'N/A';
-
-                const percentOfTotal = (grandTotalInv > 0)
-                    ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%'
-                    : '0.0%';
-
-                let statsHtml = '';
-                if (currentTab === 'ncd') {
-                    statsHtml = `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
-                } else {
-                    statsHtml = `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
-                }
+                let statsHtml = currentTab === 'ncd' 
+                    ? `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`
+                    : `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
 
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex flex-col items-start dark:text-white text-left">
                         <h3 class="font-bold text-sm w-full pr-2 whitespace-normal break-words leading-tight mb-1">${key}</h3>
                         <div class="text-[10px] w-full leading-tight text-gray-500 dark:text-gray-400">${statsHtml}</div>
                     </button>
-                    <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">
-                        ${renderTable(groups[key].items)}
-                    </div>
+                    <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[key].items)}</div>
                 </div>`;
             });
             
-            container.innerHTML = html;
-            renderSharedChart('tabChart', chartLabels, chartData, grandTotalInv);
+            container.innerHTML = html; renderSharedChart('tabChart', chartLabels, chartData, grandTotalInv);
         }
 
         function renderTable(items) {
             const isNCD = currentTab === 'ncd';
             const isMaturity = currentSubView === 'maturity';
             
-            let theadHtml = `<tr>`;
-            if (isMaturity) {
-                theadHtml += `<th class="p-2 text-center w-1/3">NBFC</th>`;
-            }
-            theadHtml += `<th class="p-2 text-center">Amt</th>`;
-            if (!isNCD) {
-                theadHtml += `<th class="p-2 text-center">Mat.Amt</th>`;
-            }
-            theadHtml += `<th class="p-2 text-center">Date</th>`;
-            theadHtml += `<th class="p-2 text-center">Rate</th>`;
-            theadHtml += `</tr>`;
+            let theadHtml = `<tr>${isMaturity ? `<th class="p-2 text-center w-1/3">NBFC</th>` : ''}
+                <th class="p-2 text-center">Amt</th>${!isNCD ? `<th class="p-2 text-center">Mat.Amt</th>` : ''}
+                <th class="p-2 text-center">Date</th><th class="p-2 text-center">Rate</th></tr>`;
 
             let tbodyHtml = items.map(item => {
                 let formattedRate = String(item.rate);
                 if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
-
                 const nbfcName = isNCD ? item.company : item.bank;
                 
-                let rowHtml = `<tr>`;
-                
-                if (isMaturity) {
-                    rowHtml += `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto">${nbfcName}</span></td>`;
-                }
-                
-                rowHtml += `<td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>`;
-                
-                if (!isNCD) {
-                    rowHtml += `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>`;
-                }
-                
-                rowHtml += `<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>`;
-                rowHtml += `<td class="p-2 text-center align-middle">${formattedRate}</td>`;
-                rowHtml += `</tr>`;
-
+                let rowHtml = `<tr>${isMaturity ? `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto">${nbfcName}</span></td>` : ''}
+                    <td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>
+                    ${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>` : ''}
+                    <td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td>
+                    <td class="p-2 text-center align-middle">${formattedRate}</td></tr>`;
                 return rowHtml;
             }).join('');
 
-            return `<table class="w-full text-[10px] dark:text-gray-300">
-                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">
-                    ${theadHtml}
-                </thead>
-                <tbody class="divide-y dark:divide-gray-700">
-                    ${tbodyHtml}
-                </tbody>
-            </table>`;
-        }
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js'); });
+            return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
         }
     </script>
 </body>
