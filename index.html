@@ -164,7 +164,6 @@
                 handleSwipeDirection();
             }, {passive: true});
 
-            // --- NEW: SCROLL EVENT LISTENER FOR FAB TOP BUTTON ---
             window.addEventListener('scroll', () => {
                 const fabTop = document.getElementById('fab-top');
                 if (!fabTop) return;
@@ -626,11 +625,15 @@
             container.innerHTML = html; renderSharedChart('tabChart', chartLabels, chartData, grandTotalInv);
         }
 
+        // --- UPDATED RENDER TABLE FUNCTION ---
         function renderTable(items) {
             const isNCD = currentTab === 'ncd';
             const isMaturity = currentSubView === 'maturity';
             
-            let theadHtml = `<tr>${isMaturity ? `<th class="p-2 text-center w-1/3">NBFC</th>` : ''}
+            // DYNAMIC HEADER LOGIC
+            const bankHeader = isNCD ? 'NBFC' : 'BANK';
+            
+            let theadHtml = `<tr>${isMaturity ? `<th class="p-2 text-center w-1/3">${bankHeader}</th>` : ''}
                 <th class="p-2 text-center">Amt</th>${!isNCD ? `<th class="p-2 text-center">Mat.Amt</th>` : ''}
                 <th class="p-2 text-center">Date</th><th class="p-2 text-center">Rate</th></tr>`;
 
