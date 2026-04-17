@@ -21,13 +21,11 @@
             await OneSignal.init({
                 appId: "18d1e593-4b61-4987-befb-c5933694288b", 
                 safari_web_id: "web.onesignal.auto.220e9b0b-02d4-465b-a5d3-49d3d287ceee", 
-                
                 notifyButton: {
                     enable: true,
                     position: 'bottom-left', 
                     offset: { bottom: '85px', right: '15px' }
                 },
-                
                 serviceWorkerParam: { scope: "/ai-tracker-pwa/" },
                 serviceWorkerPath: "ai-tracker-pwa/sw.js"
             });
@@ -76,7 +74,17 @@
         <div id="pin-overlay" class="fixed inset-0 bg-gray-200 dark:bg-gray-800 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
             <div class="bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-2xl w-full max-w-xs text-center">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6">Login</h2>
-                <input type="password" id="pin-input" inputmode="numeric" maxlength="4" oninput="if(this.value.length === 4) validatePin()" class="w-full text-center text-3xl tracking-[1em] p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:border-gray-500 outline-none mb-4" placeholder="****">
+                
+                <div class="relative w-full mb-4">
+                    <input type="password" id="pin-input" inputmode="numeric" maxlength="4" oninput="if(this.value.length === 4) validatePin()" class="w-full text-center text-3xl tracking-[1em] p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:border-gray-500 outline-none pr-12" placeholder="****">
+                    <button onclick="togglePinVisibility()" type="button" class="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400 focus:outline-none" aria-label="Toggle PIN Visibility">
+                        <svg id="pin-eye-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+                
                 <div id="pin-error" class="text-red-500 font-bold text-xs mb-4 hidden">Incorrect PIN.</div>
                 <button onclick="validatePin()" class="w-full bg-gray-800 dark:bg-gray-100 dark:text-gray-900 text-white font-bold py-3 rounded-lg active:scale-95 transition-transform">Login</button>
             </div>
@@ -125,13 +133,71 @@
     </div>
 
     <script>
+        // --- NATIVE SWIPE GESTURE VARIABLES ---
+        let touchstartX = 0;
+        let touchendX = 0;
+        let touchstartY = 0;
+        let touchendY = 0;
+
         window.addEventListener('DOMContentLoaded', () => {
             const root = document.getElementById('app-root');
             const splash = document.getElementById('native-splash');
             root.style.visibility = 'visible';
             root.style.opacity = '1';
             setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
+
+            // --- ATTACH SWIPE LISTENERS TO MAIN CONTENT ---
+            const contentBlock = document.getElementById('app-content');
+            
+            contentBlock.addEventListener('touchstart', e => {
+                touchstartX = e.changedTouches[0].screenX;
+                touchstartY = e.changedTouches[0].screenY;
+            }, {passive: true});
+
+            contentBlock.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                touchendY = e.changedTouches[0].screenY;
+                
+                // Prevent swiping if the user is scrolling horizontally inside a table (like the Tickers tab)
+                const isScrollableTable = e.target.closest('.overflow-x-auto');
+                if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) {
+                    return; 
+                }
+
+                handleSwipeDirection();
+            }, {passive: true});
         });
+
+        // --- SWIPE LOGIC ---
+        function handleSwipeDirection() {
+            const dx = touchendX - touchstartX;
+            const dy = touchendY - touchstartY;
+            
+            // If the swipe was more vertical than horizontal, ignore it (user is scrolling down the page)
+            if (Math.abs(dy) > Math.abs(dx)) return;
+            
+            // Determine the available sub-views based on the current main tab
+            const homeViews = ['dashboard', 'networth', 'tickers'];
+            const otherViews = ['maturity', 'bank'];
+            const activeViews = currentTab === 'home' ? homeViews : otherViews;
+            
+            const currentIndex = activeViews.indexOf(currentSubView);
+            
+            // Minimum distance to be considered a swipe (in pixels)
+            const swipeThreshold = 50; 
+            
+            if (dx < -swipeThreshold) { 
+                // Swiped Left (Go to NEXT view)
+                if (currentIndex < activeViews.length - 1) {
+                    showSubView(activeViews[currentIndex + 1]);
+                }
+            } else if (dx > swipeThreshold) { 
+                // Swiped Right (Go to PREVIOUS view)
+                if (currentIndex > 0) {
+                    showSubView(activeViews[currentIndex - 1]);
+                }
+            }
+        }
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; 
         const SECRET_PIN = "1549";
@@ -245,6 +311,20 @@
             renderView();
         }
 
+        // --- NEW PIN TOGGLE FUNCTION ---
+        function togglePinVisibility() {
+            const input = document.getElementById('pin-input');
+            const icon = document.getElementById('pin-eye-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'tel'; // Changes to text while keeping the number pad on mobile
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`; // Eye Off (Slash)
+            } else {
+                input.type = 'password';
+                icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`; // Eye On
+            }
+        }
+
         function togglePrivacy() { isPrivacyMode = !isPrivacyMode; updateIcons(); updateStats(); renderView(); }
         function displayMoney(amt) { return isPrivacyMode ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); }
 
@@ -317,7 +397,6 @@
         function renderView() {
             const container = document.getElementById('app-content');
             
-            // Exception: Don't show empty state if we are on the tickers tab and we DO have tickers
             const hasTickers = currentTab === 'home' && currentSubView === 'tickers' && tickerData.rows.length > 0;
             if (activeData.length === 0 && !hasTickers) {
                 container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>';
@@ -334,7 +413,6 @@
             }
         }
 
-        // --- DASHBOARD VIEW ---
         function renderDashboard(container) {
             const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
             const classTotals = activeData.reduce((acc, item) => {
@@ -373,7 +451,6 @@
             renderSharedChart('tabChart', sortedClasses, chartData, grandTotal);
         }
 
-        // --- NET WORTH VIEW ---
         function renderHome(container) {
             const totalAmount = activeData.reduce((sum, item) => sum + item.amount, 0);
             const sortedData = [...activeData].sort((a, b) => b.amount - a.amount);
@@ -398,7 +475,6 @@
             container.innerHTML = html + `</ul></div>`;
         }
 
-        // --- NEW TICKERS VIEW ---
         function renderTickers(container) {
             if (!tickerData || !tickerData.rows || tickerData.rows.length === 0) {
                 container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No ticker data found.</p>';
@@ -423,11 +499,9 @@
                     if (headerName.includes('%')) {
                         let num = parseFloat(val);
                         if (!isNaN(num)) {
-                            // Ensure percentage format (Handles raw 0.05 from Sheets or "5%" string)
                             if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) {
                                 displayVal = (num * 100).toFixed(2) + '%';
                             }
-                            
                             if (num > 0) {
                                 colorClass = "text-green-600 dark:text-green-400 font-bold";
                                 if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal;
@@ -454,16 +528,13 @@
                             <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-xs border-b dark:border-gray-600">
                                 ${theadHtml}
                             </thead>
-                            <tbody class="divide-y dark:divide-gray-700">
-                                ${tbodyHtml}
-                            </tbody>
+                            <tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody>
                         </table>
                     </div>
                 </div>
             `;
         }
 
-        // --- MATURITY VIEW ---
         function renderMaturity(container) {
             const grandTotalVal = activeData.reduce((sum, item) => sum + (currentTab === 'ncd' ? item.amount : item.maturityAmount), 0);
             const groups = activeData.reduce((acc, item) => {
@@ -509,7 +580,6 @@
             container.innerHTML = html; renderSharedChart('tabChart', chartLabels, chartData, grandTotalVal);
         }
 
-        // --- BANK OR COMPANY VIEW ---
         function renderBankOrCompany(container) {
             const grandTotalInv = activeData.reduce((sum, item) => sum + item.amount, 0);
             const groups = activeData.reduce((acc, item) => {
