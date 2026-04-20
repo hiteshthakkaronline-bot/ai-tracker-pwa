@@ -5,11 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Tracker</title>
     <link rel="manifest" href="manifest.json">
+    
     <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
 
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
@@ -34,8 +37,6 @@
         #app-root { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .accordion-content.open { max-height: 2000px; }
-        
-        /* Spin animation for save button */
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;}
     </style>
 </head>
@@ -102,7 +103,9 @@
                 <span class="text-[9px] mt-1 font-bold">HT NCDs</span>
             </button>
             <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 w-1/5">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
+                </svg>
                 <span class="text-[9px] mt-1 font-bold whitespace-nowrap">HT CASH</span>
             </button>
         </nav>
@@ -111,11 +114,21 @@
     <script>
         let touchstartX = 0; let touchendX = 0; let touchstartY = 0; let touchendY = 0;
 
+        // SPEED OPTIMIZATION: Moved from window.onload to DOMContentLoaded to execute instantly
         window.addEventListener('DOMContentLoaded', () => {
+            // Instantly apply theme and update icons before the page even finishes loading
+            applyInitialTheme();
+            
             const root = document.getElementById('app-root');
             const splash = document.getElementById('native-splash');
             root.style.visibility = 'visible'; root.style.opacity = '1';
             setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
+
+            // Immediately check auth and trigger API fetch
+            if (sessionStorage.getItem('isUnlocked') === 'true') {
+                document.getElementById('pin-overlay').style.display = 'none';
+                init(); 
+            }
 
             const contentBlock = document.getElementById('app-content');
             contentBlock.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; touchstartY = e.changedTouches[0].screenY; }, {passive: true});
@@ -196,13 +209,13 @@
 
         async function switchMainTab(tab) {
             currentTab = tab;
-            isEditingCash = false; // Reset edit mode state
+            isEditingCash = false; 
             
             const titles = { 'home': 'Net Worth', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s', 'cash': 'HT Cash' };
             document.getElementById('header-title').innerText = titles[tab];
             
             const subNav = document.getElementById('sub-nav');
-            subNav.style.display = 'flex'; // default
+            subNav.style.display = 'flex'; 
             
             if (tab === 'home') {
                 currentSubView = 'dashboard';
@@ -213,7 +226,7 @@
                 `;
             } else if (tab === 'cash') {
                 currentSubView = 'cash';
-                subNav.style.display = 'none'; // Hide sub-nav for the cash screen entirely
+                subNav.style.display = 'none'; 
             } else {
                 currentSubView = 'maturity';
                 const bankText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
@@ -292,6 +305,8 @@
             }
         }
 
+        function init() { switchMainTab('home'); }
+
         function updateStats() {
             const total = activeData.reduce((s, item) => s + item.amount, 0);
             if (currentTab === 'home' || currentTab === 'cash') {
@@ -332,17 +347,21 @@
             }
         }
 
-        // ==========================================
-        // NEW CASH VIEW & EDIT LOGIC
-        // ==========================================
         function renderCash(container) {
             let tbodyHtml = activeData.map((item, index) => {
                 let amountDisplay = isEditingCash 
                     ? `<input type="number" id="cash-input-${index}" value="${item.amount}" class="w-24 px-2 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
                     : `${displayMoney(item.amount)}`;
 
-                let formattedRate = String(item.interest);
-                if (formattedRate !== "" && !formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
+                // Format Interest dynamically (Fix for Google Sheets returning raw decimals)
+                let formattedRate = item.interest;
+                if (typeof formattedRate === 'number') {
+                    formattedRate = Number((formattedRate * 100).toFixed(2)) + '%';
+                } else if (typeof formattedRate === 'string' && formattedRate !== "" && formattedRate !== "N/A" && !formattedRate.includes('%')) {
+                    let num = parseFloat(formattedRate);
+                    if (!isNaN(num) && num > 0 && num < 1) formattedRate = Number((num * 100).toFixed(2)) + '%';
+                    else if (!isNaN(num)) formattedRate = num + '%';
+                }
 
                 return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <td class="p-3 text-left font-bold text-gray-800 dark:text-white align-middle">${item.bank}</td>
@@ -355,15 +374,10 @@
             const btnColor = isEditingCash ? "bg-green-600 hover:bg-green-700" : "bg-[#5D6B7F] hover:bg-gray-700";
 
             container.innerHTML = `
-                <div class="flex justify-between items-end mb-3 px-1">
-                    <div class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
-                        Last Updated: <span class="text-gray-800 dark:text-gray-200">${cashTimestamp}</span>
-                    </div>
-                    <button id="cash-action-btn" onclick="handleCashAction()" class="px-5 py-1.5 ${btnColor} text-white text-xs font-bold rounded shadow-sm transition-colors active:scale-95 flex items-center">
-                        ${btnText}
-                    </button>
+                <div class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2 px-1">
+                    Last Updated: <span class="text-gray-800 dark:text-gray-200">${cashTimestamp}</span>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-8 overflow-hidden">
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
                     <table class="w-full text-sm">
                         <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
                             <tr>
@@ -375,16 +389,19 @@
                         <tbody>${tbodyHtml}</tbody>
                     </table>
                 </div>
+                <div class="flex justify-end px-1 mb-8">
+                    <button id="cash-action-btn" onclick="handleCashAction()" class="px-6 py-2 ${btnColor} text-white text-sm font-bold rounded shadow-sm transition-colors active:scale-95 flex items-center">
+                        ${btnText}
+                    </button>
+                </div>
             `;
         }
 
         async function handleCashAction() {
             if (!isEditingCash) {
-                // Switch to Edit Mode
                 isEditingCash = true;
                 renderView();
             } else {
-                // Save Mode triggered
                 const btn = document.getElementById('cash-action-btn');
                 btn.innerHTML = '<span class="loader"></span> Saving';
                 btn.disabled = true;
@@ -420,9 +437,6 @@
             }
         }
 
-        // ==========================================
-        // EXISTING RENDER FUNCTIONS
-        // ==========================================
         function renderDashboard(container) {
             const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
             const classTotals = activeData.reduce((acc, item) => {
