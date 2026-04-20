@@ -185,10 +185,9 @@
         let cashTimestamp = "Never";
         let isEditingCash = false;
         
-        // --- PHASE 1, 2 & 4: CACHE TRACKING VARIABLES ---
         let memoryCache = {}; 
         let domCache = {}; 
-        let chartInstances = {}; 
+        let chartInstances = {};
         
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -218,7 +217,6 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
-        // --- PHASE 4: Helper to map JSON structure to global state ---
         function applyData(tab, data) {
             if (tab === 'home') {
                 activeData = data.assets || []; 
@@ -249,7 +247,7 @@
                     <button onclick="showSubView('networth')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-networth">Net Worth</button>
                     <button onclick="showSubView('tickers')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-tickers">Tickers</button>
                 `;
-            } else if (tab === 'cash' || tab === 'cash_nct') {
+            } else if (tab.startsWith('cash')) {
                 currentSubView = 'cash';
                 subNav.style.display = 'none'; 
             } else {
@@ -268,7 +266,6 @@
                 document.getElementById('nav-' + t).className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
-            // --- PHASE 1: Memory Cache Check ---
             if (memoryCache[tab]) {
                 applyData(tab, memoryCache[tab].rawData);
                 updateStats();
@@ -284,7 +281,6 @@
             const reqUrl = `${API_URL}?user=${paramMap[tab]}`;
             let networkDataReceived = false;
 
-            // --- PHASE 4: Stale-While-Revalidate (Check Persistent Browser Cache) ---
             caches.open('ai-tracker-data-v1').then(cache => {
                 cache.match(reqUrl).then(response => {
                     if (response) {
@@ -299,7 +295,6 @@
                 });
             });
 
-            // --- PHASE 4: Fetch Fresh Network Data & Update Caches ---
             try {
                 const response = await fetch(reqUrl);
                 const data = await response.json();
@@ -307,15 +302,22 @@
                 
                 networkDataReceived = true;
                 
-                // Save to Memory Cache
                 memoryCache[tab] = { rawData: data };
                 
-                // Save to Persistent Browser Cache
                 const cache = await caches.open('ai-tracker-data-v1');
                 cache.put(reqUrl, new Response(JSON.stringify(data)));
 
                 applyData(tab, data);
                 updateStats(); 
+                
+                // Explicitly clear DOM cache for this tab so fresh data draws!
+                Object.keys(domCache).forEach(key => {
+                    if (key.startsWith(tab + '_')) {
+                        domCache[key].remove();
+                        delete domCache[key];
+                    }
+                });
+
                 renderView();
             } catch (e) {
                 if (!networkDataReceived) {
@@ -428,6 +430,10 @@
 
             const viewDiv = document.createElement('div');
             viewDiv.id = 'view-' + viewKey;
+            
+            // FIX: Attach to DOM before rendering so Chart.js can find the canvas!
+            container.appendChild(viewDiv);
+            domCache[viewKey] = viewDiv;
 
             if (currentTab === 'home') {
                 if (currentSubView === 'dashboard') renderDashboard(viewDiv);
@@ -439,9 +445,6 @@
                 if (currentSubView === 'maturity') renderMaturity(viewDiv);
                 else renderBankOrCompany(viewDiv);
             }
-
-            container.appendChild(viewDiv);
-            domCache[viewKey] = viewDiv;
         }
 
         function renderCash(container) {
@@ -529,7 +532,6 @@
                     cashTimestamp = result.timestamp;
                     isEditingCash = false;
 
-                    // --- PHASE 4: Update Memory AND Persistent Cache immediately on save ---
                     const freshData = { items: activeData, lastUpdated: cashTimestamp };
                     memoryCache[currentTab] = { rawData: freshData };
                     
