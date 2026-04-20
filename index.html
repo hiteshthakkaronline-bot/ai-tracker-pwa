@@ -182,6 +182,9 @@
         let cashTimestamp = "Never";
         let isEditingCash = false;
         
+        // --- NEW: PHASE 1 CACHE OBJECT ---
+        let memoryCache = {};
+        
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -210,7 +213,7 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
-        async function switchMainTab(tab) {
+       async function switchMainTab(tab) {
             currentTab = tab;
             isEditingCash = false; 
             
@@ -246,6 +249,23 @@
                 document.getElementById('nav-' + t).className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
+            // --- PHASE 1: CHECK IN-MEMORY CACHE ---
+            if (memoryCache[tab]) {
+                if (tab === 'home') {
+                    activeData = memoryCache[tab].assets;
+                    tickerData = memoryCache[tab].tickers;
+                } else if (tab.startsWith('cash')) {
+                    activeData = memoryCache[tab].items;
+                    cashTimestamp = memoryCache[tab].timestamp;
+                } else {
+                    activeData = memoryCache[tab].data;
+                    tickerData = { headers: [], rows: [] };
+                }
+                updateStats();
+                renderView();
+                return; // Exit instantly, skipping the fetch!
+            }
+
             document.getElementById('app-content').innerHTML = '<div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div></div>';
             document.getElementById('global-stats').innerHTML = 'Fetching data...';
             
@@ -255,12 +275,16 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
                 
+                // --- PHASE 1: SAVE TO CACHE AFTER FETCH ---
                 if (tab === 'home') {
                     activeData = data.assets || []; tickerData = data.tickers || { headers: [], rows: [] };
-                } else if (tab === 'cash' || tab === 'cash_nct') {
+                    memoryCache[tab] = { assets: activeData, tickers: tickerData };
+                } else if (tab.startsWith('cash')) {
                     activeData = data.items || []; cashTimestamp = data.lastUpdated || "Never";
+                    memoryCache[tab] = { items: activeData, timestamp: cashTimestamp };
                 } else {
                     activeData = data; tickerData = { headers: [], rows: [] };
+                    memoryCache[tab] = { data: activeData };
                 }
 
                 updateStats(); renderView();
@@ -418,7 +442,6 @@
                     }
                 });
 
-                // Target the correct keyword block in Google Sheets
                 const targetKeyword = currentTab === 'cash' ? "HT Cash" : "NCT Cash";
 
                 try {
@@ -432,6 +455,10 @@
                     
                     cashTimestamp = result.timestamp;
                     isEditingCash = false;
+
+                    // --- PHASE 1: UPDATE CACHE ON SAVE ---
+                    memoryCache[currentTab] = { items: activeData, timestamp: cashTimestamp };
+
                     updateStats();
                     renderView();
                 } catch(e) {
