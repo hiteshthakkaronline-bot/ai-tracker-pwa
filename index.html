@@ -74,6 +74,10 @@
 
         <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40 text-[11px] sm:text-sm"></div>
 
+        <div id="loading-spinner" style="display:none;" class="flex justify-center p-10">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div>
+        </div>
+
         <main id="app-content" class="p-2 space-y-4"></main>
 
         <div class="fixed bottom-24 right-4 flex flex-col gap-3 z-40">
@@ -178,12 +182,13 @@
         let activeData = [];
         let tickerData = { headers: [], rows: [] };
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
-        let currentChartInstance = null;
         let cashTimestamp = "Never";
         let isEditingCash = false;
         
-        // --- NEW: PHASE 1 CACHE OBJECT ---
-        let memoryCache = {};
+        // --- PHASE 1 & 2: CACHE TRACKING VARIABLES ---
+        let memoryCache = {}; 
+        let domCache = {}; 
+        let chartInstances = {}; // Supports multiple chart canvasses
         
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -213,7 +218,7 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
-       async function switchMainTab(tab) {
+        async function switchMainTab(tab) {
             currentTab = tab;
             isEditingCash = false; 
             
@@ -249,7 +254,7 @@
                 document.getElementById('nav-' + t).className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
-            // --- PHASE 1: CHECK IN-MEMORY CACHE ---
+            // PHASE 1: Memory Cache Check
             if (memoryCache[tab]) {
                 if (tab === 'home') {
                     activeData = memoryCache[tab].assets;
@@ -263,10 +268,12 @@
                 }
                 updateStats();
                 renderView();
-                return; // Exit instantly, skipping the fetch!
+                return;
             }
 
-            document.getElementById('app-content').innerHTML = '<div class="flex justify-center p-10"><div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div></div>';
+            // PHASE 2: Separated spinner so we don't break existing domCache items
+            document.getElementById('loading-spinner').style.display = 'flex';
+            document.getElementById('app-content').style.display = 'none';
             document.getElementById('global-stats').innerHTML = 'Fetching data...';
             
             try {
@@ -275,7 +282,6 @@
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
                 
-                // --- PHASE 1: SAVE TO CACHE AFTER FETCH ---
                 if (tab === 'home') {
                     activeData = data.assets || []; tickerData = data.tickers || { headers: [], rows: [] };
                     memoryCache[tab] = { assets: activeData, tickers: tickerData };
@@ -289,6 +295,8 @@
 
                 updateStats(); renderView();
             } catch (e) {
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
                 document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">Connection Error:<br>${e.message}</div>`;
                 document.getElementById('global-stats').innerHTML = 'Error loading';
             }
@@ -319,7 +327,18 @@
             }
         }
 
-        function togglePrivacy() { isPrivacyMode = !isPrivacyMode; updateIcons(); updateStats(); renderView(); }
+        function togglePrivacy() { 
+            isPrivacyMode = !isPrivacyMode; 
+            updateIcons(); 
+            updateStats(); 
+            
+            // PHASE 2: Flush DOM Cache since the text values literally change from 'X' to numbers
+            domCache = {};
+            document.getElementById('app-content').innerHTML = ''; 
+            
+            renderView(); 
+        }
+
         function displayMoney(amt) { return isPrivacyMode && !isEditingCash ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); }
 
         function validatePin() {
@@ -348,9 +367,13 @@
 
         function renderSharedChart(canvasId, labels, data, totalValue) {
             const ctx = document.getElementById(canvasId); if (!ctx) return;
-            if (currentChartInstance) currentChartInstance.destroy();
+            
+            // Phase 2: Handle dynamic chart instance tracking so they don't break
+            if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
+            
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4', '#84CC16', '#6366F1'];
-            currentChartInstance = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: bgColors.slice(0, labels.length), borderWidth: 0, hoverOffset: 4 }] },
+            
+            chartInstances[canvasId] = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: bgColors.slice(0, labels.length), borderWidth: 0, hoverOffset: 4 }] },
                 options: { responsive: true, maintainAspectRatio: true, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) {
                     const val = context.raw; const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%'; return ` ${context.label}: ${displayMoney(val)} (${pct})`;
                 }}}}}
@@ -358,20 +381,50 @@
         }
 
         function renderView() {
+            // Ensure Spinner is hidden and Container is visible
+            document.getElementById('loading-spinner').style.display = 'none';
             const container = document.getElementById('app-content');
+            container.style.display = 'block';
+
+            const viewKey = currentTab + '_' + currentSubView;
+
+            // --- PHASE 2: Hide all existing views instead of destroying them ---
+            Array.from(container.children).forEach(child => {
+                child.style.display = 'none';
+            });
+
+            // Exception: No Data State
             const hasTickers = currentTab === 'home' && currentSubView === 'tickers' && tickerData.rows.length > 0;
-            if (activeData.length === 0 && !hasTickers) { container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>'; return; }
+            if (activeData.length === 0 && !hasTickers) { 
+                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>'; 
+                domCache = {}; // Flush cache since DOM was forcefully overwritten
+                return; 
+            }
+
+            // --- PHASE 2: Check if DOM view already exists and unhide it! ---
+            if (domCache[viewKey]) {
+                domCache[viewKey].style.display = 'block'; 
+                return;
+            }
+
+            // If it doesn't exist, create a new wrapper DIV to hold the rendered HTML
+            const viewDiv = document.createElement('div');
+            viewDiv.id = 'view-' + viewKey;
 
             if (currentTab === 'home') {
-                if (currentSubView === 'dashboard') renderDashboard(container);
-                else if (currentSubView === 'networth') renderHome(container); 
-                else if (currentSubView === 'tickers') renderTickers(container);
+                if (currentSubView === 'dashboard') renderDashboard(viewDiv);
+                else if (currentSubView === 'networth') renderHome(viewDiv); 
+                else if (currentSubView === 'tickers') renderTickers(viewDiv);
             } else if (currentTab.startsWith('cash')) {
-                renderCash(container);
+                renderCash(viewDiv);
             } else {
-                if (currentSubView === 'maturity') renderMaturity(container);
-                else renderBankOrCompany(container);
+                if (currentSubView === 'maturity') renderMaturity(viewDiv);
+                else renderBankOrCompany(viewDiv);
             }
+
+            // Add the new view to the DOM and register it in the cache
+            container.appendChild(viewDiv);
+            domCache[viewKey] = viewDiv;
         }
 
         function renderCash(container) {
@@ -424,8 +477,12 @@
         }
 
         async function handleCashAction() {
+            const viewKey = currentTab + '_' + currentSubView;
+
             if (!isEditingCash) {
                 isEditingCash = true;
+                // Flush Cash DOM cache so input fields are re-rendered correctly
+                if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
                 renderView();
             } else {
                 const btn = document.getElementById('cash-action-btn');
@@ -456,8 +513,10 @@
                     cashTimestamp = result.timestamp;
                     isEditingCash = false;
 
-                    // --- PHASE 1: UPDATE CACHE ON SAVE ---
                     memoryCache[currentTab] = { items: activeData, timestamp: cashTimestamp };
+                    
+                    // Flush Cash DOM cache so new static values are re-rendered
+                    if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
 
                     updateStats();
                     renderView();
@@ -480,9 +539,12 @@
             const chartData = sortedClasses.map(key => classTotals[key]);
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
 
+            // Dynamic Chart ID for Phase 2
+            const canvasId = `chart-${currentTab}-${currentSubView}`;
+
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
                     <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
-                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="tabChart"></canvas></div></div>
+                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8"><ul class="divide-y dark:divide-gray-700">`;
             
             sortedClasses.forEach((label, i) => {
@@ -491,7 +553,8 @@
                     <div class="flex items-center gap-3 w-1/2"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span><span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate">${label}</span></div>
                     <div class="w-1/2 text-right flex flex-col"><span class="font-bold text-base leading-tight">${displayMoney(amount)}</span><span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${percent}</span></div></li>`;
             });
-            container.innerHTML = html + `</ul></div>`; renderSharedChart('tabChart', sortedClasses, chartData, grandTotal);
+            container.innerHTML = html + `</ul></div>`; 
+            renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
         }
 
         function renderHome(container) {
@@ -546,7 +609,10 @@
             const chartLabels = []; const chartData = [];
             Object.keys(groups).sort().forEach(y => { chartLabels.push(y); chartData.push(groups[y].total); });
 
-            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="tabChart"></canvas></div></div>`;
+            // Dynamic Chart ID
+            const canvasId = `chart-${currentTab}-${currentSubView}`;
+
+            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
             Object.keys(groups).sort().forEach(y => {
                 const yearlyTotal = groups[y].total; const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg"><span>${y}</span> <span>${yearPercent}%, ${displayMoney(yearlyTotal)}</span></button><div class="accordion-content">`;
@@ -557,7 +623,7 @@
                 });
                 html += `</div></div>`;
             });
-            container.innerHTML = html; renderSharedChart('tabChart', chartLabels, chartData, grandTotalVal);
+            container.innerHTML = html; renderSharedChart(canvasId, chartLabels, chartData, grandTotalVal);
         }
 
         function renderBankOrCompany(container) {
@@ -575,7 +641,10 @@
             const sortedBanks = Object.keys(groups).sort((a, b) => groups[b].inv - groups[a].inv);
             const chartLabels = sortedBanks; const chartData = sortedBanks.map(k => groups[k].inv);
             
-            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">${currentTab === 'ncd' ? 'NBFC Allocation' : 'Bank Allocation'}</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="tabChart"></canvas></div></div>`;
+            // Dynamic Chart ID
+            const canvasId = `chart-${currentTab}-${currentSubView}`;
+
+            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">${currentTab === 'ncd' ? 'NBFC Allocation' : 'Bank Allocation'}</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
             Object.keys(groups).sort().forEach(key => {
                 groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                 const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
@@ -583,7 +652,7 @@
                 let statsHtml = currentTab === 'ncd' ? `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>` : `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex flex-col items-start dark:text-white text-left"><h3 class="font-bold text-sm w-full pr-2 whitespace-normal break-words leading-tight mb-1">${key}</h3><div class="text-[10px] w-full leading-tight text-gray-500 dark:text-gray-400">${statsHtml}</div></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[key].items)}</div></div>`;
             });
-            container.innerHTML = html; renderSharedChart('tabChart', chartLabels, chartData, grandTotalInv);
+            container.innerHTML = html; renderSharedChart(canvasId, chartLabels, chartData, grandTotalInv);
         }
 
         function renderTable(items) {
