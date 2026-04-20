@@ -187,7 +187,7 @@
         
         let memoryCache = {}; 
         let domCache = {}; 
-        let chartInstances = {};
+        let chartInstances = {}; 
         
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -307,18 +307,32 @@
                 const cache = await caches.open('ai-tracker-data-v1');
                 cache.put(reqUrl, new Response(JSON.stringify(data)));
 
-                applyData(tab, data);
-                updateStats(); 
-                
-                // Explicitly clear DOM cache for this tab so fresh data draws!
-                Object.keys(domCache).forEach(key => {
-                    if (key.startsWith(tab + '_')) {
-                        domCache[key].remove();
-                        delete domCache[key];
-                    }
-                });
+                // --- BUG FIX: Race Condition & Edit Interruption ---
+                // Only update the active UI if the user is still on this exact tab 
+                if (currentTab === tab) {
+                    // And only if they aren't actively typing in an input box!
+                    if (!isEditingCash) {
+                        applyData(tab, data);
+                        updateStats(); 
+                        
+                        Object.keys(domCache).forEach(key => {
+                            if (key.startsWith(tab + '_')) {
+                                domCache[key].remove();
+                                delete domCache[key];
+                            }
+                        });
 
-                renderView();
+                        renderView();
+                    }
+                } else {
+                    // They navigated away while fetch was running. Just clear the background DOM cache.
+                    Object.keys(domCache).forEach(key => {
+                        if (key.startsWith(tab + '_')) {
+                            domCache[key].remove();
+                            delete domCache[key];
+                        }
+                    });
+                }
             } catch (e) {
                 if (!networkDataReceived) {
                     document.getElementById('loading-spinner').style.display = 'none';
@@ -431,7 +445,6 @@
             const viewDiv = document.createElement('div');
             viewDiv.id = 'view-' + viewKey;
             
-            // FIX: Attach to DOM before rendering so Chart.js can find the canvas!
             container.appendChild(viewDiv);
             domCache[viewKey] = viewDiv;
 
