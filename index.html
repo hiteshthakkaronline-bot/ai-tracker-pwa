@@ -44,9 +44,6 @@
         .accordion-content.open { max-height: 2000px; }
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;}
         
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
         .keypad-btn { -webkit-tap-highlight-color: transparent; }
         .keypad-btn:active { background-color: rgba(156, 163, 175, 0.2); }
     </style>
@@ -90,16 +87,27 @@
             </div>
         </div>
 
-        <header class="bg-[#5D6B7F] dark:bg-[#2D3748] p-4 text-white shadow-md sticky top-0 z-50 grid grid-cols-[40px_1fr_40px] items-center text-center">
-            <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
-            <div>
-                <h1 id="header-title" class="text-lg font-bold uppercase tracking-tight">Home</h1>
-                <div id="global-stats" class="text-[10px] opacity-90">Initializing...</div>
-            </div>
-            <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
-        </header>
-
-        <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 sticky top-[68px] z-40 text-[11px] sm:text-sm"></div>
+        <div class="sticky top-0 z-50 shadow-md">
+            <header class="bg-[#5D6B7F] dark:bg-[#2D3748] text-white transition-colors duration-300">
+                <div class="p-4 grid grid-cols-[40px_1fr_40px] items-center text-center">
+                    <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
+                    <div>
+                        <h1 id="header-title" class="text-lg font-bold uppercase tracking-tight">Home</h1>
+                        <div id="global-stats" class="text-[10px] opacity-90">Initializing...</div>
+                    </div>
+                    <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
+                </div>
+                
+                <div id="profile-toggle" class="pb-3 flex justify-center transition-all duration-300" style="display: none;">
+                    <div class="bg-black/20 p-1 rounded-full flex relative w-56">
+                        <div id="toggle-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-white dark:bg-gray-700 rounded-full shadow transition-transform duration-300"></div>
+                        <button onclick="switchUser('HT')" id="btn-user-ht" class="flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors">HITESH</button>
+                        <button onclick="switchUser('NCT')" id="btn-user-nct" class="flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors">NEHA</button>
+                    </div>
+                </div>
+            </header>
+            <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 text-[11px] sm:text-sm shadow-sm transition-colors duration-300"></div>
+        </div>
 
         <div id="loading-spinner" style="display:none;" class="flex justify-center p-10">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div>
@@ -116,48 +124,30 @@
             </button>
         </div>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex items-center z-50 shadow-2xl transition-colors px-1 overflow-x-auto hide-scrollbar scroll-smooth">
-            <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
+        <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-around items-center z-50 shadow-2xl transition-colors">
+            <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <span class="text-[9px] mt-1 font-bold">HOME</span>
             </button>
-            <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT FDs</span>
+            <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-1 px-1">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                <span class="text-[9px] mt-1 font-bold">FDs</span>
             </button>
-            <button onclick="switchMainTab('nct')" id="nav-nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NCT FDs</span>
+            <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+                <span class="text-[9px] mt-1 font-bold">NCDs</span>
             </button>
-            <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT NCDs</span>
-            </button>
-            <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
                 </svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT CASH</span>
+                <span class="text-[9px] mt-1 font-bold">CASH</span>
             </button>
-            <button onclick="switchMainTab('cash_nct')" id="nav-cash_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
-                    <path d="M7 6h10"/><path d="M7 10h10"/><path d="M7 14l7 6"/><path d="M7 14a4 4 0 0 0 0-4"/>
-                </svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">NCT CASH</span>
-            </button>
-            <button onclick="switchMainTab('nps_ht')" id="nav-nps_ht" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <button onclick="switchMainTab('nps')" id="nav-nps" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT NPS</span>
-            </button>
-            <button onclick="switchMainTab('nps_nct')" id="nav-nps_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
-                    <path d="M22 12A10 10 0 0 0 12 2v10z"/>
-                </svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">NCT NPS</span>
+                <span class="text-[9px] mt-1 font-bold">NPS</span>
             </button>
         </nav>
     </div>
@@ -205,7 +195,7 @@
             
             const homeViews = ['dashboard', 'networth', 'tickers'];
             const otherViews = ['maturity', 'bank'];
-            const activeViews = currentTab === 'home' ? homeViews : ((currentTab.startsWith('cash') || currentTab.startsWith('nps')) ? [] : otherViews);
+            const activeViews = currentTab === 'home' ? homeViews : ((currentTab === 'cash' || currentTab === 'nps') ? [] : otherViews);
             
             if(activeViews.length === 0) return;
 
@@ -219,6 +209,7 @@
         const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec"; 
         const SECRET_PIN = "1549";
         
+        let currentUser = 'HT';
         let activeData = [];
         let tickerData = { headers: [], rows: [] };
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
@@ -310,14 +301,38 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
+        // --- NEW: User Toggle Logic ---
+        function switchUser(user, skipFetch = false) {
+            currentUser = user;
+            localStorage.setItem('currentUser', currentUser);
+            
+            const slider = document.getElementById('toggle-slider');
+            const btnHt = document.getElementById('btn-user-ht');
+            const btnNct = document.getElementById('btn-user-nct');
+            
+            if (user === 'HT') {
+                slider.style.transform = 'translateX(0)';
+                btnHt.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors";
+                btnNct.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors";
+            } else {
+                slider.style.transform = 'translateX(100%)';
+                btnNct.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors";
+                btnHt.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors";
+            }
+            
+            if (!skipFetch && currentTab !== 'home') {
+                switchMainTab(currentTab);
+            }
+        }
+
         function applyData(tab, data) {
             if (tab === 'home') {
                 activeData = data.assets || []; 
                 tickerData = data.tickers || { headers: [], rows: [] };
-            } else if (tab.startsWith('cash')) {
+            } else if (tab === 'cash') {
                 activeData = data.items || []; 
                 cashTimestamp = data.lastUpdated || "Never";
-            } else if (tab.startsWith('nps')) {
+            } else if (tab === 'nps') {
                 activeData = data.items || []; 
             } else {
                 activeData = data; 
@@ -331,10 +346,20 @@
             isEditingCash = false; 
             isEditingNPS = false; 
             
-            const titles = { 'home': 'Net Worth', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s', 'cash': 'HT Cash', 'cash_nct': 'NCT Cash', 'nps_ht': 'HT NPS', 'nps_nct': 'NCT NPS' };
+            const titles = { 
+                'home': 'Net Worth', 
+                'fds': currentUser === 'HT' ? "Hitesh FD's" : "NCT FD's", 
+                'ncd': 'HT NCDs', 
+                'cash': currentUser === 'HT' ? 'HT Cash' : 'NCT Cash', 
+                'nps': currentUser === 'HT' ? 'HT NPS' : 'NCT NPS' 
+            };
             document.getElementById('header-title').innerText = titles[tab];
             
             const subNav = document.getElementById('sub-nav');
+            const profileToggle = document.getElementById('profile-toggle');
+            
+            // Hide user toggle on Home screen
+            profileToggle.style.display = tab === 'home' ? 'none' : 'flex';
             subNav.style.display = 'flex'; 
             
             const activeClass = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
@@ -349,8 +374,8 @@
                     <button onclick="showSubView('networth')" class="${currentSubView === 'networth' ? activeClass : inactiveClass}" id="btn-networth">Net Worth</button>
                     <button onclick="showSubView('tickers')" class="${currentSubView === 'tickers' ? activeClass : inactiveClass}" id="btn-tickers">Tickers</button>
                 `;
-            } else if (tab.startsWith('cash') || tab.startsWith('nps')) {
-                currentSubView = tab.split('_')[0]; 
+            } else if (tab === 'cash' || tab === 'nps') {
+                currentSubView = tab; 
                 subNav.style.display = 'none'; 
             } else {
                 let savedSubView = localStorage.getItem('lastActiveSubView') || 'maturity';
@@ -366,12 +391,15 @@
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
 
-            ['home', 'fds', 'nct', 'ncd', 'cash', 'cash_nct', 'nps_ht', 'nps_nct'].forEach(t => {
-                document.getElementById('nav-' + t).className = `flex flex-col items-center flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
+            ['home', 'fds', 'ncd', 'cash', 'nps'].forEach(t => {
+                const el = document.getElementById('nav-' + t);
+                if(el) el.className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
-            if (memoryCache[tab]) {
-                applyData(tab, memoryCache[tab].rawData);
+            const reqTabKey = tab === 'home' ? tab : tab + '_' + currentUser;
+
+            if (memoryCache[reqTabKey]) {
+                applyData(tab, memoryCache[reqTabKey].rawData);
                 updateStats();
                 renderView();
                 return;
@@ -381,7 +409,13 @@
             document.getElementById('app-content').style.display = 'none';
             document.getElementById('global-stats').innerHTML = 'Fetching data...';
             
-            const paramMap = { 'home': 'HOME', 'fds': 'HT', 'nct': 'NCT', 'ncd': 'NCD', 'cash': 'CASH_HT', 'cash_nct': 'CASH_NCT', 'nps_ht': 'NPS_HT', 'nps_nct': 'NPS_NCT' };
+            const paramMap = { 
+                'home': 'HOME', 
+                'fds': currentUser === 'HT' ? 'HT' : 'NCT', 
+                'ncd': 'NCD', 
+                'cash': currentUser === 'HT' ? 'CASH_HT' : 'CASH_NCT', 
+                'nps': currentUser === 'HT' ? 'NPS_HT' : 'NPS_NCT' 
+            };
             const reqUrl = `${API_URL}?user=${paramMap[tab]}`;
             let networkDataReceived = false;
 
@@ -405,7 +439,7 @@
                 if (data.error) throw new Error(data.error);
                 
                 networkDataReceived = true;
-                memoryCache[tab] = { rawData: data };
+                memoryCache[reqTabKey] = { rawData: data };
                 
                 const cache = await caches.open('ai-tracker-data-v1');
                 cache.put(reqUrl, new Response(JSON.stringify(data)));
@@ -416,7 +450,7 @@
                         updateStats(); 
                         
                         Object.keys(domCache).forEach(key => {
-                            if (key.startsWith(tab + '_')) {
+                            if (key.startsWith(reqTabKey + '_')) {
                                 domCache[key].remove();
                                 delete domCache[key];
                             }
@@ -426,7 +460,7 @@
                     }
                 } else {
                     Object.keys(domCache).forEach(key => {
-                        if (key.startsWith(tab + '_')) {
+                        if (key.startsWith(reqTabKey + '_')) {
                             domCache[key].remove();
                             delete domCache[key];
                         }
@@ -453,7 +487,7 @@
                 document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
                 document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
                 document.getElementById('btn-tickers').className = view === 'tickers' ? active : inactive;
-            } else if (!currentTab.startsWith('cash') && !currentTab.startsWith('nps')) {
+            } else if (currentTab !== 'cash' && currentTab !== 'nps') {
                 document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
             }
@@ -476,13 +510,15 @@
         }
 
         function init() { 
+            let savedUser = localStorage.getItem('currentUser') || 'HT';
+            switchUser(savedUser, true);
             const savedTab = localStorage.getItem('lastActiveTab') || 'home';
             switchMainTab(savedTab); 
         }
 
         function updateStats() {
             const total = activeData.reduce((s, item) => s + (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount), 0);
-            if (currentTab === 'home' || currentTab.startsWith('cash') || currentTab.startsWith('nps')) {
+            if (currentTab === 'home' || currentTab === 'cash' || currentTab === 'nps') {
                 document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
             } else if (currentTab === 'ncd') {
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
@@ -511,7 +547,8 @@
             const container = document.getElementById('app-content');
             container.style.display = 'block';
 
-            const viewKey = currentTab + '_' + currentSubView;
+            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
+            const viewKey = reqTabKey + '_' + currentSubView;
 
             Array.from(container.children).forEach(child => {
                 child.style.display = 'none';
@@ -539,9 +576,9 @@
                 if (currentSubView === 'dashboard') renderDashboard(viewDiv);
                 else if (currentSubView === 'networth') renderHome(viewDiv); 
                 else if (currentSubView === 'tickers') renderTickers(viewDiv);
-            } else if (currentTab.startsWith('cash')) {
+            } else if (currentTab === 'cash') {
                 renderCash(viewDiv);
-            } else if (currentTab.startsWith('nps')) {
+            } else if (currentTab === 'nps') {
                 renderNPS(viewDiv);
             } else {
                 if (currentSubView === 'maturity') renderMaturity(viewDiv);
@@ -549,9 +586,6 @@
             }
         }
 
-        // ==========================================
-        // NPS RENDER (COMPACT ALIGNMENT & SIZING)
-        // ==========================================
         function renderNPS(container) {
             let tiers = activeData.reduce((acc, item) => {
                 let t = item.tier || "Tier 1";
@@ -650,7 +684,8 @@
         }
 
         async function handleNPSAction() {
-            const viewKey = currentTab + '_' + currentSubView;
+            const reqTabKey = currentTab + '_' + currentUser;
+            const viewKey = reqTabKey + '_' + currentSubView;
 
             if (!isEditingNPS) {
                 isEditingNPS = true;
@@ -683,7 +718,7 @@
                     return;
                 }
 
-                const targetKeyword = currentTab === 'nps_ht' ? "HT NPS" : "NCT NPS";
+                const targetKeyword = currentUser === 'HT' ? "HT NPS" : "NCT NPS";
 
                 try {
                     const response = await fetch(API_URL, {
@@ -704,7 +739,7 @@
                     }
 
                     const freshData = { items: activeData };
-                    memoryCache[currentTab] = { rawData: freshData };
+                    memoryCache[reqTabKey] = { rawData: freshData };
                     
                     const reqUrl = `${API_URL}?user=${targetKeyword === 'HT NPS' ? 'NPS_HT' : 'NPS_NCT'}`;
                     caches.open('ai-tracker-data-v1').then(cache => {
@@ -773,7 +808,8 @@
         }
 
         async function handleCashAction() {
-            const viewKey = currentTab + '_' + currentSubView;
+            const reqTabKey = currentTab + '_' + currentUser;
+            const viewKey = reqTabKey + '_' + currentSubView;
 
             if (!isEditingCash) {
                 isEditingCash = true;
@@ -794,7 +830,7 @@
                     }
                 });
 
-                const targetKeyword = currentTab === 'cash' ? "HT Cash" : "NCT Cash";
+                const targetKeyword = currentUser === 'HT' ? "HT Cash" : "NCT Cash";
 
                 try {
                     const response = await fetch(API_URL, {
@@ -809,7 +845,7 @@
                     isEditingCash = false;
 
                     const freshData = { items: activeData, lastUpdated: cashTimestamp };
-                    memoryCache[currentTab] = { rawData: freshData };
+                    memoryCache[reqTabKey] = { rawData: freshData };
                     
                     const reqUrl = `${API_URL}?user=${targetKeyword === 'HT Cash' ? 'CASH_HT' : 'CASH_NCT'}`;
                     caches.open('ai-tracker-data-v1').then(cache => {
@@ -839,7 +875,8 @@
             const chartData = sortedClasses.map(key => classTotals[key]);
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
 
-            const canvasId = `chart-${currentTab}-${currentSubView}`;
+            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
+            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
 
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
                     <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
@@ -908,7 +945,8 @@
             const chartLabels = []; const chartData = [];
             Object.keys(groups).sort().forEach(y => { chartLabels.push(y); chartData.push(groups[y].total); });
 
-            const canvasId = `chart-${currentTab}-${currentSubView}`;
+            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
+            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
 
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
             Object.keys(groups).sort().forEach(y => {
@@ -939,7 +977,8 @@
             const sortedBanks = Object.keys(groups).sort((a, b) => groups[b].inv - groups[a].inv);
             const chartLabels = sortedBanks; const chartData = sortedBanks.map(k => groups[k].inv);
             
-            const canvasId = `chart-${currentTab}-${currentSubView}`;
+            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
+            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
 
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">${currentTab === 'ncd' ? 'NBFC Allocation' : 'Bank Allocation'}</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
             Object.keys(groups).sort().forEach(key => {
