@@ -47,7 +47,6 @@
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
-        /* Custom Keypad Styles */
         .keypad-btn { -webkit-tap-highlight-color: transparent; }
         .keypad-btn:active { background-color: rgba(156, 163, 175, 0.2); }
     </style>
@@ -118,28 +117,34 @@
         </div>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex items-center z-50 shadow-2xl transition-colors px-1 overflow-x-auto hide-scrollbar scroll-smooth">
+            
             <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
             </button>
+            
             <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT FDs</span>
             </button>
+            
             <button onclick="switchMainTab('nct')" id="nav-nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NCT FDs</span>
             </button>
+            
             <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT NCDs</span>
             </button>
+            
             <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT CASH</span>
             </button>
+            
             <button onclick="switchMainTab('cash_nct')" id="nav-cash_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
@@ -147,12 +152,14 @@
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">NCT CASH</span>
             </button>
+
             <button onclick="switchMainTab('nps_ht')" id="nav-nps_ht" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT NPS</span>
             </button>
+
             <button onclick="switchMainTab('nps_nct')" id="nav-nps_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
@@ -233,7 +240,6 @@
         let domCache = {}; 
         let chartInstances = {}; 
         
-        // --- NEW: Custom Keypad Logic ---
         let enteredPin = "";
         
         function handlePinInput(val) {
@@ -250,7 +256,6 @@
             
             updatePinDisplay();
             
-            // Auto-submit instantly if 4 digits are reached
             if (enteredPin.length === 4 && val !== 'submit') {
                 setTimeout(validatePin, 150);
             }
@@ -284,7 +289,6 @@
                 updatePinDisplay();
             }
         }
-        // ---------------------------------
 
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -329,8 +333,10 @@
             }
         }
 
-        async function switchMainTab(tab) {
+        // --- UPDATED: Retrieve exact state from sessionStorage on load ---
+        async function switchMainTab(tab, isInit = false) {
             currentTab = tab;
+            sessionStorage.setItem('lastTab', tab);
             isEditingCash = false; 
             isEditingNPS = false; 
             
@@ -340,23 +346,33 @@
             const subNav = document.getElementById('sub-nav');
             subNav.style.display = 'flex'; 
             
+            const inactive = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
+            const active = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
+
             if (tab === 'home') {
-                currentSubView = 'dashboard';
                 subNav.innerHTML = `
-                    <button onclick="showSubView('dashboard')" class="flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors" id="btn-dashboard">Dashboard</button>
-                    <button onclick="showSubView('networth')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-networth">Net Worth</button>
-                    <button onclick="showSubView('tickers')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-tickers">Tickers</button>
+                    <button onclick="showSubView('dashboard')" class="${inactive}" id="btn-dashboard">Dashboard</button>
+                    <button onclick="showSubView('networth')" class="${inactive}" id="btn-networth">Net Worth</button>
+                    <button onclick="showSubView('tickers')" class="${inactive}" id="btn-tickers">Tickers</button>
                 `;
+                currentSubView = isInit ? (sessionStorage.getItem('lastSubView') || 'dashboard') : 'dashboard';
             } else if (tab.startsWith('cash') || tab.startsWith('nps')) {
                 currentSubView = tab.split('_')[0]; 
                 subNav.style.display = 'none'; 
             } else {
-                currentSubView = 'maturity';
                 const bankText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
                 subNav.innerHTML = `
-                    <button onclick="showSubView('maturity')" class="flex-1 p-3 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors" id="btn-maturity">Maturity</button>
-                    <button onclick="showSubView('bank')" class="flex-1 p-3 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-bank">${bankText}</button>
+                    <button onclick="showSubView('maturity')" class="${inactive}" id="btn-maturity">Maturity</button>
+                    <button onclick="showSubView('bank')" class="${inactive}" id="btn-bank">${bankText}</button>
                 `;
+                currentSubView = isInit ? (sessionStorage.getItem('lastSubView') || 'maturity') : 'maturity';
+            }
+
+            if (!isInit) sessionStorage.setItem('lastSubView', currentSubView);
+
+            if (currentTab === 'home' || (!currentTab.startsWith('cash') && !currentTab.startsWith('nps'))) {
+                const activeBtn = document.getElementById('btn-' + currentSubView);
+                if (activeBtn) activeBtn.className = active;
             }
 
             const backBtn = document.getElementById('fab-back');
@@ -438,8 +454,11 @@
             }
         }
 
+        // --- UPDATED: Save state to session storage ---
         function showSubView(view) {
             currentSubView = view;
+            sessionStorage.setItem('lastSubView', view);
+            
             const active = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
             const inactive = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
             
@@ -452,6 +471,15 @@
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
             }
             renderView();
+        }
+
+        function togglePinVisibility() {
+            const input = document.getElementById('pin-input'); const icon = document.getElementById('pin-eye-icon');
+            if (input.type === 'password') {
+                input.type = 'tel'; icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
+            } else {
+                input.type = 'password'; icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+            }
         }
 
         function togglePrivacy() { 
@@ -469,7 +497,11 @@
             return isPrivacyMode && !isEditingCash && !isEditingNPS ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); 
         }
 
-        function init() { switchMainTab('home'); }
+        // --- UPDATED: Initializer now triggers last-saved state ---
+        function init() { 
+            const savedTab = sessionStorage.getItem('lastTab') || 'home';
+            switchMainTab(savedTab, true); 
+        }
 
         function updateStats() {
             const total = activeData.reduce((s, item) => s + (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount), 0);
