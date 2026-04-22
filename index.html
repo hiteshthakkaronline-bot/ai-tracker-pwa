@@ -390,7 +390,7 @@
             if (input.type === 'password') {
                 input.type = 'tel'; icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
             } else {
-                input.type = 'password'; icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />`;
+                input.type = 'password'; icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7-4.477 0-8.268-2.943-9.542-7z" />`;
             }
         }
 
@@ -491,7 +491,7 @@
         }
 
         // ==========================================
-        // NPS RENDER & EDIT LOGIC (UPDATED FOR lastUpdated)
+        // NPS RENDER (UPDATED FOR CENTER ALIGNMENT)
         // ==========================================
         function renderNPS(container) {
             let tiers = activeData.reduce((acc, item) => {
@@ -511,7 +511,6 @@
                 let latestTimeMs = 0;
                 let tierTimestampStr = "Never";
                 
-                // Track latest 'lastUpdated' per Tier
                 tiers[tierName].forEach(item => {
                     if (item.lastUpdated && item.lastUpdated !== "") {
                         let d = new Date(item.lastUpdated).getTime();
@@ -527,8 +526,9 @@
                 let tbodyHtml = tiers[tierName].map(item => {
                     let globalIdx = activeData.indexOf(item); 
 
+                    // UPDATED: Added text-center and mx-auto to input
                     let unitsDisplay = isEditingNPS 
-                        ? `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${item.units}" class="w-full min-w-[80px] max-w-[120px] px-2 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
+                        ? `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${item.units}" class="w-full min-w-[80px] max-w-[120px] px-2 py-1 text-center mx-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
                         : `${item.units}`;
 
                     let percentStr = item.percent;
@@ -542,14 +542,15 @@
                     let totalDisplay = typeof item.total === 'number' ? displayMoney(item.total) : item.total;
                     let navDateDisplay = item.navDate ? new Date(item.navDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'}) : '';
 
+                    // UPDATED: Changed text-left and text-right to text-center for all cells
                     return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                        <td class="p-3 text-left font-bold text-gray-800 dark:text-white whitespace-nowrap align-middle">${item.fund}</td>
-                        <td class="p-3 text-left text-gray-700 dark:text-gray-300 whitespace-nowrap align-middle min-w-[120px]">${item.scheme}</td>
-                        <td class="p-3 text-right text-gray-500 dark:text-gray-400 align-middle">${percentStr}</td>
-                        <td class="p-3 text-right font-bold text-blue-600 dark:text-blue-400 align-middle">${unitsDisplay}</td>
-                        <td class="p-3 text-right text-gray-700 dark:text-gray-300 align-middle">${item.nav}</td>
-                        <td class="p-3 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle">${navDateDisplay}</td>
-                        <td class="p-3 text-right font-bold text-gray-900 dark:text-gray-100 align-middle">${totalDisplay}</td>
+                        <td class="p-3 text-center font-bold text-gray-800 dark:text-white whitespace-nowrap align-middle">${item.fund}</td>
+                        <td class="p-3 text-center text-gray-700 dark:text-gray-300 whitespace-nowrap align-middle min-w-[120px]">${item.scheme}</td>
+                        <td class="p-3 text-center text-gray-500 dark:text-gray-400 align-middle">${percentStr}</td>
+                        <td class="p-3 text-center font-bold text-blue-600 dark:text-blue-400 align-middle">${unitsDisplay}</td>
+                        <td class="p-3 text-center text-gray-700 dark:text-gray-300 align-middle">${item.nav}</td>
+                        <td class="p-3 text-center text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle">${navDateDisplay}</td>
+                        <td class="p-3 text-center font-bold text-gray-900 dark:text-gray-100 align-middle">${totalDisplay}</td>
                     </tr>`;
                 }).join('');
 
@@ -565,13 +566,13 @@
                             <table class="w-full text-sm">
                                 <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
                                     <tr>
-                                        <th class="p-3 text-left whitespace-nowrap">Pension Fund</th>
-                                        <th class="p-3 text-left whitespace-nowrap">Scheme</th>
-                                        <th class="p-3 text-right whitespace-nowrap">%</th>
-                                        <th class="p-3 text-right whitespace-nowrap">Units</th>
-                                        <th class="p-3 text-right whitespace-nowrap">NAV</th>
-                                        <th class="p-3 text-right whitespace-nowrap">NAV Date</th>
-                                        <th class="p-3 text-right whitespace-nowrap">Total</th>
+                                        <th class="p-3 text-center whitespace-nowrap">Pension Fund</th>
+                                        <th class="p-3 text-center whitespace-nowrap">Scheme</th>
+                                        <th class="p-3 text-center whitespace-nowrap">%</th>
+                                        <th class="p-3 text-center whitespace-nowrap">Units</th>
+                                        <th class="p-3 text-center whitespace-nowrap">NAV</th>
+                                        <th class="p-3 text-center whitespace-nowrap">NAV Date</th>
+                                        <th class="p-3 text-center whitespace-nowrap">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>${tbodyHtml}</tbody>
@@ -641,7 +642,7 @@
                     if (result.timestamp) {
                         updates.forEach(u => {
                             let match = activeData.find(a => a.row === u.row);
-                            if (match) match.lastUpdated = result.timestamp; // Locally update timestamp mapping
+                            if (match) match.lastUpdated = result.timestamp;
                         });
                     }
 
