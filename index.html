@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="theme-color" content="#5D6B7F" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#2D3748" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <title>AI Tracker</title>
     <link rel="manifest" href="manifest.json">
     
@@ -39,9 +44,12 @@
         .accordion-content.open { max-height: 2000px; }
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;}
         
-        /* Nav Horizontal Scroll Hide */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Custom Keypad Styles */
+        .keypad-btn { -webkit-tap-highlight-color: transparent; }
+        .keypad-btn:active { background-color: rgba(156, 163, 175, 0.2); }
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-300 pb-24 relative">
@@ -53,17 +61,33 @@
 
     <div id="app-root">
 
-        <div id="pin-overlay" class="fixed inset-0 bg-gray-200 dark:bg-gray-800 z-[100] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
-            <div class="bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-2xl w-full max-w-xs text-center">
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white mb-6">Login</h2>
-                <div class="relative w-full mb-4">
-                    <input type="password" id="pin-input" inputmode="numeric" maxlength="4" oninput="if(this.value.length === 4) validatePin()" class="w-full text-center text-3xl tracking-[1em] p-3 border-2 border-gray-200 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:border-gray-500 outline-none pr-12" placeholder="****">
-                    <button onclick="togglePinVisibility()" type="button" class="absolute inset-y-0 right-3 flex items-center text-gray-500 dark:text-gray-400 focus:outline-none">
-                        <svg id="pin-eye-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                    </button>
-                </div>
-                <div id="pin-error" class="text-red-500 font-bold text-xs mb-4 hidden">Incorrect PIN.</div>
-                <button onclick="validatePin()" class="w-full bg-gray-800 dark:bg-gray-100 dark:text-gray-900 text-white font-bold py-3 rounded-lg active:scale-95 transition-transform">Login</button>
+        <div id="pin-overlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-[100] flex flex-col items-center justify-center px-6 pt-10 pb-20 transition-opacity duration-500">
+            <h2 class="text-xl font-medium text-gray-600 dark:text-gray-300 mb-12 tracking-wide">Enter Pin</h2>
+            
+            <div class="flex gap-6 mb-16 h-10 items-end justify-center">
+                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
+                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
+                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
+                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
+            </div>
+
+            <div id="pin-error" class="text-red-500 font-bold text-sm mb-6 hidden h-5">Incorrect PIN.</div>
+            
+            <div class="grid grid-cols-3 gap-x-8 gap-y-6 max-w-[280px] w-full mt-auto">
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('1')">1</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('2')">2</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('3')">3</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('4')">4</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('5')">5</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('6')">6</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('7')">7</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('8')">8</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('9')">9</button>
+                <button class="keypad-btn text-lg font-medium text-gray-500 dark:text-gray-400 py-4 rounded-full transition-colors flex items-center justify-center" onclick="handlePinInput('clear')">Cancel</button>
+                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('0')">0</button>
+                <button class="keypad-btn text-3xl font-light text-gray-800 dark:text-white py-4 rounded-full transition-colors flex justify-center items-center" onclick="handlePinInput('submit')">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+                </button>
             </div>
         </div>
 
@@ -94,34 +118,28 @@
         </div>
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex items-center z-50 shadow-2xl transition-colors px-1 overflow-x-auto hide-scrollbar scroll-smooth">
-            
             <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
             </button>
-            
             <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT FDs</span>
             </button>
-            
             <button onclick="switchMainTab('nct')" id="nav-nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NCT FDs</span>
             </button>
-            
             <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT NCDs</span>
             </button>
-            
             <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT CASH</span>
             </button>
-            
             <button onclick="switchMainTab('cash_nct')" id="nav-cash_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
@@ -129,14 +147,12 @@
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">NCT CASH</span>
             </button>
-
             <button onclick="switchMainTab('nps_ht')" id="nav-nps_ht" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT NPS</span>
             </button>
-
             <button onclick="switchMainTab('nps_nct')" id="nav-nps_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
@@ -217,6 +233,59 @@
         let domCache = {}; 
         let chartInstances = {}; 
         
+        // --- NEW: Custom Keypad Logic ---
+        let enteredPin = "";
+        
+        function handlePinInput(val) {
+            const errorMsg = document.getElementById('pin-error');
+            errorMsg.classList.add('hidden');
+
+            if (val === 'clear') {
+                enteredPin = enteredPin.slice(0, -1);
+            } else if (val === 'submit') {
+                if (enteredPin.length === 4) validatePin();
+            } else {
+                if (enteredPin.length < 4) enteredPin += val;
+            }
+            
+            updatePinDisplay();
+            
+            // Auto-submit instantly if 4 digits are reached
+            if (enteredPin.length === 4 && val !== 'submit') {
+                setTimeout(validatePin, 150);
+            }
+        }
+
+        function updatePinDisplay() {
+            const dots = document.querySelectorAll('.pin-indicator');
+            dots.forEach((dot, idx) => {
+                if (idx < enteredPin.length) {
+                    dot.innerHTML = '●';
+                    dot.classList.add('text-gray-800', 'dark:text-gray-200');
+                    dot.classList.remove('text-transparent', 'border-b', 'border-gray-400', 'dark:border-gray-600');
+                } else {
+                    dot.innerHTML = '';
+                    dot.classList.remove('text-gray-800', 'dark:text-gray-200');
+                    dot.classList.add('text-transparent', 'border-b', 'border-gray-400', 'dark:border-gray-600');
+                }
+            });
+        }
+
+        function validatePin() {
+            if (enteredPin === SECRET_PIN) {
+                sessionStorage.setItem('isUnlocked', 'true');
+                const overlay = document.getElementById('pin-overlay');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+                init(); 
+            } else {
+                document.getElementById('pin-error').classList.remove('hidden');
+                enteredPin = "";
+                updatePinDisplay();
+            }
+        }
+        // ---------------------------------
+
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -385,15 +454,6 @@
             renderView();
         }
 
-        function togglePinVisibility() {
-            const input = document.getElementById('pin-input'); const icon = document.getElementById('pin-eye-icon');
-            if (input.type === 'password') {
-                input.type = 'tel'; icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>`;
-            } else {
-                input.type = 'password'; icon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7-4.477 0-8.268-2.943-9.542-7z" />`;
-            }
-        }
-
         function togglePrivacy() { 
             isPrivacyMode = !isPrivacyMode; 
             updateIcons(); 
@@ -407,16 +467,6 @@
 
         function displayMoney(amt) { 
             return isPrivacyMode && !isEditingCash && !isEditingNPS ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); 
-        }
-
-        function validatePin() {
-            const pinInput = document.getElementById('pin-input');
-            if (pinInput.value === SECRET_PIN) {
-                pinInput.blur(); sessionStorage.setItem('isUnlocked', 'true');
-                document.getElementById('pin-overlay').classList.add('opacity-0', 'pointer-events-none'); init();
-            } else {
-                document.getElementById('pin-error').classList.remove('hidden'); pinInput.value = "";
-            }
         }
 
         function init() { switchMainTab('home'); }
@@ -490,9 +540,6 @@
             }
         }
 
-        // ==========================================
-        // NPS RENDER (UPDATED FOR CENTER ALIGNMENT)
-        // ==========================================
         function renderNPS(container) {
             let tiers = activeData.reduce((acc, item) => {
                 let t = item.tier || "Tier 1";
@@ -526,7 +573,6 @@
                 let tbodyHtml = tiers[tierName].map(item => {
                     let globalIdx = activeData.indexOf(item); 
 
-                    // UPDATED: Added text-center and mx-auto to input
                     let unitsDisplay = isEditingNPS 
                         ? `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${item.units}" class="w-full min-w-[80px] max-w-[120px] px-2 py-1 text-center mx-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
                         : `${item.units}`;
@@ -542,7 +588,6 @@
                     let totalDisplay = typeof item.total === 'number' ? displayMoney(item.total) : item.total;
                     let navDateDisplay = item.navDate ? new Date(item.navDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'}) : '';
 
-                    // UPDATED: Changed text-left and text-right to text-center for all cells
                     return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                         <td class="p-3 text-center font-bold text-gray-800 dark:text-white whitespace-nowrap align-middle">${item.fund}</td>
                         <td class="p-3 text-center text-gray-700 dark:text-gray-300 whitespace-nowrap align-middle min-w-[120px]">${item.scheme}</td>
