@@ -38,6 +38,10 @@
         .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
         .accordion-content.open { max-height: 2000px; }
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;}
+        
+        /* Nav Horizontal Scroll Hide */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-300 pb-24 relative">
@@ -89,35 +93,48 @@
             </button>
         </div>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-between items-center z-50 shadow-2xl transition-colors px-1">
-            <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+        <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex items-center z-50 shadow-2xl transition-colors px-1 overflow-x-auto hide-scrollbar scroll-smooth">
+            <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
             </button>
-            <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-1 px-1">
+            <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT FDs</span>
             </button>
-            <button onclick="switchMainTab('nct')" id="nav-nct" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+            <button onclick="switchMainTab('nct')" id="nav-nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NCT FDs</span>
             </button>
-            <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+            <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HT NCDs</span>
             </button>
-            <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+            <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT CASH</span>
             </button>
-            <button onclick="switchMainTab('cash_nct')" id="nav-cash_nct" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+            <button onclick="switchMainTab('cash_nct')" id="nav-cash_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
                     <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
                     <path d="M7 6h10"/><path d="M7 10h10"/><path d="M7 14l7 6"/><path d="M7 14a4 4 0 0 0 0-4"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">NCT CASH</span>
+            </button>
+            <button onclick="switchMainTab('nps_ht')" id="nav-nps_ht" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">HT NPS</span>
+            </button>
+            <button onclick="switchMainTab('nps_nct')" id="nav-nps_nct" class="flex flex-col items-center text-gray-400 flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+                    <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+                </svg>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold whitespace-nowrap">NCT NPS</span>
             </button>
         </nav>
     </div>
@@ -165,7 +182,7 @@
             
             const homeViews = ['dashboard', 'networth', 'tickers'];
             const otherViews = ['maturity', 'bank'];
-            const activeViews = currentTab === 'home' ? homeViews : (currentTab.startsWith('cash') ? [] : otherViews);
+            const activeViews = currentTab === 'home' ? homeViews : ((currentTab.startsWith('cash') || currentTab.startsWith('nps')) ? [] : otherViews);
             
             if(activeViews.length === 0) return;
 
@@ -182,8 +199,12 @@
         let activeData = [];
         let tickerData = { headers: [], rows: [] };
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
+        
         let cashTimestamp = "Never";
         let isEditingCash = false;
+        
+        let npsTimestamp = "Never";
+        let isEditingNPS = false;
         
         let memoryCache = {}; 
         let domCache = {}; 
@@ -224,6 +245,9 @@
             } else if (tab.startsWith('cash')) {
                 activeData = data.items || []; 
                 cashTimestamp = data.lastUpdated || "Never";
+            } else if (tab.startsWith('nps')) {
+                activeData = data.items || []; 
+                npsTimestamp = data.lastUpdated || "Never";
             } else {
                 activeData = data; 
                 tickerData = { headers: [], rows: [] };
@@ -233,8 +257,9 @@
         async function switchMainTab(tab) {
             currentTab = tab;
             isEditingCash = false; 
+            isEditingNPS = false; 
             
-            const titles = { 'home': 'Net Worth', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s', 'cash': 'HT Cash', 'cash_nct': 'NCT Cash' };
+            const titles = { 'home': 'Net Worth', 'fds': 'Hitesh FD\'s', 'nct': 'NCT FD\'s', 'ncd': 'HT NCD\'s', 'cash': 'HT Cash', 'cash_nct': 'NCT Cash', 'nps_ht': 'HT NPS', 'nps_nct': 'NCT NPS' };
             document.getElementById('header-title').innerText = titles[tab];
             
             const subNav = document.getElementById('sub-nav');
@@ -247,8 +272,8 @@
                     <button onclick="showSubView('networth')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-networth">Net Worth</button>
                     <button onclick="showSubView('tickers')" class="flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors" id="btn-tickers">Tickers</button>
                 `;
-            } else if (tab.startsWith('cash')) {
-                currentSubView = 'cash';
+            } else if (tab.startsWith('cash') || tab.startsWith('nps')) {
+                currentSubView = tab.split('_')[0]; 
                 subNav.style.display = 'none'; 
             } else {
                 currentSubView = 'maturity';
@@ -262,8 +287,8 @@
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
 
-            ['home', 'fds', 'nct', 'ncd', 'cash', 'cash_nct'].forEach(t => {
-                document.getElementById('nav-' + t).className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
+            ['home', 'fds', 'nct', 'ncd', 'cash', 'cash_nct', 'nps_ht', 'nps_nct'].forEach(t => {
+                document.getElementById('nav-' + t).className = `flex flex-col items-center flex-shrink-0 min-w-[22%] sm:min-w-[16%] px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
             if (memoryCache[tab]) {
@@ -277,7 +302,7 @@
             document.getElementById('app-content').style.display = 'none';
             document.getElementById('global-stats').innerHTML = 'Fetching data...';
             
-            const paramMap = { 'home': 'HOME', 'fds': 'HT', 'nct': 'NCT', 'ncd': 'NCD', 'cash': 'CASH_HT', 'cash_nct': 'CASH_NCT' };
+            const paramMap = { 'home': 'HOME', 'fds': 'HT', 'nct': 'NCT', 'ncd': 'NCD', 'cash': 'CASH_HT', 'cash_nct': 'CASH_NCT', 'nps_ht': 'NPS_HT', 'nps_nct': 'NPS_NCT' };
             const reqUrl = `${API_URL}?user=${paramMap[tab]}`;
             let networkDataReceived = false;
 
@@ -301,17 +326,13 @@
                 if (data.error) throw new Error(data.error);
                 
                 networkDataReceived = true;
-                
                 memoryCache[tab] = { rawData: data };
                 
                 const cache = await caches.open('ai-tracker-data-v1');
                 cache.put(reqUrl, new Response(JSON.stringify(data)));
 
-                // --- BUG FIX: Race Condition & Edit Interruption ---
-                // Only update the active UI if the user is still on this exact tab 
                 if (currentTab === tab) {
-                    // And only if they aren't actively typing in an input box!
-                    if (!isEditingCash) {
+                    if (!isEditingCash && !isEditingNPS) {
                         applyData(tab, data);
                         updateStats(); 
                         
@@ -325,7 +346,6 @@
                         renderView();
                     }
                 } else {
-                    // They navigated away while fetch was running. Just clear the background DOM cache.
                     Object.keys(domCache).forEach(key => {
                         if (key.startsWith(tab + '_')) {
                             domCache[key].remove();
@@ -352,7 +372,7 @@
                 document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
                 document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
                 document.getElementById('btn-tickers').className = view === 'tickers' ? active : inactive;
-            } else if (!currentTab.startsWith('cash')) {
+            } else if (!currentTab.startsWith('cash') && !currentTab.startsWith('nps')) {
                 document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
             }
@@ -379,7 +399,9 @@
             renderView(); 
         }
 
-        function displayMoney(amt) { return isPrivacyMode && !isEditingCash ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); }
+        function displayMoney(amt) { 
+            return isPrivacyMode && !isEditingCash && !isEditingNPS ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); 
+        }
 
         function validatePin() {
             const pinInput = document.getElementById('pin-input');
@@ -394,8 +416,8 @@
         function init() { switchMainTab('home'); }
 
         function updateStats() {
-            const total = activeData.reduce((s, item) => s + item.amount, 0);
-            if (currentTab === 'home' || currentTab.startsWith('cash')) {
+            const total = activeData.reduce((s, item) => s + (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount), 0);
+            if (currentTab === 'home' || currentTab.startsWith('cash') || currentTab.startsWith('nps')) {
                 document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
             } else if (currentTab === 'ncd') {
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
@@ -454,9 +476,145 @@
                 else if (currentSubView === 'tickers') renderTickers(viewDiv);
             } else if (currentTab.startsWith('cash')) {
                 renderCash(viewDiv);
+            } else if (currentTab.startsWith('nps')) {
+                renderNPS(viewDiv);
             } else {
                 if (currentSubView === 'maturity') renderMaturity(viewDiv);
                 else renderBankOrCompany(viewDiv);
+            }
+        }
+
+        function renderNPS(container) {
+            let tiers = activeData.reduce((acc, item) => {
+                let t = item.tier || "Tier 1";
+                if (!acc[t]) acc[t] = [];
+                acc[t].push(item);
+                return acc;
+            }, {});
+
+            let html = `<div class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2 px-1">
+                    Last Updated: <span class="text-gray-800 dark:text-gray-200">${npsTimestamp}</span>
+                </div>`;
+
+            const btnText = isEditingNPS ? "Save" : "Edit";
+            const btnColor = isEditingNPS ? "bg-green-600 hover:bg-green-700" : "bg-[#5D6B7F] hover:bg-gray-700";
+
+            Object.keys(tiers).sort().forEach(tierName => {
+                let tbodyHtml = tiers[tierName].map(item => {
+                    let globalIdx = activeData.indexOf(item); 
+
+                    let unitsDisplay = isEditingNPS 
+                        ? `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${item.units}" class="w-full min-w-[80px] max-w-[120px] px-2 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
+                        : `${item.units}`;
+
+                    let percentStr = item.percent;
+                    if (typeof percentStr === 'number') percentStr = Number((percentStr * 100).toFixed(2)) + '%';
+                    else if (typeof percentStr === 'string' && percentStr !== "" && !percentStr.includes('%')) {
+                        let n = parseFloat(percentStr);
+                        if (!isNaN(n) && n > 0 && n < 1) percentStr = Number((n * 100).toFixed(2)) + '%';
+                        else if (!isNaN(n)) percentStr = n + '%';
+                    }
+
+                    let totalDisplay = typeof item.total === 'number' ? displayMoney(item.total) : item.total;
+                    let navDateDisplay = item.navDate ? new Date(item.navDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'}) : '';
+
+                    return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                        <td class="p-3 text-left font-bold text-gray-800 dark:text-white whitespace-nowrap align-middle">${item.fund}</td>
+                        <td class="p-3 text-left text-gray-700 dark:text-gray-300 whitespace-nowrap align-middle min-w-[120px]">${item.scheme}</td>
+                        <td class="p-3 text-right text-gray-500 dark:text-gray-400 align-middle">${percentStr}</td>
+                        <td class="p-3 text-right font-bold text-blue-600 dark:text-blue-400 align-middle">${unitsDisplay}</td>
+                        <td class="p-3 text-right text-gray-700 dark:text-gray-300 align-middle">${item.nav}</td>
+                        <td class="p-3 text-right text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle">${navDateDisplay}</td>
+                        <td class="p-3 text-right font-bold text-gray-900 dark:text-gray-100 align-middle">${totalDisplay}</td>
+                    </tr>`;
+                }).join('');
+
+                html += `
+                    <h3 class="font-bold text-gray-700 dark:text-gray-300 mt-4 mb-2 ml-1 uppercase text-xs tracking-wider">${tierName}</h3>
+                    <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 overflow-hidden">
+                        <div class="overflow-x-auto hide-scrollbar">
+                            <table class="w-full text-sm">
+                                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
+                                    <tr>
+                                        <th class="p-3 text-left whitespace-nowrap">Pension Fund</th>
+                                        <th class="p-3 text-left whitespace-nowrap">Scheme</th>
+                                        <th class="p-3 text-right whitespace-nowrap">%</th>
+                                        <th class="p-3 text-right whitespace-nowrap">Units</th>
+                                        <th class="p-3 text-right whitespace-nowrap">NAV</th>
+                                        <th class="p-3 text-right whitespace-nowrap">NAV Date</th>
+                                        <th class="p-3 text-right whitespace-nowrap">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>${tbodyHtml}</tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="flex justify-end px-1 mb-8">
+                    <button id="nps-action-btn" onclick="handleNPSAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        async function handleNPSAction() {
+            const viewKey = currentTab + '_' + currentSubView;
+
+            if (!isEditingNPS) {
+                isEditingNPS = true;
+                if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
+                renderView();
+            } else {
+                const btn = document.getElementById('nps-action-btn');
+                btn.innerHTML = '<span class="loader"></span> Saving';
+                btn.disabled = true;
+
+                const updates = [];
+                activeData.forEach((item, index) => {
+                    const input = document.getElementById('nps-input-' + index);
+                    if(input) {
+                        const newVal = parseFloat(input.value) || 0;
+                        item.units = newVal; 
+                        updates.push({ row: item.row, col: item.col, units: newVal });
+                    }
+                });
+
+                const targetKeyword = currentTab === 'nps_ht' ? "HT NPS" : "NCT NPS";
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: "POST",
+                        body: JSON.stringify({ action: "UPDATE_NPS", keyword: targetKeyword, updates: updates })
+                    });
+                    const result = await response.json();
+                    
+                    if(result.error) throw new Error(result.error);
+                    
+                    npsTimestamp = result.timestamp;
+                    isEditingNPS = false;
+
+                    const freshData = { items: activeData, lastUpdated: npsTimestamp };
+                    memoryCache[currentTab] = { rawData: freshData };
+                    
+                    const reqUrl = `${API_URL}?user=${targetKeyword === 'HT NPS' ? 'NPS_HT' : 'NPS_NCT'}`;
+                    caches.open('ai-tracker-data-v1').then(cache => {
+                        cache.put(reqUrl, new Response(JSON.stringify(freshData)));
+                    });
+
+                    if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
+
+                    updateStats();
+                    renderView();
+                } catch(e) {
+                    alert("Save failed: " + e.message);
+                    btn.innerHTML = 'Save';
+                    btn.disabled = false;
+                }
             }
         }
 
@@ -630,7 +788,7 @@
                 });
                 return rowHtml + `</tr>`;
             }).join('');
-            container.innerHTML = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-8 overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-xs border-b dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table></div></div>`;
+            container.innerHTML = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-8 overflow-hidden"><div class="overflow-x-auto hide-scrollbar"><table class="w-full text-sm"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-xs border-b dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table></div></div>`;
         }
 
         function renderMaturity(container) {
@@ -654,7 +812,7 @@
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
                     groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                     const monthlyTotal = groups[y].months[m].total; const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
-                    html += `<div class="border-l-4 border-[#5D6B7F] ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${percent}%, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[y].months[m].items)}</div></div>`;
+                    html += `<div class="border-l-4 border-[#5D6B7F] ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${percent}%, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
                 });
                 html += `</div></div>`;
             });
@@ -684,17 +842,17 @@
                 const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
                 const percentOfTotal = (grandTotalInv > 0) ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%' : '0.0%';
                 let statsHtml = currentTab === 'ncd' ? `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>` : `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
-                html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex flex-col items-start dark:text-white text-left"><h3 class="font-bold text-sm w-full pr-2 whitespace-normal break-words leading-tight mb-1">${key}</h3><div class="text-[10px] w-full leading-tight text-gray-500 dark:text-gray-400">${statsHtml}</div></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto">${renderTable(groups[key].items)}</div></div>`;
+                html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex flex-col items-start dark:text-white text-left"><h3 class="font-bold text-sm w-full pr-2 whitespace-normal break-words leading-tight mb-1">${key}</h3><div class="text-[10px] w-full leading-tight text-gray-500 dark:text-gray-400">${statsHtml}</div></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[key].items)}</div></div>`;
             });
             container.innerHTML = html; renderSharedChart(canvasId, chartLabels, chartData, grandTotalInv);
         }
 
         function renderTable(items) {
             const isNCD = currentTab === 'ncd'; const isMaturity = currentSubView === 'maturity';
-            let theadHtml = `<tr>${isMaturity ? `<th class="p-2 text-center w-1/3">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}<th class="p-2 text-center">Amt</th>${!isNCD ? `<th class="p-2 text-center">Mat.Amt</th>` : ''}<th class="p-2 text-center">Date</th><th class="p-2 text-center">Rate</th></tr>`;
+            let theadHtml = `<tr>${isMaturity ? `<th class="p-2 text-center w-1/3 whitespace-nowrap">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}<th class="p-2 text-center whitespace-nowrap">Amt</th>${!isNCD ? `<th class="p-2 text-center whitespace-nowrap">Mat.Amt</th>` : ''}<th class="p-2 text-center whitespace-nowrap">Date</th><th class="p-2 text-center whitespace-nowrap">Rate</th></tr>`;
             let tbodyHtml = items.map(item => {
                 let formattedRate = String(item.rate); if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
-                return `<tr>${isMaturity ? `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto">${isNCD ? item.company : item.bank}</span></td>` : ''}<td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>` : ''}<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td><td class="p-2 text-center align-middle">${formattedRate}</td></tr>`;
+                return `<tr>${isMaturity ? `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto min-w-[80px]">${isNCD ? item.company : item.bank}</span></td>` : ''}<td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>` : ''}<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td><td class="p-2 text-center align-middle">${formattedRate}</td></tr>`;
             }).join('');
             return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
         }
