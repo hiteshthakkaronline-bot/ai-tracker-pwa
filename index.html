@@ -30,7 +30,6 @@
                 serviceWorkerParam: { scope: "/" },
                 serviceWorkerPath: "sw.js"
             });
-            // NEW: Automatically trigger the subscription popup!
             OneSignal.Slidedown.promptPush();
         });
     </script>
@@ -128,28 +127,32 @@
 
         <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-around items-center z-50 shadow-2xl transition-colors">
             <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-                <span class="text-[9px] mt-1 font-bold">HOME</span>
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
             </button>
             <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-1 px-1">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
-                <span class="text-[9px] mt-1 font-bold">FDs</span>
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">FDs</span>
             </button>
             <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-                <span class="text-[9px] mt-1 font-bold">NCDs</span>
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NCDs</span>
+            </button>
+            <button onclick="switchMainTab('mf')" id="nav-mf" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">MFs</span>
             </button>
             <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
                 </svg>
-                <span class="text-[9px] mt-1 font-bold">CASH</span>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">CASH</span>
             </button>
             <button onclick="switchMainTab('nps')" id="nav-nps" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
-                <span class="text-[9px] mt-1 font-bold">NPS</span>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NPS</span>
             </button>
         </nav>
     </div>
@@ -197,7 +200,7 @@
             
             const homeViews = ['dashboard', 'networth', 'tickers'];
             const otherViews = ['maturity', 'bank'];
-            const activeViews = currentTab === 'home' ? homeViews : ((currentTab === 'cash' || currentTab === 'nps') ? [] : otherViews);
+            const activeViews = currentTab === 'home' ? homeViews : ((currentTab === 'cash' || currentTab === 'nps' || currentTab === 'mf') ? [] : otherViews);
             
             if(activeViews.length === 0) return;
 
@@ -218,7 +221,6 @@
         
         let cashTimestamp = "Never";
         let isEditingCash = false;
-        
         let isEditingNPS = false;
         
         let memoryCache = {}; 
@@ -303,7 +305,6 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
-        // --- NEW: User Toggle Logic ---
         function switchUser(user, skipFetch = false) {
             currentUser = user;
             localStorage.setItem('currentUser', currentUser);
@@ -336,6 +337,8 @@
                 cashTimestamp = data.lastUpdated || "Never";
             } else if (tab === 'nps') {
                 activeData = data.items || []; 
+            } else if (tab === 'mf') {
+                activeData = currentUser === 'HT' ? (data.ht || []) : (data.nct || []);
             } else {
                 activeData = data; 
                 tickerData = { headers: [], rows: [] };
@@ -352,6 +355,7 @@
                 'home': 'Net Worth', 
                 'fds': currentUser === 'HT' ? "Hitesh FD's" : "NCT FD's", 
                 'ncd': 'HT NCDs', 
+                'mf': currentUser === 'HT' ? 'HT MF SIPs' : 'NCT MF SIPs',
                 'cash': currentUser === 'HT' ? 'HT Cash' : 'NCT Cash', 
                 'nps': currentUser === 'HT' ? 'HT NPS' : 'NCT NPS' 
             };
@@ -360,7 +364,6 @@
             const subNav = document.getElementById('sub-nav');
             const profileToggle = document.getElementById('profile-toggle');
             
-            // Hide user toggle on Home screen
             profileToggle.style.display = tab === 'home' ? 'none' : 'flex';
             subNav.style.display = 'flex'; 
             
@@ -376,7 +379,7 @@
                     <button onclick="showSubView('networth')" class="${currentSubView === 'networth' ? activeClass : inactiveClass}" id="btn-networth">Net Worth</button>
                     <button onclick="showSubView('tickers')" class="${currentSubView === 'tickers' ? activeClass : inactiveClass}" id="btn-tickers">Tickers</button>
                 `;
-            } else if (tab === 'cash' || tab === 'nps') {
+            } else if (tab === 'cash' || tab === 'nps' || tab === 'mf') {
                 currentSubView = tab; 
                 subNav.style.display = 'none'; 
             } else {
@@ -393,12 +396,12 @@
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
 
-            ['home', 'fds', 'ncd', 'cash', 'nps'].forEach(t => {
+            ['home', 'fds', 'ncd', 'mf', 'cash', 'nps'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
                 if(el) el.className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
 
-            const reqTabKey = tab === 'home' ? tab : tab + '_' + currentUser;
+            const reqTabKey = tab === 'home' ? tab : (tab === 'mf' ? 'mf_data' : tab + '_' + currentUser);
 
             if (memoryCache[reqTabKey]) {
                 applyData(tab, memoryCache[reqTabKey].rawData);
@@ -418,7 +421,7 @@
                 'cash': currentUser === 'HT' ? 'CASH_HT' : 'CASH_NCT', 
                 'nps': currentUser === 'HT' ? 'NPS_HT' : 'NPS_NCT' 
             };
-            const reqUrl = `${API_URL}?user=${paramMap[tab]}`;
+            const reqUrl = tab === 'mf' ? `${API_URL}?action=getMFs` : `${API_URL}?user=${paramMap[tab]}`;
             let networkDataReceived = false;
 
             caches.open('ai-tracker-data-v1').then(cache => {
@@ -489,7 +492,7 @@
                 document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
                 document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
                 document.getElementById('btn-tickers').className = view === 'tickers' ? active : inactive;
-            } else if (currentTab !== 'cash' && currentTab !== 'nps') {
+            } else if (currentTab !== 'cash' && currentTab !== 'nps' && currentTab !== 'mf') {
                 document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
             }
@@ -519,9 +522,11 @@
         }
 
         function updateStats() {
-            const total = activeData.reduce((s, item) => s + (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount), 0);
+            const total = activeData.reduce((s, item) => s + (item.totalAmount !== undefined ? item.totalAmount : (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount)), 0);
             if (currentTab === 'home' || currentTab === 'cash' || currentTab === 'nps') {
                 document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
+            } else if (currentTab === 'mf') {
+                document.getElementById('global-stats').innerHTML = `SIPs: ${displayMoney(total)}`;
             } else if (currentTab === 'ncd') {
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
             } else {
@@ -549,7 +554,7 @@
             const container = document.getElementById('app-content');
             container.style.display = 'block';
 
-            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
+            const reqTabKey = currentTab === 'home' ? currentTab : (currentTab === 'mf' ? 'mf_data_' + currentUser : currentTab + '_' + currentUser);
             const viewKey = reqTabKey + '_' + currentSubView;
 
             Array.from(container.children).forEach(child => {
@@ -582,10 +587,56 @@
                 renderCash(viewDiv);
             } else if (currentTab === 'nps') {
                 renderNPS(viewDiv);
+            } else if (currentTab === 'mf') {
+                renderMF(viewDiv);
             } else {
                 if (currentSubView === 'maturity') renderMaturity(viewDiv);
                 else renderBankOrCompany(viewDiv);
             }
+        }
+
+        function renderMF(container) {
+            let html = '';
+            
+            activeData.forEach(fund => {
+                let sipsHtml = fund.details.map(sip => {
+                    return `
+                    <div class="bg-gray-50 dark:bg-gray-700/50 border border-gray-100 dark:border-gray-600 p-3 rounded-lg text-sm grid grid-cols-2 gap-y-2 relative mt-2">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 font-medium uppercase">Plan</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">${sip.plan}</span>
+                        </div>
+                        <div class="flex flex-col text-right">
+                            <span class="text-[10px] text-gray-400 font-medium uppercase">Bank</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-200">${sip.bank}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-gray-400 font-medium uppercase">Start Date</span>
+                            <span class="text-gray-600 dark:text-gray-400 text-xs">${sip.startDate}</span>
+                        </div>
+                        <div class="flex flex-col text-right">
+                            <span class="text-[10px] text-gray-400 font-medium uppercase">End Date</span>
+                            <span class="text-gray-600 dark:text-gray-400 text-xs">${sip.endDate}</span>
+                        </div>
+                        <div class="col-span-2 mt-1 pt-2 border-t border-gray-200 dark:border-gray-600 flex justify-between items-center">
+                            <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase">SIP Amount</span>
+                            <span class="font-bold text-gray-700 dark:text-white">${displayMoney(sip.amount)}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                html += `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
+                    <div class="bg-gray-100 dark:bg-gray-700 px-4 py-3 border-b dark:border-gray-600 flex justify-between items-center gap-2">
+                        <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight w-2/3">${fund.fund}</span>
+                        <span class="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-blue-100 dark:border-blue-800">${displayMoney(fund.totalAmount)}</span>
+                    </div>
+                    <div class="p-3 bg-white dark:bg-gray-800">
+                        ${sipsHtml}
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
         }
 
         function renderNPS(container) {
