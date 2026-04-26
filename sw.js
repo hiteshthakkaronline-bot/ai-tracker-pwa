@@ -1,5 +1,8 @@
+// 1. IMPORT ONESIGNAL FIRST
+importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+
 // Change the version number (e.g., v1, v2) every time you update your code/CSS
-const CACHE_NAME = 'ai-tracker-v2.16';
+const CACHE_NAME = 'ai-tracker-v2.17';
 
 // List all the static files you want to work offline
 const ASSETS_TO_CACHE = [
@@ -10,7 +13,7 @@ const ASSETS_TO_CACHE = [
   'https://cdn.tailwindcss.com'
 ];
 
-// 1. Install Event: Saves the 'App Shell' to the phone's storage
+// 2. Install Event: Saves the 'App Shell' to the phone's storage
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -22,7 +25,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// 2. Activate Event: Deletes old caches when you update the version number
+// 3. Activate Event: Deletes old caches when you update the version number
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -39,7 +42,7 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 3. Fetch Event: Serves files from cache for speed, fetches data from network
+// 4. Fetch Event: Serves files from cache for speed, fetches data from network
 self.addEventListener('fetch', (event) => {
   // Check if the request is for your Google Apps Script API
   // We want the API to ALWAYS go to the network for fresh data
