@@ -30,6 +30,8 @@
                 serviceWorkerParam: { scope: "/" },
                 serviceWorkerPath: "sw.js"
             });
+            // NEW: Automatically trigger the subscription popup!
+            OneSignal.Slidedown.promptPush();
         });
     </script>
     
