@@ -2,14 +2,14 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // Bumped version to force the browser to update
-const CACHE_NAME = 'ai-tracker-v2.20';
+const CACHE_NAME = 'ai-tracker-v2.21';
 
 // REMOVED the Tailwind CDN from here!
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
-  './icons/rupee.png'
+  './icons/AI PWA.png'
 ];
 
 // 2. Install Event
