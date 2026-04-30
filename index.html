@@ -389,7 +389,7 @@
                 const bankText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
                 subNav.innerHTML = `
                     <button onclick="showSubView('maturity')" class="${currentSubView === 'maturity' ? activeClass : inactiveClass}" id="btn-maturity">Maturity</button>
-                    <button onclick="showSubView('bank')" class="${currentSubView === 'bank' ? activeClass : inactiveClass}" id="btn-bank">${bankText}</button>
+                    <button onclick="showSubView('bank')" class="${currentSubView === 'bank' ? activeClass : inactiveClass}" id="btn-bank">${currentSubView === 'ncd' ? 'NBFC-wise' : 'Bank-wise'}</button>
                 `;
             }
 
@@ -510,8 +510,12 @@
             renderView(); 
         }
 
-        function displayMoney(amt) { 
-            return isPrivacyMode && !isEditingCash && !isEditingNPS ? fmt.format(amt).replace(/[0-9]/g, 'X') : fmt.format(amt); 
+        function displayMoney(amt) {
+            if (typeof amt === 'string' && amt.includes('%')) {
+                return isPrivacyMode && !isEditingCash && !isEditingNPS ? amt.replace(/[0-9]/g, '●') : amt;
+            }
+
+            return isPrivacyMode && !isEditingCash && !isEditingNPS ? fmt.format(amt).replace(/[0-9]/g, '●') : fmt.format(amt); 
         }
 
         function init() { 
@@ -544,7 +548,7 @@
             
             chartInstances[canvasId] = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: bgColors.slice(0, labels.length), borderWidth: 0, hoverOffset: 4 }] },
                 options: { responsive: true, maintainAspectRatio: true, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) {
-                    const val = context.raw; const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%'; return ` ${context.label}: ${displayMoney(val)} (${pct})`;
+                    const val = context.raw; const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%'; return ` ${context.label}: ${displayMoney(val)} (${displayMoney(pct)})`;
                 }}}}}
             });
         }
@@ -595,11 +599,10 @@
             }
         }
 
-function renderMF(container) {
+        function renderMF(container) {
             let html = '';
             
             activeData.forEach(fund => {
-                // 1. Build the table rows for each individual SIP
                 let sipsHtml = fund.details.map(sip => {
                     return `
                     <tr class="hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
@@ -611,7 +614,6 @@ function renderMF(container) {
                     </tr>`;
                 }).join('');
 
-                // 2. Wrap it all in the Accordion structure (matches FDs/NCDs exactly)
                 html += `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     
@@ -686,6 +688,8 @@ function renderMF(container) {
                         if (!isNaN(n) && n > 0 && n < 1) percentStr = Number((n * 100).toFixed(2)) + '%';
                         else if (!isNaN(n)) percentStr = n + '%';
                     }
+
+                    percentStr = displayMoney(percentStr);
 
                     let totalDisplay = typeof item.total === 'number' ? displayMoney(item.total) : item.total;
                     let navDateDisplay = item.navDate ? new Date(item.navDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'}) : '';
@@ -828,6 +832,8 @@ function renderMF(container) {
                     if (!isNaN(num) && num > 0 && num < 1) formattedRate = Number((num * 100).toFixed(2)) + '%';
                     else if (!isNaN(num)) formattedRate = num + '%';
                 }
+                
+                formattedRate = displayMoney(formattedRate);
 
                 return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <td class="p-3 text-left font-bold text-gray-800 dark:text-white align-middle">${item.bank}</td>
@@ -943,7 +949,7 @@ function renderMF(container) {
                 const amount = classTotals[label]; const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
                 html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200">
                     <div class="flex items-center gap-3 w-1/2"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span><span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate">${label}</span></div>
-                    <div class="w-1/2 text-right flex flex-col"><span class="font-bold text-base leading-tight">${displayMoney(amount)}</span><span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${percent}</span></div></li>`;
+                    <div class="w-1/2 text-right flex flex-col"><span class="font-bold text-base leading-tight">${displayMoney(amount)}</span><span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span></div></li>`;
             });
             container.innerHTML = html + `</ul></div>`; 
             renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
@@ -962,7 +968,7 @@ function renderMF(container) {
                 html += `<li class="p-3 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors gap-2">
                     <div class="font-semibold text-gray-800 dark:text-white w-2/5 leading-tight break-words">${item.asset}</div>
                     <div class="text-[10px] font-bold text-[#5D6B7F] dark:text-gray-400 w-1/5 text-center leading-tight uppercase tracking-wide break-words">${item.assetClass || '-'}</div>
-                    <div class="w-2/5 text-right flex flex-col justify-center"><span class="font-bold text-sm leading-tight">${displayMoney(item.amount)}</span><span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400 mt-1">${percent}</span></div></li>`;
+                    <div class="w-2/5 text-right flex flex-col justify-center"><span class="font-bold text-sm leading-tight">${displayMoney(item.amount)}</span><span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400 mt-1">${displayMoney(percent)}</span></div></li>`;
             });
             container.innerHTML = html + `</ul></div>`;
         }
@@ -982,6 +988,9 @@ function renderMF(container) {
                             } else if (num < 0) { colorClass = "text-red-600 dark:text-red-400 font-bold"; } else { colorClass = "text-gray-500 font-bold"; }
                         }
                     } else if (typeof val === 'number') { displayVal = Number.isInteger(val) ? val : parseFloat(val).toFixed(2); }
+                    
+                    displayVal = displayMoney(displayVal);
+                    
                     rowHtml += `<td class="p-3 text-right ${colorClass} align-middle">${displayVal}</td>`;
                 });
                 return rowHtml + `</tr>`;
@@ -1007,11 +1016,11 @@ function renderMF(container) {
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
             Object.keys(groups).sort().forEach(y => {
                 const yearlyTotal = groups[y].total; const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
-                html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg"><span>${y}</span> <span>${yearPercent}%, ${displayMoney(yearlyTotal)}</span></button><div class="accordion-content">`;
+                html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg"><span>${y}</span> <span>${displayMoney(yearPercent + '%')}, ${displayMoney(yearlyTotal)}</span></button><div class="accordion-content">`;
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
                     groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                     const monthlyTotal = groups[y].months[m].total; const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
-                    html += `<div class="border-l-4 border-[#5D6B7F] ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${percent}%, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
+                    html += `<div class="border-l-4 border-[#5D6B7F] ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${displayMoney(percent + '%')}, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
                 });
                 html += `</div></div>`;
             });
@@ -1041,7 +1050,11 @@ function renderMF(container) {
                 groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                 const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
                 const percentOfTotal = (grandTotalInv > 0) ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%' : '0.0%';
-                let statsHtml = currentTab === 'ncd' ? `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>` : `<span class="text-gray-900 dark:text-white font-bold">${percentOfTotal}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${weightedAvgRate}</span>`;
+                
+                const mRate = displayMoney(weightedAvgRate);
+                const mPercent = displayMoney(percentOfTotal);
+
+                let statsHtml = currentTab === 'ncd' ? `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> , Inv: ${displayMoney(groups[key].inv)}, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>` : `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> , Inv: ${displayMoney(groups[key].inv)}, Mat: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].total)}</span>, Int Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex flex-col items-start dark:text-white text-left"><h3 class="font-bold text-sm w-full pr-2 whitespace-normal break-words leading-tight mb-1">${key}</h3><div class="text-[10px] w-full leading-tight text-gray-500 dark:text-gray-400">${statsHtml}</div></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[key].items)}</div></div>`;
             });
             container.innerHTML = html; renderSharedChart(canvasId, chartLabels, chartData, grandTotalInv);
@@ -1052,6 +1065,9 @@ function renderMF(container) {
             let theadHtml = `<tr>${isMaturity ? `<th class="p-2 text-center w-1/3 whitespace-nowrap">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}<th class="p-2 text-center whitespace-nowrap">Amt</th>${!isNCD ? `<th class="p-2 text-center whitespace-nowrap">Mat.Amt</th>` : ''}<th class="p-2 text-center whitespace-nowrap">Date</th><th class="p-2 text-center whitespace-nowrap">Rate</th></tr>`;
             let tbodyHtml = items.map(item => {
                 let formattedRate = String(item.rate); if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
+                
+                formattedRate = displayMoney(formattedRate);
+
                 return `<tr>${isMaturity ? `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto min-w-[80px]">${isNCD ? item.company : item.bank}</span></td>` : ''}<td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>` : ''}<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td><td class="p-2 text-center align-middle">${formattedRate}</td></tr>`;
             }).join('');
             return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
