@@ -46,7 +46,6 @@
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;}
         
         .keypad-btn { -webkit-tap-highlight-color: transparent; }
-        .keypad-btn:active { background-color: rgba(156, 163, 175, 0.2); }
     </style>
 </head>
 <body class="bg-white dark:bg-gray-900 transition-colors duration-300 pb-24 relative">
@@ -59,32 +58,50 @@
     <div id="app-root">
 
         <div id="pin-overlay" class="fixed inset-0 bg-gray-50 dark:bg-gray-900 z-[100] flex flex-col items-center justify-center px-6 pt-10 pb-20 transition-opacity duration-500">
-            <h2 class="text-xl font-medium text-gray-600 dark:text-gray-300 mb-12 tracking-wide">Enter Pin</h2>
+            <h2 class="text-lg font-normal text-gray-500 dark:text-gray-400 mb-8 tracking-wider">Enter Pin</h2>
             
-            <div class="flex gap-6 mb-16 h-10 items-end justify-center">
-                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
-                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
-                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
-                <div class="pin-indicator w-8 h-8 flex items-center justify-center text-3xl border-b border-gray-400 dark:border-gray-600 text-transparent transition-all duration-150"></div>
+            <div class="flex flex-col items-center mb-16 w-full max-w-[180px]">
+                <div class="flex gap-2 h-10 items-end justify-center w-full mb-2">
+                    <div class="pin-indicator w-8 flex items-center justify-center text-4xl font-light text-transparent transition-all duration-150 mt-2"></div>
+                    <div class="pin-indicator w-8 flex items-center justify-center text-4xl font-light text-transparent transition-all duration-150 mt-2"></div>
+                    <div class="pin-indicator w-8 flex items-center justify-center text-4xl font-light text-transparent transition-all duration-150 mt-2"></div>
+                    <div class="pin-indicator w-8 flex items-center justify-center text-4xl font-light text-transparent transition-all duration-150 mt-2"></div>
+                </div>
+                <div class="w-full h-px bg-gray-400 dark:bg-gray-500"></div>
             </div>
 
             <div id="pin-error" class="text-red-500 font-bold text-sm mb-6 hidden h-5">Incorrect PIN.</div>
             
-            <div class="grid grid-cols-3 gap-x-8 gap-y-6 max-w-[280px] w-full mt-auto">
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('1')">1</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('2')">2</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('3')">3</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('4')">4</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('5')">5</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('6')">6</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('7')">7</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('8')">8</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('9')">9</button>
-                <button class="keypad-btn text-lg font-medium text-gray-500 dark:text-gray-400 py-4 rounded-full transition-colors flex items-center justify-center" onclick="handlePinInput('clear')">Cancel</button>
-                <button class="keypad-btn text-4xl font-light text-gray-700 dark:text-gray-200 py-4 rounded-full transition-colors" onclick="handlePinInput('0')">0</button>
-                <button class="keypad-btn text-3xl font-light text-gray-800 dark:text-white py-4 rounded-full transition-colors flex justify-center items-center" onclick="handlePinInput('submit')">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-                </button>
+            <div class="grid grid-cols-3 gap-x-6 gap-y-6 max-w-[280px] w-full mt-auto place-items-center">
+                
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('1')">1</button>
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('2')">2</button>
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('3')">3</button>
+                
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('4')">4</button>
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('5')">5</button>
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('6')">6</button>
+                
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('7')">7</button>
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('8')">8</button>
+                <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('9')">9</button>
+                
+                <div class="flex flex-col items-center gap-1 w-full mt-2">
+                    <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('clear')">C</button>
+                    <span class="text-[10px] text-gray-400 dark:text-gray-500 tracking-wider">Cancel</span>
+                </div>
+                <div class="flex flex-col items-center gap-1 w-full mt-2">
+                    <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-3xl font-light text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('0')">0</button>
+                    <span class="text-[10px] text-transparent tracking-wider">0</span> 
+                </div>
+                <div class="flex flex-col items-center gap-1 w-full mt-2">
+                    <button class="keypad-btn w-[72px] h-[72px] rounded-full border border-gray-400 dark:border-gray-600 text-gray-700 dark:text-gray-200 flex items-center justify-center transition-colors active:bg-[#5D6B7F] active:border-[#5D6B7F] active:text-white dark:active:bg-[#5D6B7F]" onclick="handlePinInput('submit')">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 16l-4-4m0 0l4-4m-4 4h10.5a3.5 3.5 0 000-7H14" />
+                        </svg>
+                    </button>
+                    <span class="text-[10px] text-gray-400 dark:text-gray-500 tracking-wider">Enter</span>
+                </div>
             </div>
         </div>
 
@@ -252,13 +269,13 @@
             const dots = document.querySelectorAll('.pin-indicator');
             dots.forEach((dot, idx) => {
                 if (idx < enteredPin.length) {
-                    dot.innerHTML = '●';
-                    dot.classList.add('text-gray-800', 'dark:text-gray-200');
-                    dot.classList.remove('text-transparent', 'border-b', 'border-gray-400', 'dark:border-gray-600');
+                    dot.innerHTML = idx === enteredPin.length - 1 ? enteredPin[idx] : '*';
+                    dot.classList.add('text-[#5D6B7F]', 'dark:text-gray-300');
+                    dot.classList.remove('text-transparent');
                 } else {
                     dot.innerHTML = '';
-                    dot.classList.remove('text-gray-800', 'dark:text-gray-200');
-                    dot.classList.add('text-transparent', 'border-b', 'border-gray-400', 'dark:border-gray-600');
+                    dot.classList.remove('text-[#5D6B7F]', 'dark:text-gray-300');
+                    dot.classList.add('text-transparent');
                 }
             });
         }
@@ -389,7 +406,7 @@
                 const bankText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
                 subNav.innerHTML = `
                     <button onclick="showSubView('maturity')" class="${currentSubView === 'maturity' ? activeClass : inactiveClass}" id="btn-maturity">Maturity</button>
-                    <button onclick="showSubView('bank')" class="${currentSubView === 'bank' ? activeClass : inactiveClass}" id="btn-bank">${currentSubView === 'ncd' ? 'NBFC-wise' : 'Bank-wise'}</button>
+                    <button onclick="showSubView('bank')" class="${currentSubView === 'bank' ? activeClass : inactiveClass}" id="btn-bank">${bankText}</button>
                 `;
             }
 
@@ -1055,12 +1072,10 @@
                 const mRate = displayMoney(weightedAvgRate);
                 const mPercent = displayMoney(percentOfTotal);
 
-                // Stats string: Inv is now here, Mat is removed
                 let statsHtml = currentTab === 'ncd' 
                     ? `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>` 
                     : `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Inv: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].inv)}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
                 
-                // Pill amount: Maturity for FDs, Invested for NCDs
                 let pillAmount = currentTab === 'ncd' ? displayMoney(groups[key].inv) : displayMoney(groups[key].total);
 
                 html += `
@@ -1070,7 +1085,7 @@
                             <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${key}</span>
                             <span class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 leading-tight">${statsHtml}</span>
                         </div>
-                        <span class="font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-blue-100 dark:border-blue-800">
+                        <span class="font-bold text-[#5D6B7F] dark:text-gray-200 bg-gray-200/50 dark:bg-gray-700 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-gray-300 dark:border-gray-600">
                             ${pillAmount}
                         </span>
                     </button>
