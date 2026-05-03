@@ -217,7 +217,12 @@
             
             const homeViews = ['dashboard', 'networth', 'tickers'];
             const otherViews = ['maturity', 'bank'];
-            const activeViews = currentTab === 'home' ? homeViews : ((currentTab === 'cash' || currentTab === 'nps' || currentTab === 'mf') ? [] : otherViews);
+            const mfViews = ['dashboard', 'details'];
+            
+            let activeViews = [];
+            if (currentTab === 'home') activeViews = homeViews;
+            else if (currentTab === 'mf') activeViews = mfViews;
+            else if (currentTab !== 'cash' && currentTab !== 'nps') activeViews = otherViews;
             
             if(activeViews.length === 0) return;
 
@@ -233,6 +238,7 @@
         
         let currentUser = 'HT';
         let activeData = [];
+        let mfTotals = null; // New variable to hold backend market cap calculations
         let tickerData = { headers: [], rows: [] };
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
         
@@ -356,6 +362,7 @@
                 activeData = data.items || []; 
             } else if (tab === 'mf') {
                 activeData = currentUser === 'HT' ? (data.ht || []) : (data.nct || []);
+                mfTotals = currentUser === 'HT' ? (data.htMarketCap || null) : (data.nctMarketCap || null);
             } else {
                 activeData = data; 
                 tickerData = { headers: [], rows: [] };
@@ -396,7 +403,15 @@
                     <button onclick="showSubView('networth')" class="${currentSubView === 'networth' ? activeClass : inactiveClass}" id="btn-networth">Net Worth</button>
                     <button onclick="showSubView('tickers')" class="${currentSubView === 'tickers' ? activeClass : inactiveClass}" id="btn-tickers">Tickers</button>
                 `;
-            } else if (tab === 'cash' || tab === 'nps' || tab === 'mf') {
+            } else if (tab === 'mf') {
+                let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
+                currentSubView = ['dashboard', 'details'].includes(savedSubView) ? savedSubView : 'dashboard';
+                
+                subNav.innerHTML = `
+                    <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? activeClass : inactiveClass}" id="btn-dashboard">Market Cap Allocation</button>
+                    <button onclick="showSubView('details')" class="${currentSubView === 'details' ? activeClass : inactiveClass}" id="btn-details">SIP Details</button>
+                `;
+            } else if (tab === 'cash' || tab === 'nps') {
                 currentSubView = tab; 
                 subNav.style.display = 'none'; 
             } else {
@@ -509,7 +524,10 @@
                 document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
                 document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
                 document.getElementById('btn-tickers').className = view === 'tickers' ? active : inactive;
-            } else if (currentTab !== 'cash' && currentTab !== 'nps' && currentTab !== 'mf') {
+            } else if (currentTab === 'mf') {
+                document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
+                document.getElementById('btn-details').className = view === 'details' ? active : inactive;
+            } else if (currentTab !== 'cash' && currentTab !== 'nps') {
                 document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
             }
@@ -582,7 +600,7 @@
             });
 
             const hasTickers = currentTab === 'home' && currentSubView === 'tickers' && tickerData.rows.length > 0;
-            if (activeData.length === 0 && !hasTickers) { 
+            if (activeData.length === 0 && !hasTickers && !mfTotals) { 
                 container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>'; 
                 domCache = {}; 
                 return; 
@@ -608,14 +626,60 @@
             } else if (currentTab === 'nps') {
                 renderNPS(viewDiv);
             } else if (currentTab === 'mf') {
-                renderMF(viewDiv);
+                if (currentSubView === 'dashboard') renderMFDashboard(viewDiv);
+                else renderMFDetails(viewDiv);
             } else {
                 if (currentSubView === 'maturity') renderMaturity(viewDiv);
                 else renderBankOrCompany(viewDiv);
             }
         }
 
-        function renderMF(container) {
+        function renderMFDashboard(container) {
+            if (!mfTotals) {
+                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No market cap data found.</p>';
+                return;
+            }
+
+            const labels = ['Large Cap', 'Mid Cap', 'Small Cap'];
+            const chartData = [mfTotals.large, mfTotals.mid, mfTotals.small];
+            const totalInv = mfTotals.total;
+
+            if (mfTotals.other > (totalInv * 0.01)) {
+                labels.push('Other / Debt');
+                chartData.push(mfTotals.other);
+            }
+
+            const reqTabKey = currentTab + '_' + currentUser;
+            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
+            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
+
+            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
+                    <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Market Cap Allocation</h2>
+                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8"><ul class="divide-y dark:divide-gray-700">`;
+            
+            labels.forEach((label, i) => {
+                const amount = chartData[i]; 
+                const percent = totalInv > 0 ? (amount / totalInv * 100).toFixed(2) + '%' : '0.00%';
+                
+                html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200">
+                    <div class="flex items-center gap-3 w-1/2">
+                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
+                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate">${label}</span>
+                    </div>
+                    <div class="w-1/2 text-right flex flex-col">
+                        <span class="font-bold text-base leading-tight">${displayMoney(amount)}</span>
+                        <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
+                    </div>
+                </li>`;
+            });
+            html += `</ul></div>`;
+            
+            container.innerHTML = html; 
+            renderSharedChart(canvasId, labels, chartData, totalInv);
+        }
+
+        function renderMFDetails(container) {
             let html = '';
             
             activeData.forEach(fund => {
@@ -630,7 +694,6 @@
                     </tr>`;
                 }).join('');
 
-                // NEW: Calculate and Render the Star Ratings
                 let starsHtml = '';
                 if (fund.rating && !isNaN(fund.rating)) {
                     let rating = parseInt(fund.rating);
@@ -647,7 +710,6 @@
                     starsHtml += `</div>`;
                 }
 
-                // NEW: Expanded MF Details (Plan, Exp Ratio, Market Caps)
                 let detailsHtml = '';
                 if (fund.planType || fund.expenseRatio || fund.large !== undefined) {
                     let pType = fund.planType || '-';
