@@ -2,7 +2,7 @@
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // Bumped version to force the browser to update
-const CACHE_NAME = 'ai-tracker-v2.31';
+const CACHE_NAME = 'ai-tracker-v2.32';
 
 // REMOVED the Tailwind CDN from here!
 const ASSETS_TO_CACHE = [
