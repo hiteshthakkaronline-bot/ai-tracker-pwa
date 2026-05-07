@@ -1209,46 +1209,35 @@
             return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
         }
     </script>
-    <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const action = urlParams.get('action');
     const rows = urlParams.get('rows');
 
     if (action === 'markCompleted' && rows) {
+        // 1. Instantly clean the URL so the user sees nothing on screen
+        window.history.replaceState({}, document.title, window.location.pathname);
         
-        const toast = document.createElement('div');
-        toast.className = "fixed top-10 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl z-[9999] transition-all duration-300 ease-in-out font-medium text-sm";
-        toast.innerText = "⏳ Marking tasks as completed...";
-        document.body.appendChild(toast);
+        // 2. Log to the backend/console for troubleshooting
+        console.log(`[Silent Action] Marking rows ${rows} as completed...`);
 
+        // Paste your actual Google Web App URL below
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
 
+        // 3. Silently ping the backend
         fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rows}`)
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    toast.innerText = "✅ Tasks successfully marked as completed!";
-                    toast.classList.replace('bg-gray-800', 'bg-green-600');
+                    console.log("✅ Success: Tasks marked as completed in Google Sheets.");
                 } else {
-                    throw new Error("Backend failed");
+                    console.error("❌ Failed: Backend did not return success status.");
                 }
             })
             .catch(error => {
-                toast.innerText = "❌ Failed to update Google Sheet.";
-                toast.classList.replace('bg-gray-800', 'bg-red-600');
-                console.error(error);
-            })
-            .finally(() => {
-                setTimeout(() => { toast.style.opacity = '0'; }, 3000);
-                setTimeout(() => { toast.remove(); }, 3500);
+                console.error("❌ Network Error: Failed to contact Google Script backend.", error);
             });
-
-        window.history.replaceState({}, document.title, window.location.pathname);
-    } 
-    
-    else if (action === 'dismiss') {
-        window.history.replaceState({}, document.title, window.location.pathname);
     }
 });
 </script>
