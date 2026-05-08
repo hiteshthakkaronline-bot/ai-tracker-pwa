@@ -1083,27 +1083,60 @@
             container.innerHTML = html + `</ul></div>`;
         }
 
-        function renderTickers(container) {
-            if (!tickerData || !tickerData.rows || tickerData.rows.length === 0) { container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No ticker data found.</p>'; return; }
+       function renderTickers(container) {
+            if (!tickerData || !tickerData.rows || tickerData.rows.length === 0) { 
+                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No ticker data found.</p>'; 
+                return; 
+            }
             
-            let theadHtml = `<tr><th class="p-3 text-left w-2/5">TICKER</th>`;
-            for (let i = 1; i < tickerData.headers.length; i++) { theadHtml += `<th class="p-3 text-right">${String(tickerData.headers[i]).toUpperCase()}</th>`; }
+            // 1 & 2. Create a dedicated formatter that ALWAYS shows 2 decimals and ignores Privacy Mode
+            const tickerFmt = new Intl.NumberFormat('en-IN', { 
+                style: 'currency', 
+                currency: 'INR', 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+
+            // 3. Reduced padding to px-2 and removed the forced "w-2/5" width to pull columns closer
+            let theadHtml = `<tr><th class="px-2 py-2 text-left whitespace-nowrap">TICKER</th>`;
+            for (let i = 1; i < tickerData.headers.length; i++) { 
+                theadHtml += `<th class="px-2 py-2 text-right whitespace-nowrap">${String(tickerData.headers[i]).toUpperCase()}</th>`; 
+            }
             theadHtml += `</tr>`;
             
             let tbodyHtml = tickerData.rows.map(row => {
-                let rowHtml = `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"><td class="p-3 text-left font-bold text-gray-800 dark:text-white align-middle">${row.ticker}</td>`;
+                let rowHtml = `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"><td class="px-2 py-2 text-left font-bold text-gray-800 dark:text-white align-middle whitespace-nowrap">${row.ticker}</td>`;
+                
                 row.values.forEach((val, idx) => {
-                    const headerName = String(tickerData.headers[idx + 1]).toUpperCase(); let displayVal = val; let colorClass = "text-gray-800 dark:text-gray-200 font-semibold";
+                    const headerName = String(tickerData.headers[idx + 1]).toUpperCase(); 
+                    let displayVal = val; 
+                    let colorClass = "text-gray-800 dark:text-gray-200 font-semibold";
                     
-                    if (headerName.includes('%')) { let num = parseFloat(val); if (!isNaN(num)) {
-                            if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) { displayVal = (num * 100).toFixed(2) + '%'; }
-                            if (num > 0) { colorClass = "text-green-600 dark:text-green-400 font-bold"; if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal;
-                            } else if (num < 0) { colorClass = "text-red-600 dark:text-red-400 font-bold"; } else { colorClass = "text-gray-500 font-bold"; }
+                    if (headerName.includes('%')) { 
+                        let num = parseFloat(val); 
+                        if (!isNaN(num)) {
+                            if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) { 
+                                displayVal = (num * 100).toFixed(2) + '%'; 
+                            }
+                            if (num > 0) { 
+                                colorClass = "text-green-600 dark:text-green-400 font-bold"; 
+                                if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal;
+                            } else if (num < 0) { 
+                                colorClass = "text-red-600 dark:text-red-400 font-bold"; 
+                            } else { 
+                                colorClass = "text-gray-500 font-bold"; 
+                            }
                         }
-                    } else if (typeof val === 'number') { displayVal = Number.isInteger(val) ? val : parseFloat(val).toFixed(2); }
+                    } else { 
+                        // It is a standard number/value. Format with 2 decimals natively.
+                        let num = parseFloat(val);
+                        if (!isNaN(num)) {
+                            displayVal = tickerFmt.format(num);
+                        }
+                    }
                     
-                    displayVal = displayMoney(displayVal);
-                    rowHtml += `<td class="p-3 text-right ${colorClass} align-middle">${displayVal}</td>`;
+                    // Notice we completely removed the "displayMoney()" privacy wrapper from here
+                    rowHtml += `<td class="px-2 py-2 text-right ${colorClass} align-middle whitespace-nowrap">${displayVal}</td>`;
                 });
                 return rowHtml + `</tr>`;
             }).join('');
