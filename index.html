@@ -288,18 +288,20 @@
         function updatePinDisplay() {
             const dots = document.querySelectorAll('.pin-indicator');
             dots.forEach((dot, idx) => {
+                // Clear any lingering text asterisks just in case
+                dot.innerHTML = ''; 
+                
                 if (idx < enteredPin.length) {
-                    dot.innerHTML = idx === enteredPin.length - 1 ? enteredPin[idx] : '*';
-                    dot.classList.add('text-[#5D6B7F]', 'dark:text-gray-300');
-                    dot.classList.remove('text-transparent');
+                    // Filled state (Darker dot)
+                    dot.classList.add('bg-[#344755]', 'dark:bg-gray-300');
+                    dot.classList.remove('bg-gray-300', 'dark:bg-gray-600');
                 } else {
-                    dot.innerHTML = '';
-                    dot.classList.remove('text-[#5D6B7F]', 'dark:text-gray-300');
-                    dot.classList.add('text-transparent');
+                    // Empty state (Lighter dot)
+                    dot.classList.remove('bg-[#344755]', 'dark:bg-gray-300');
+                    dot.classList.add('bg-gray-300', 'dark:bg-gray-600');
                 }
             });
         }
-
         function validatePin() {
             if (enteredPin === SECRET_PIN) {
                 sessionStorage.setItem('isUnlocked', 'true');
