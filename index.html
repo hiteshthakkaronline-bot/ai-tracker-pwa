@@ -684,15 +684,15 @@
             renderSharedChart(canvasId, labels, chartData, totalInv);
         }
 
-function renderMFDetails(container, fundsDataObj) {
-            // Fallback to activeData if a specific object isn't passed yet
+        function renderMFDetails(container, fundsDataObj) {
+            // Check if we passed the specific object (e.g., mfData.ht), otherwise fallback to the global activeData
             const dataToRender = fundsDataObj || activeData; 
             let finalHtml = '';
 
             const buildSection = (fundList, title) => {
                 if (!fundList || fundList.length === 0) return '';
                 
-                let html = `<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-4 mb-2 px-2">${title}</h3>`;
+                let html = `<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-5 mb-2 px-2">${title}</h3>`;
                 
                 fundList.forEach(fund => {
                     // 1. Nested SIP Table Rows (Plan, Start, End, Amt)
@@ -729,6 +729,8 @@ function renderMFDetails(container, fundsDataObj) {
                     let lPct = fund.large !== undefined ? (Number(fund.large).toFixed(2) + '%') : '-';
                     let mPct = fund.medium !== undefined ? (Number(fund.medium).toFixed(2) + '%') : '-';
                     let sPct = fund.small !== undefined ? (Number(fund.small).toFixed(2) + '%') : '-';
+                    
+                    // FIXED: Do not use displayMoney on Alpha!
                     let alphaVal = (fund.alphaEfficiency !== undefined && fund.alphaEfficiency !== null && fund.alphaEfficiency !== '') ? fund.alphaEfficiency : '-';
 
                     let detailsHtml = `
@@ -737,11 +739,13 @@ function renderMFDetails(container, fundsDataObj) {
                             <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Large</div><div class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(lPct)}</div></div>
                             <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Mid</div><div class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(mPct)}</div></div>
                             <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(sPct)}</div></div>
-                            <div><div class="text-purple-500 dark:text-purple-400 mb-0.5 font-bold uppercase">Alpha</div><div class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(alphaVal)}</div></div>
+                            
+                            <div><div class="text-purple-500 dark:text-purple-400 mb-0.5 font-bold uppercase">Alpha</div><div class="font-bold text-gray-800 dark:text-gray-200 truncate" title="${alphaVal}">${alphaVal}</div></div>
                         </div>
+                        
                         <div class="flex justify-between text-[10px] text-gray-600 dark:text-gray-400 px-1 mt-1">
                             <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Plan:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${pType}</span></div>
-                            <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Exp Ratio:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(expRatio)}</span></div>
+                            <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Exp Ratio:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${expRatio}</span></div>
                         </div>
                     </div>`;
 
@@ -781,12 +785,12 @@ function renderMFDetails(container, fundsDataObj) {
                 return html;
             };
 
-            // Detect if the passed data is the new {active: [], inactive: []} object
+            // Safely route the new {active: [], inactive: []} object structure
             if (dataToRender && dataToRender.active !== undefined) {
                 finalHtml += buildSection(dataToRender.active, "ACTIVE SIPs");
                 finalHtml += buildSection(dataToRender.inactive, "INACTIVE SIPs");
             } else if (Array.isArray(dataToRender)) {
-                // Fallback for older arrays
+                // Fallback
                 finalHtml += buildSection(dataToRender, "SIP Details");
             }
 
