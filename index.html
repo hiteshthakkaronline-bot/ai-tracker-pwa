@@ -689,6 +689,21 @@
             const dataToRender = fundsDataObj || activeData; 
             let finalHtml = '';
 
+            // --- NEW: CALCULATE AND DISPLAY TOTAL ACTIVE SIP AMOUNT AT THE TOP ---
+            let totalActiveSip = 0;
+            if (dataToRender && dataToRender.active) {
+                totalActiveSip = dataToRender.active.reduce((sum, fund) => sum + (fund.totalAmount || 0), 0);
+            } else if (Array.isArray(dataToRender)) {
+                totalActiveSip = dataToRender.reduce((sum, fund) => sum + (fund.totalAmount || 0), 0);
+            }
+
+            finalHtml += `
+            <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 mt-2 p-5 flex flex-col items-center justify-center">
+                <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Total Active SIP</span>
+                <span class="text-3xl font-black text-[#344755] dark:text-white tracking-tight">${displayMoney(totalActiveSip)}</span>
+            </div>`;
+            // ----------------------------------------------------------------------
+
             const buildSection = (fundList, title) => {
                 if (!fundList || fundList.length === 0) return '';
                 
@@ -730,7 +745,6 @@
                     let mPct = fund.medium !== undefined ? (Number(fund.medium).toFixed(2) + '%') : '-';
                     let sPct = fund.small !== undefined ? (Number(fund.small).toFixed(2) + '%') : '-';
                     
-                    // FIXED: Do not use displayMoney on Alpha!
                     let alphaVal = (fund.alphaEfficiency !== undefined && fund.alphaEfficiency !== null && fund.alphaEfficiency !== '') ? fund.alphaEfficiency : '-';
 
                     let detailsHtml = `
@@ -790,7 +804,6 @@
                 finalHtml += buildSection(dataToRender.active, "ACTIVE SIPs");
                 finalHtml += buildSection(dataToRender.inactive, "INACTIVE SIPs");
             } else if (Array.isArray(dataToRender)) {
-                // Fallback
                 finalHtml += buildSection(dataToRender, "SIP Details");
             }
 
