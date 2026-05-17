@@ -31,7 +31,7 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS STABLE ROLLBACK
-const CACHE_NAME = 'ai-tracker-v2.81';
+const CACHE_NAME = 'ai-tracker-v2.85';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -67,13 +67,22 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event (The Original Stable Version)
+// 6. Fetch Event (The Golden Rule Routing)
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('script.google.com')|| event.request.url.includes('onesignal.com')) {
-    event.respondWith(fetch(event.request));
-    return;
+  
+  // RULE 1: Never intercept POST requests (This fixes the OneSignal crash!)
+  if (event.request.method !== 'GET') {
+    return; // Let the browser handle it normally
   }
 
+  // RULE 2: Only intercept requests for our own Vercel files.
+  // Completely ignore OneSignal, Google, and any other external websites!
+  const url = new URL(event.request.url);
+  if (url.origin !== location.origin) {
+    return; // Let the browser handle it normally
+  }
+
+  // RULE 3: Cache our local Vercel files safely
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) { return cachedResponse; }
