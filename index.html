@@ -402,7 +402,7 @@
             
             const activeClass = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
             const inactiveClass = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
-            
+
             if (tab === 'home') {
                 let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
                 currentSubView = ['dashboard', 'networth', 'tickers'].includes(savedSubView) ? savedSubView : 'dashboard';
@@ -414,7 +414,6 @@
             } else if (tab === 'mf') {
                 let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
                 currentSubView = ['dashboard', 'details'].includes(savedSubView) ? savedSubView : 'dashboard';
-                
                 subNav.innerHTML = `
                     <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? activeClass : inactiveClass}" id="btn-dashboard">Market Cap Allocation</button>
                     <button onclick="showSubView('details')" class="${currentSubView === 'details' ? activeClass : inactiveClass}" id="btn-details">SIP Details</button>
@@ -435,14 +434,14 @@
 
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
-            
+
             ['home', 'fds', 'ncd', 'mf', 'cash', 'nps'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
                 if(el) el.className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
-            
+
             const reqTabKey = tab === 'home' ? tab : (tab === 'mf' ? 'mf_data' : tab + '_' + currentUser);
-            
+
             if (memoryCache[reqTabKey]) {
                 applyData(tab, memoryCache[reqTabKey].rawData);
                 updateStats();
@@ -461,32 +460,63 @@
                 'cash': currentUser === 'HT' ? 'CASH_HT' : 'CASH_NCT', 
                 'nps': currentUser === 'HT' ? 'NPS_HT' : 'NPS_NCT' 
             };
-            const reqUrl = tab === 'mf' ? `${API_URL}?action=getMFs` : `${API_URL}?user=${paramMap[tab]}`;
+
             let networkDataReceived = false;
-            
-            caches.open('ai-tracker-data-v1').then(cache => {
-                cache.match(reqUrl).then(response => {
-                    if (response) {
-                        response.json().then(data => {
-                            if (!networkDataReceived) {
-                                applyData(tab, data);
-                                updateStats();
-                                renderView();
-                            }
-                        }).catch(() => {}); 
-                    }
-                });
-            });
-            
+
             try {
-                const response = await fetch(reqUrl);
-                const data = await response.json();
-                if (data.error) throw new Error(data.error);
-                
-                networkDataReceived = true;
-                memoryCache[reqTabKey] = { rawData: data };
-                const cache = await caches.open('ai-tracker-data-v1');
-                cache.put(reqUrl, new Response(JSON.stringify(data)));
+                let data;
+
+                // 🚀 THE PARALLEL FETCH LOGIC FOR MFs
+                if (tab === 'mf') {
+                    const urls = [
+                        `${API_URL}?action=getHTSips`,
+                        `${API_URL}?action=getNCTSips`,
+                        `${API_URL}?action=getHTMarketCap`,
+                        `${API_URL}?action=getNCTMarketCap`
+                    ];
+
+                    // Fire all 4 endpoints at the exact same time
+                    const [ht, nct, htMarketCap, nctMarketCap] = await Promise.all(
+                        urls.map(url => fetch(url).then(r => r.json()))
+                    );
+
+                    // Reconstruct the single payload structure your UI relies on
+                    data = { ht, htMarketCap, nct, nctMarketCap };
+                    
+                    networkDataReceived = true;
+                    memoryCache[reqTabKey] = { rawData: data };
+
+                    // Cache the finalized payload for instant loading next time
+                    const cache = await caches.open('ai-tracker-data-v1');
+                    cache.put(`${API_URL}?action=getMFs`, new Response(JSON.stringify(data)));
+
+                } else {
+                    // Standard Single-Fetch Logic for FDs, NCDs, Cash, NPS
+                    const reqUrl = `${API_URL}?user=${paramMap[tab]}`;
+                    
+                    caches.open('ai-tracker-data-v1').then(cache => {
+                        cache.match(reqUrl).then(response => {
+                            if (response) {
+                                response.json().then(cachedData => {
+                                    if (!networkDataReceived) {
+                                        applyData(tab, cachedData);
+                                        updateStats();
+                                        renderView();
+                                    }
+                                }).catch(() => {}); 
+                            }
+                        });
+                    });
+
+                    const response = await fetch(reqUrl);
+                    data = await response.json();
+                    if (data.error) throw new Error(data.error);
+                    
+                    networkDataReceived = true;
+                    memoryCache[reqTabKey] = { rawData: data };
+                    const cache = await caches.open('ai-tracker-data-v1');
+                    cache.put(reqUrl, new Response(JSON.stringify(data)));
+                }
 
                 if (currentTab === tab) {
                     if (!isEditingCash && !isEditingNPS) {
