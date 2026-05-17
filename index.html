@@ -808,21 +808,6 @@
             const dataToRender = fundsDataObj || activeData; 
             let finalHtml = '';
 
-            // --- NEW: CALCULATE AND DISPLAY TOTAL ACTIVE SIP AMOUNT AT THE TOP ---
-            let totalActiveSip = 0;
-            if (dataToRender && dataToRender.active) {
-                totalActiveSip = dataToRender.active.reduce((sum, fund) => sum + (fund.totalAmount || 0), 0);
-            } else if (Array.isArray(dataToRender)) {
-                totalActiveSip = dataToRender.reduce((sum, fund) => sum + (fund.totalAmount || 0), 0);
-            }
-
-            finalHtml += `
-            <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 mt-2 p-5 flex flex-col items-center justify-center">
-                <span class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-1">Total Active SIP</span>
-                <span class="text-3xl font-black text-[#344755] dark:text-white tracking-tight">${displayMoney(totalActiveSip)}</span>
-            </div>`;
-            // ----------------------------------------------------------------------
-
             const buildSection = (fundList, title) => {
                 if (!fundList || fundList.length === 0) return '';
                 
@@ -869,9 +854,9 @@
                     let detailsHtml = `
                     <div class="px-3 py-3 bg-gray-100/80 dark:bg-gray-800/80 border-b dark:border-gray-700 flex flex-col gap-2">
                         <div class="grid grid-cols-4 gap-2 bg-white dark:bg-gray-700 p-2 rounded border dark:border-gray-600 text-center text-[10px] shadow-sm">
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Large</div><div class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(lPct)}</div></div>
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Mid</div><div class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(mPct)}</div></div>
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gray-200">${displayMoney(sPct)}</div></div>
+                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Large</div><div class="font-bold text-gray-800 dark:text-gray-200">${lPct}</div></div>
+                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Mid</div><div class="font-bold text-gray-800 dark:text-gray-200">${mPct}</div></div>
+                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gray-200">${sPct}</div></div>
                             
                             <div><div class="text-purple-500 dark:text-purple-400 mb-0.5 font-bold uppercase">Alpha</div><div class="font-bold text-gray-800 dark:text-gray-200 truncate" title="${alphaVal}">${alphaVal}</div></div>
                         </div>
@@ -1368,9 +1353,18 @@
 
             const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
             const canvasId = `chart-${reqTabKey}-${currentSubView}`;
-            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">${currentTab === 'ncd' ? 'NBFC Allocation' : 'Bank Allocation'}</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
+            
+            let html = '';
+            
+            // THE FIX: Only render the Chart container if the tab is NOT NCD
+            if (currentTab !== 'ncd') {
+                html += `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
+                    <h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Bank Allocation</h2>
+                    <div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div>
+                </div>`;
+            }
 
-            // THE FIX: Iterate through sortedBanks instead of the default alphabetical sort
             sortedBanks.forEach(key => {
                 groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                 const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
@@ -1401,8 +1395,13 @@
                     </div>
                 </div>`;
             });
+            
             container.innerHTML = html; 
-            renderSharedChart(canvasId, chartLabels, chartData, grandTotalInv);
+            
+            // THE FIX: Only call the chart rendering function if the tab is NOT NCD
+            if (currentTab !== 'ncd') {
+                renderSharedChart(canvasId, chartLabels, chartData, grandTotalInv);
+            }
         }
 
         function renderTable(items) {
