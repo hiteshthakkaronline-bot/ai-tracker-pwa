@@ -31,11 +31,10 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS NEW UPDATE
-const CACHE_NAME = 'ai-tracker-v2.60';
+const CACHE_NAME = 'ai-tracker-v2.61';
 
 const ASSETS_TO_CACHE = [
   '/',
-  '/index.html',
   '/styles.css',
   '/manifest.json'
 ];
