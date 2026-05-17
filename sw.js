@@ -1,6 +1,12 @@
-// 1. INTERCEPT THE BACKGROUND BUTTON CLICK
+// 1. IMPORT ONESIGNAL SDK SAFELY (MUST BE LINE 1)
+try {
+  importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+} catch (e) {
+  console.log("[Service Worker] Offline mode: OneSignal bypassed.");
+}
+
+// 2. INTERCEPT THE BACKGROUND BUTTON CLICK
 self.addEventListener('notificationclick', function(event) {
-  
   if (event.action && event.action.startsWith('btn_completed|')) {
     
     // Kill the notification and keep the app closed
@@ -13,35 +19,26 @@ self.addEventListener('notificationclick', function(event) {
     
     if (rowsToUpdate) {
       const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
-      
-      // THE FIX: "mode: 'no-cors'" forces a fire-and-forget request that bypasses Google's security blocks
       event.waitUntil(
         fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rowsToUpdate}`, {
             method: 'GET',
             mode: 'no-cors' 
         })
-        .then(() => console.log("[Service Worker] Sent blind update to Google Sheets."))
-        .catch(err => console.error("[Service Worker] Network failed:", err))
+        .catch(err => console.error(err))
       );
     }
   }
 });
 
-// 2. IMPORT ONESIGNAL SDK
-importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
-
-// 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS STABLE ROLLBACK
-const CACHE_NAME = 'ai-tracker-v2.85';
-
+// 3. CACHE SETUP (Fixed Vercel Paths)
+const CACHE_NAME = 'ai-tracker-v2.95';
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './styles.css', 
-  './manifest.json',
-  './icons/AI PWA.png'
+  '/',
+  '/styles.css', 
+  '/manifest.json'
 ];
 
-// 4. Install Event
+// 4. INSTALL EVENT
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -51,7 +48,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// 5. Activate Event
+// 5. ACTIVATE EVENT
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -67,19 +64,18 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event (The Golden Rule Routing)
+// 6. FETCH EVENT (The Golden Rule Routing)
 self.addEventListener('fetch', (event) => {
   
-  // RULE 1: Never intercept POST requests (This fixes the OneSignal crash!)
+  // RULE 1: Never intercept POST requests (This fixes the OneSignal rubber-banding!)
   if (event.request.method !== 'GET') {
-    return; // Let the browser handle it normally
+    return; 
   }
 
   // RULE 2: Only intercept requests for our own Vercel files.
-  // Completely ignore OneSignal, Google, and any other external websites!
   const url = new URL(event.request.url);
-  if (url.origin !== location.origin) {
-    return; // Let the browser handle it normally
+  if (url.origin !== self.location.origin) {
+    return; 
   }
 
   // RULE 3: Cache our local Vercel files safely
