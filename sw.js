@@ -24,7 +24,7 @@ self.addEventListener('notificationclick', function(event) {
 });
 
 // 3. CACHE SETUP (WITH THE MISSING QUOTE FIXED!)
-const CACHE_NAME = 'ai-tracker-v3.01';
+const CACHE_NAME = 'ai-tracker-v3.02';
 
 const ASSETS_TO_CACHE = [
   '/',
