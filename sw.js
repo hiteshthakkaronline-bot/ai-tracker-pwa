@@ -1,8 +1,8 @@
 // 1. INTERCEPT THE BACKGROUND BUTTON CLICK
 self.addEventListener('notificationclick', function(event) {
-  
+
   if (event.action && event.action.startsWith('btn_completed|')) {
-    
+
     // Kill the notification and keep the app closed
     event.stopImmediatePropagation();
     event.preventDefault();
@@ -10,10 +10,10 @@ self.addEventListener('notificationclick', function(event) {
 
     // Extract row numbers from the button ID
     const rowsToUpdate = event.action.split('|')[1];
-    
+
     if (rowsToUpdate) {
       const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
-      
+
       // THE FIX: "mode: 'no-cors'" forces a fire-and-forget request that bypasses Google's security blocks
       event.waitUntil(
         fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rowsToUpdate}`, {
@@ -27,11 +27,15 @@ self.addEventListener('notificationclick', function(event) {
   }
 });
 
-// 2. IMPORT ONESIGNAL SDK
-importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+// 2. IMPORT ONESIGNAL SDK SAFELY (THIS PREVENTS THE OFFLINE CRASH)
+try {
+  importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
+} catch (e) {
+  console.log("[Service Worker] Offline mode: OneSignal bypassed.");
+}
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS NEW UPDATE
-const CACHE_NAME = 'ai-tracker-v2.61';
+const CACHE_NAME = 'ai-tracker-v2.62';
 
 const ASSETS_TO_CACHE = [
   '/',
@@ -91,9 +95,8 @@ self.addEventListener('fetch', (event) => {
 
   // LANE 2: STATIC ASSETS (Stale-While-Revalidate)
   event.respondWith(
-    // THE FIX: ignoreSearch tells it to ignore "?utm_source" junk from Android
     caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
-      
+
       if (cachedResponse) {
         fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
@@ -104,13 +107,13 @@ self.addEventListener('fetch', (event) => {
         }).catch(() => {}); 
         return cachedResponse; 
       }
-      
-      // THE FIX: If completely offline and looking for the app screen, force serve index.html
+
+      // THE BULLETPROOF FALLBACK (Forces the app to load if the browser is confused)
       return fetch(event.request).catch((error) => {
-        if (event.request.mode === 'navigate') {
+        if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
           return caches.match('/');
         }
-        throw error;
+        return new Response('', { status: 503, statusText: 'Offline' });
       });
     })
   );
