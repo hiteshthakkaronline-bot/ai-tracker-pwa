@@ -378,7 +378,7 @@
             }
         }
 
-        async function switchMainTab(tab) {
+async function switchMainTab(tab) {
             currentTab = tab;
             localStorage.setItem('lastActiveTab', tab);
             isEditingCash = false; 
@@ -466,29 +466,48 @@
             try {
                 let data;
 
-                // 🚀 THE PARALLEL FETCH LOGIC FOR MFs
+                // 🚀 THE SEQUENTIAL DEBUGGING FETCH LOGIC FOR MFs
                 if (tab === 'mf') {
-                    const urls = [
-                        `${API_URL}?action=getHTSips`,
-                        `${API_URL}?action=getNCTSips`,
-                        `${API_URL}?action=getHTMarketCap`,
-                        `${API_URL}?action=getNCTMarketCap`
-                    ];
+                    data = { ht: [], htMarketCap: null, nct: [], nctMarketCap: null };
+                    const stats = document.getElementById('global-stats');
 
-                    // Fire all 4 endpoints at the exact same time
-                    const [ht, nct, htMarketCap, nctMarketCap] = await Promise.all(
-                        urls.map(url => fetch(url).then(r => r.json()))
-                    );
+                    try {
+                        // STEP 1: HT SIPs
+                        stats.innerHTML = '1/4: Loading HT SIPs...';
+                        console.log("Fetching HT SIPs...");
+                        const res1 = await fetch(`${API_URL}?action=getHTSips`);
+                        data.ht = await res1.json();
 
-                    // Reconstruct the single payload structure your UI relies on
-                    data = { ht, htMarketCap, nct, nctMarketCap };
-                    
-                    networkDataReceived = true;
-                    memoryCache[reqTabKey] = { rawData: data };
+                        // STEP 2: HT Market Cap
+                        stats.innerHTML = '2/4: Loading HT Market Cap...';
+                        console.log("Fetching HT Market Cap...");
+                        const res2 = await fetch(`${API_URL}?action=getHTMarketCap`);
+                        data.htMarketCap = await res2.json();
 
-                    // Cache the finalized payload for instant loading next time
-                    const cache = await caches.open('ai-tracker-data-v1');
-                    cache.put(`${API_URL}?action=getMFs`, new Response(JSON.stringify(data)));
+                        // STEP 3: NCT SIPs
+                        stats.innerHTML = '3/4: Loading NCT SIPs...';
+                        console.log("Fetching NCT SIPs...");
+                        const res3 = await fetch(`${API_URL}?action=getNCTSips`);
+                        data.nct = await res3.json();
+
+                        // STEP 4: NCT Market Cap
+                        stats.innerHTML = '4/4: Loading NCT Market Cap...';
+                        console.log("Fetching NCT Market Cap...");
+                        const res4 = await fetch(`${API_URL}?action=getNCTMarketCap`);
+                        data.nctMarketCap = await res4.json();
+
+                        stats.innerHTML = 'Formatting data...';
+                        
+                        networkDataReceived = true;
+                        memoryCache[reqTabKey] = { rawData: data };
+
+                        // Cache the finalized payload
+                        const cache = await caches.open('ai-tracker-data-v1');
+                        cache.put(`${API_URL}?action=getMFs`, new Response(JSON.stringify(data)));
+
+                    } catch (fetchError) {
+                        throw new Error(`Failed at ${stats.innerHTML} - ${fetchError.message}`);
+                    }
 
                 } else {
                     // Standard Single-Fetch Logic for FDs, NCDs, Cash, NPS
