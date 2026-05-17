@@ -31,7 +31,7 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS NEW UPDATE
-const CACHE_NAME = 'ai-tracker-v2.58';
+const CACHE_NAME = 'ai-tracker-v2.59';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -67,6 +67,7 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
+
 // 6. Fetch Event - The Traffic Cop
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
@@ -76,7 +77,6 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
       fetch(event.request)
         .then((networkResponse) => {
-          // If we successfully got fresh data from Google, save a backup in the cache
           const responseToCache = networkResponse.clone();
           caches.open('ai-tracker-data-v1').then((cache) => {
             cache.put(event.request, responseToCache);
@@ -84,36 +84,36 @@ self.addEventListener('fetch', (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // If the user has NO mobile data, gracefully serve the last known data from memory!
           console.log("[Service Worker] Offline! Serving fallback data.");
           return caches.match(event.request);
         })
     );
-    return; // Stop here so it doesn't run the static asset logic
+    return; 
   }
 
   // LANE 2: STATIC ASSETS (Stale-While-Revalidate)
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // If we have the file (like styles.css) in the cache, instantly serve it to the screen
+    // THE FIX: ignoreSearch tells it to ignore "?utm_source" junk from Android
+    caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+      
       if (cachedResponse) {
-        
-        // ...but also silently fetch the newest version from Vercel in the background!
         fetch(event.request).then((networkResponse) => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, networkResponse.clone());
             });
           }
-        }).catch(() => { 
-            // Completely ignore background fetch errors if we are offline
-        });
-
+        }).catch(() => {}); 
         return cachedResponse; 
       }
       
-      // If it's the very first time downloading the app and the cache is empty, fetch it normally
-      return fetch(event.request);
+      // THE FIX: If completely offline and looking for the app screen, force serve index.html
+      return fetch(event.request).catch((error) => {
+        if (event.request.mode === 'navigate') {
+          return caches.match('./index.html');
+        }
+        throw error;
+      });
     })
   );
 });
