@@ -31,7 +31,7 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS STABLE ROLLBACK
-const CACHE_NAME = 'ai-tracker-v2.80';
+const CACHE_NAME = 'ai-tracker-v2.81';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -69,7 +69,7 @@ self.addEventListener('activate', (event) => {
 
 // 6. Fetch Event (The Original Stable Version)
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('script.google.com')) {
+  if (event.request.url.includes('script.google.com')|| event.request.url.includes('onesignal.com')) {
     event.respondWith(fetch(event.request));
     return;
   }
