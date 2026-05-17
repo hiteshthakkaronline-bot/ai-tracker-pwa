@@ -24,7 +24,7 @@ self.addEventListener('notificationclick', function(event) {
 });
 
 // 3. CACHE SETUP (WITH THE MISSING QUOTE FIXED!)
-const CACHE_NAME = 'ai-tracker-v4.00';
+const CACHE_NAME = 'ai-tracker-v4.01';
 
 const ASSETS_TO_CACHE = [
   '/',
@@ -59,26 +59,31 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event (The "Network-First" Strategy)
+// 6. Fetch Event (Production Optimized: Stale-While-Revalidate)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return; 
   
   const url = new URL(event.request.url);
+  
+  // GOLDEN RULE: Completely ignore external endpoints (OneSignal, Google Scripts, Chart.js)
+  // This guarantees your third-party SDKs and tracking protection never clash with your offline vault.
   if (url.origin !== self.location.origin) return; 
 
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // We got the fresh files from Vercel! Save a backup to the vault.
+    caches.match(event.request).then((cachedResponse) => {
+      // Fire off a background network request to check for application layout updates
+      const fetchPromise = fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           let responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
         }
         return networkResponse;
-      })
-      .catch(() => {
-        // If the internet is down, fall back to the offline vault!
-        return caches.match(event.request);
-      })
+      }).catch(() => {
+        // Suppress background errors if the device briefly drops connection
+      });
+      
+      // Instantly serve from the vault if it exists, otherwise wait for the network asset
+      return cachedResponse || fetchPromise;
+    })
   );
 });
