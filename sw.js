@@ -31,12 +31,13 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS NEW UPDATE
-const CACHE_NAME = 'ai-tracker-v2.56;
+// (Fixed the missing quote here and bumped to 2.57)
+const CACHE_NAME = 'ai-tracker-v2.57';
 
-// REMOVED the Tailwind CDN from here!
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
+  './styles.css', // <--- ADDED THIS LINE!
   './manifest.json',
   './icons/AI PWA.png'
 ];
