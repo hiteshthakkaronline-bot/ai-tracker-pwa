@@ -29,7 +29,7 @@ const CACHE_NAME = 'ai-tracker-v3.03';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/MAIN.css',
+  '/main.css',
   '/manifest.json'
 ];
 
