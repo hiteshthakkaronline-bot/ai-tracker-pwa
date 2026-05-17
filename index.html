@@ -615,15 +615,30 @@ async function switchMainTab(tab) {
         }
 
         function updateStats() {
-            const total = activeData.reduce((s, item) => s + (item.totalAmount !== undefined ? item.totalAmount : (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount)), 0);
+            let total = 0;
+            
+            // THE FIX: Safely handle the new MF Active/Inactive structure
+            if (currentTab === 'mf') {
+                if (activeData && activeData.active) {
+                    // Sum only the active SIPs for the top header stat
+                    total = activeData.active.reduce((s, item) => s + (item.totalAmount || 0), 0);
+                }
+            } else if (Array.isArray(activeData)) {
+                // Standard math for FDs, NCDs, Cash, NPS (which are still normal arrays)
+                total = activeData.reduce((s, item) => s + (item.totalAmount !== undefined ? item.totalAmount : (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount)), 0);
+            }
+
             if (currentTab === 'home' || currentTab === 'cash' || currentTab === 'nps') {
                 document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
             } else if (currentTab === 'mf') {
-                document.getElementById('global-stats').innerHTML = `SIPs: ${displayMoney(total)}`;
+                document.getElementById('global-stats').innerHTML = `Active SIPs: ${displayMoney(total)}`;
             } else if (currentTab === 'ncd') {
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
             } else {
-                const mat = activeData.reduce((s, f) => s + f.maturityAmount, 0);
+                let mat = 0;
+                if (Array.isArray(activeData)) {
+                    mat = activeData.reduce((s, f) => s + (f.maturityAmount || 0), 0);
+                }
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)} | Mat: ${displayMoney(mat)}`;
             }
         }
