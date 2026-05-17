@@ -770,10 +770,9 @@
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
             
             let html = `
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
                     <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Market Cap Allocation</h2>
                     <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
-                    
                     <div class="mt-4 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
                         Total Invested: ${displayMoney(totalInv)}
                     </div>
@@ -786,14 +785,16 @@
                 const amount = chartData[i]; 
                 const percent = totalInv > 0 ? (amount / totalInv * 100).toFixed(2) + '%' : '0.00%';
                 
-                html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200">
-                    <div class="flex items-center gap-3 w-1/2">
+                // THE FIX: Applied the same 'flex-1 min-w-0' logic here to prevent mobile stretching
+                html += `
+                <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
                         <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
-                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate">${label}</span>
+                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
                     </div>
-                    <div class="w-1/2 text-right flex flex-col">
-                        <span class="font-bold text-base leading-tight">${displayMoney(amount)}</span>
-                        <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
+                    <div class="text-right flex flex-col flex-shrink-0">
+                        <span class="font-bold text-sm leading-tight">${displayMoney(amount)}</span>
+                        <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
                     </div>
                  </li>`;
             });
@@ -1201,7 +1202,6 @@
                 const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
                 acc[aClass] = (acc[aClass] || 0) + item.amount; return acc;
             }, {});
-            
             const sortedClasses = Object.keys(classTotals).sort((a, b) => classTotals[b] - classTotals[a]);
             const chartData = sortedClasses.map(key => classTotals[key]);
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
@@ -1209,19 +1209,34 @@
             const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
             const canvasId = `chart-${reqTabKey}-${currentSubView}`;
             
-            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-6 flex flex-col items-center">
+            // Reduced outer padding (p-4 instead of p-6) to save edge space
+            let html = `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
                     <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
-                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8"><ul class="divide-y dark:divide-gray-700">`;
+                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
+                    <ul class="divide-y dark:divide-gray-700">`;
             
             sortedClasses.forEach((label, i) => {
-                const amount = classTotals[label]; const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
-                html += `<li class="p-4 flex justify-between items-center text-sm dark:text-gray-200">
-                    <div class="flex items-center gap-3 w-1/2"><span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span><span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate">${label}</span></div>
-                    <div class="w-1/2 text-right flex flex-col"><span class="font-bold text-base leading-tight">${displayMoney(amount)}</span><span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span></div></li>`;
+                const amount = classTotals[label]; 
+                const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
+                
+                // THE FIX: Using 'flex-1 min-w-0' allows the text to dynamically shrink and truncate (...) without stretching the container horizontally.
+                html += `
+                <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
+                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
+                    </div>
+                    <div class="text-right flex flex-col flex-shrink-0">
+                        <span class="font-bold text-sm leading-tight">${displayMoney(amount)}</span>
+                        <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
+                    </div>
+                </li>`;
             });
-            
-            container.innerHTML = html + `</ul></div>`; 
+            html += `</ul></div>`; 
+            container.innerHTML = html;
             renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
         }
 
@@ -1407,16 +1422,34 @@
         function renderTable(items) {
             const isNCD = currentTab === 'ncd';
             const isMaturity = currentSubView === 'maturity';
-            let theadHtml = `<tr>${isMaturity ? `<th class="p-2 text-center w-1/3 whitespace-nowrap">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}<th class="p-2 text-center whitespace-nowrap">Amt</th>${!isNCD ? `<th class="p-2 text-center whitespace-nowrap">Mat.Amt</th>` : ''}<th class="p-2 text-center whitespace-nowrap">Date</th><th class="p-2 text-center whitespace-nowrap">Rate</th></tr>`;
+            
+            // THE FIX: Removed 'whitespace-nowrap' and reduced padding so the browser can fluidly wrap the text inside the screen bounds.
+            let theadHtml = `<tr>
+                ${isMaturity ? `<th class="px-1 py-2 text-center w-[25%]">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}
+                <th class="px-1 py-2 text-center">Amt</th>
+                ${!isNCD ? `<th class="px-1 py-2 text-center">Mat.Amt</th>` : ''}
+                <th class="px-1 py-2 text-center">Date</th>
+                <th class="px-1 py-2 text-center w-[15%]">Rate</th>
+            </tr>`;
             
             let tbodyHtml = items.map(item => {
-                let formattedRate = String(item.rate); if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
-                
+                let formattedRate = String(item.rate); 
+                if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
                 formattedRate = displayMoney(formattedRate);
+                
+                // THE FIX: Date formatting shifted to DD/MM/YY (e.g. 15/10/24) to drastically cut horizontal width.
+                let compactDate = new Date(item.maturityDate).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
 
-                return `<tr>${isMaturity ? `<td class="p-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto min-w-[80px]">${isNCD ? item.company : item.bank}</span></td>` : ''}<td class="p-2 text-center align-middle">${displayMoney(item.amount)}</td>${!isNCD ? `<td class="p-2 text-center font-bold text-gray-900 dark:text-white align-middle">${displayMoney(item.maturityAmount)}</td>` : ''}<td class="p-2 text-center font-semibold text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${new Date(item.maturityDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'})}</td><td class="p-2 text-center align-middle">${formattedRate}</td></tr>`;
+                return `<tr>
+                    ${isMaturity ? `<td class="px-1 py-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto text-[9px]">${isNCD ? item.company : item.bank}</span></td>` : ''}
+                    <td class="px-1 py-2 text-center font-semibold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.amount)}</td>
+                    ${!isNCD ? `<td class="px-1 py-2 text-center font-bold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.maturityAmount)}</td>` : ''}
+                    <td class="px-1 py-2 text-center font-medium text-gray-600 dark:text-gray-400 align-middle text-[9px] break-words">${compactDate}</td>
+                    <td class="px-1 py-2 text-center align-middle font-medium text-[9px] break-words">${formattedRate}</td>
+                </tr>`;
             }).join('');
-            return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
+            
+            return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600 text-[9px]">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
         }
     </script>
 <script>
