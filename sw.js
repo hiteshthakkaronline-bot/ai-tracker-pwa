@@ -31,7 +31,7 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS NEW UPDATE
-const CACHE_NAME = 'ai-tracker-v2.59';
+const CACHE_NAME = 'ai-tracker-v2.60';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -110,7 +110,7 @@ self.addEventListener('fetch', (event) => {
       // THE FIX: If completely offline and looking for the app screen, force serve index.html
       return fetch(event.request).catch((error) => {
         if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
+          return caches.match('/');
         }
         throw error;
       });
