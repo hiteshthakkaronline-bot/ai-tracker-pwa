@@ -24,7 +24,7 @@ self.addEventListener('notificationclick', function(event) {
 });
 
 // 3. CACHE SETUP (WITH THE MISSING QUOTE FIXED!)
-const CACHE_NAME = 'ai-tracker-v3.03';
+const CACHE_NAME = 'ai-tracker-v4.00';
 
 const ASSETS_TO_CACHE = [
   '/',
@@ -59,7 +59,7 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event (Golden Rule Routing to protect OneSignal)
+// 6. Fetch Event (The "Network-First" Strategy)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return; 
   
@@ -67,19 +67,18 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return; 
 
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) return cachedResponse;
-      
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
+    fetch(event.request)
+      .then((networkResponse) => {
+        // We got the fresh files from Vercel! Save a backup to the vault.
+        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+          let responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
         }
-        let responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
-        });
         return networkResponse;
-      }).catch((error) => console.error(error));
-    })
+      })
+      .catch(() => {
+        // If the internet is down, fall back to the offline vault!
+        return caches.match(event.request);
+      })
   );
 });
