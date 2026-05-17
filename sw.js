@@ -31,8 +31,7 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. BUMP CACHE TO FORCE YOUR PHONE TO DOWNLOAD THIS NEW UPDATE
-// (Fixed the missing quote here and bumped to 2.57)
-const CACHE_NAME = 'ai-tracker-v2.57';
+const CACHE_NAME = 'ai-tracker-v2.58';
 
 const ASSETS_TO_CACHE = [
   './',
@@ -68,27 +67,53 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event
+// 6. Fetch Event - The Traffic Cop
 self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('script.google.com')) {
-    event.respondWith(fetch(event.request));
-    return;
+  const url = new URL(event.request.url);
+
+  // LANE 1: GOOGLE APPS SCRIPT DATA (Network First, Offline Fallback)
+  if (url.hostname.includes('script.google.com')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          // If we successfully got fresh data from Google, save a backup in the cache
+          const responseToCache = networkResponse.clone();
+          caches.open('ai-tracker-data-v1').then((cache) => {
+            cache.put(event.request, responseToCache);
+          });
+          return networkResponse;
+        })
+        .catch(() => {
+          // If the user has NO mobile data, gracefully serve the last known data from memory!
+          console.log("[Service Worker] Offline! Serving fallback data.");
+          return caches.match(event.request);
+        })
+    );
+    return; // Stop here so it doesn't run the static asset logic
   }
 
+  // LANE 2: STATIC ASSETS (Stale-While-Revalidate)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) { return cachedResponse; }
-      
-      return fetch(event.request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
-            return networkResponse;
-        }
-        let responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
+      // If we have the file (like styles.css) in the cache, instantly serve it to the screen
+      if (cachedResponse) {
+        
+        // ...but also silently fetch the newest version from Vercel in the background!
+        fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, networkResponse.clone());
+            });
+          }
+        }).catch(() => { 
+            // Completely ignore background fetch errors if we are offline
         });
-        return networkResponse;
-      }).catch((error) => console.error(error));
+
+        return cachedResponse; 
+      }
+      
+      // If it's the very first time downloading the app and the cache is empty, fetch it normally
+      return fetch(event.request);
     })
   );
 });
