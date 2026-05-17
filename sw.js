@@ -34,11 +34,10 @@ importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 const CACHE_NAME = 'ai-tracker-v2.60';
 
 const ASSETS_TO_CACHE = [
-  './',
-  './index.html',
-  './styles.css', // <--- ADDED THIS LINE!
-  './manifest.json',
-  './icons/AI PWA.png'
+  '/',
+  '/index.html',
+  '/styles.css',
+  '/manifest.json'
 ];
 
 // 4. Install Event
