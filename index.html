@@ -28,94 +28,114 @@
     </script>
     
     <style>
-        /* 1. Base App Structure (Device Agnostic) */
-        body { padding-bottom: 80px; font-family: system-ui, -apple-system, sans-serif; background: var(--pico-background-color); }
-        .app-container { max-width: 600px; margin: 0 auto; background: var(--pico-background-color); min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
-        main { padding: 0.5rem; }
+        /* 1. Opaque Structural Layout (Fixes Scroll Bleeding & Overlaps) */
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--pico-background-color); margin: 0; padding: 0; }
+        .app-container { max-width: 600px; margin: 0 auto; background: var(--pico-background-color); min-height: 100vh; position: relative; }
         
-        /* 2. Splash Screen */
-        #native-splash { position: fixed; inset: 0; z-index: 999999; background-color: var(--pico-background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
+        main#app-content { 
+            padding: 155px 12px 90px 12px; /* Precise clearance windows for header and footer */
+            display: block; 
+        }
+        
+        /* 2. Absolute Isolation for the PIN Overlay (Fixes Background Bleed) */
+        #pin-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background-color: var(--pico-background-color) !important; 
+            z-index: 999999 !important; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .pin-dots { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; justify-content: center; }
+        .pin-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--pico-muted-border-color); transition: background 0.15s ease; }
+        
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 280px; width: 100%; place-items: center; }
+        .keypad button { width: 72px; height: 72px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: transparent; border: 1px solid var(--pico-muted-border-color); color: var(--pico-color); box-shadow: none; -webkit-tap-highlight-color: transparent; }
+        .keypad button:active { background: var(--pico-form-element-background-color); }
+        
+        /* 3. Native App Splash Screen */
+        #native-splash { position: fixed; inset: 0; z-index: 999998; background-color: var(--pico-background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
         .spinner-ring { width: 48px; height: 48px; border: 4px solid var(--pico-muted-border-color); border-top-color: var(--pico-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
         #app-root { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
         
-        /* 3. Sticky Header Roof (Fixes the overlapping bug) */
-        .sticky-top { position: sticky; top: 0; z-index: 100; background: var(--pico-background-color); border-bottom: 1px solid var(--pico-muted-border-color); padding-top: 10px; margin-bottom: 1rem; }
-        .header-grid { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; text-align: center; padding: 0 10px; }
+        /* 4. Fixed Header Block */
+        .fixed-header { 
+            position: fixed; 
+            top: 0; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 100%; 
+            max-width: 600px; 
+            z-index: 1000; 
+            background-color: var(--pico-background-color); 
+            border-bottom: 1px solid var(--pico-muted-border-color); 
+            padding-top: 8px; 
+        }
+        .header-grid { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; text-align: center; padding: 0 12px; }
         .header-grid button { background: transparent; border: none; color: var(--pico-color); padding: 0; margin: 0; width: auto; box-shadow: none; }
-        .header-grid h1 { margin: 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; }
+        .header-grid h1 { margin: 0; font-size: 1.15rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; }
         
-        /* 4. Sub Navigation Tabs */
-        .sub-nav { display: flex; justify-content: space-around; padding-top: 10px; }
-        .sub-nav button { flex: 1; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--pico-muted-color); border-radius: 0; padding: 10px 5px; margin: 0; box-shadow: none; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; transition: color 0.2s; }
+        /* Sub Navigation & Segmented Tabs */
+        .sub-nav { display: flex; justify-content: space-around; padding-top: 4px; }
+        .sub-nav button { flex: 1; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--pico-muted-color); border-radius: 0; padding: 8px 4px; margin: 0; box-shadow: none; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; }
         .sub-nav button.active { color: var(--pico-primary); border-bottom: 3px solid var(--pico-primary); }
 
-        /* 5. Profile Segmented Control (HT/NEHA) */
-        .profile-toggle { display: flex; justify-content: center; margin-top: 10px; padding-bottom: 5px; }
+        .profile-toggle { display: flex; justify-content: center; margin-top: 6px; padding-bottom: 4px; }
         .profile-toggle-inner { display: flex; background: var(--pico-form-element-background-color); border-radius: 20px; padding: 3px; width: 220px; position: relative; }
-        .profile-toggle-inner button { flex: 1; margin: 0; padding: 6px 0; font-size: 0.7rem; font-weight: bold; border: none; background: transparent; color: var(--pico-muted-color); box-shadow: none; z-index: 2; transition: color 0.3s; }
-        .profile-toggle-inner button.active { color: var(--pico-primary-inverse); }
-        .toggle-slider { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); background: var(--pico-primary); border-radius: 20px; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1; }
+        .profile-toggle-inner button { flex: 1; margin: 0; padding: 5px 0; font-size: 0.7rem; font-weight: bold; border: none; background: transparent; color: var(--pico-muted-color); box-shadow: none; z-index: 2; }
+        .profile-toggle-inner button.active { color: var(--pico-primary-inverse); transition: color 0.2s; }
+        .toggle-slider { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); background: var(--pico-primary); border-radius: 20px; transition: transform 0.25s ease; z-index: 1; }
 
-        /* 6. Layout Utilities (Replacing Tailwind) */
-        .card { background: var(--pico-card-background-color); border: 1px solid var(--pico-muted-border-color); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .card-header { padding: 12px; text-align: center; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: var(--pico-muted-color); letter-spacing: 1px; border-bottom: 1px solid var(--pico-muted-border-color); }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .flex-col { display: flex; flex-direction: column; }
+        /* 5. Custom Semantic Containers */
+        .card { background: var(--pico-card-background-color); border: 1px solid var(--pico-muted-border-color); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
+        .card-header { padding: 12px 16px; text-align: center; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: var(--pico-muted-color); letter-spacing: 1px; border-bottom: 1px solid var(--pico-muted-border-color); background: var(--pico-form-element-background-color); }
         
-        /* 7. Custom List Rows (Fixes the squished data view) */
         .list-container { list-style: none; padding: 0; margin: 0; }
-        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--pico-muted-border-color); transition: background-color 0.2s; }
+        .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--pico-muted-border-color); }
         .list-row:last-child { border-bottom: none; }
-        .list-row:active { background-color: var(--pico-form-element-background-color); }
         
-        /* 8. Typography Helpers */
+        /* 6. Text Typography & Colors */
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .text-sm { font-size: 0.85rem; }
         .text-xs { font-size: 0.75rem; }
         .text-muted { color: var(--pico-muted-color); }
         .font-bold { font-weight: bold; }
-        .text-green { color: #10b981; font-weight: bold; }
-        .text-red { color: #ef4444; font-weight: bold; }
-        .pill { background: var(--pico-primary); color: var(--pico-primary-inverse); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .text-green { color: #10b981 !important; font-weight: bold; }
+        .text-red { color: #ef4444 !important; font-weight: bold; }
+        .pill { background: var(--pico-primary); color: var(--pico-primary-inverse); padding: 4px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: bold; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .flex-col { display: flex; flex-direction: column; }
         
-        /* 9. Data Tables */
+        /* 7. Precision Data Tables */
         .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table.compact { width: 100%; font-size: 0.75rem; margin: 0; }
+        table.compact { width: 100%; font-size: 0.75rem; margin: 0; border-collapse: collapse; }
         table.compact th, table.compact td { padding: 10px 8px; border-bottom: 1px solid var(--pico-muted-border-color); }
-        table.compact th { color: var(--pico-muted-color); text-transform: uppercase; font-weight: bold; font-size: 0.65rem; letter-spacing: 0.5px; }
+        table.compact th { color: var(--pico-muted-color); text-transform: uppercase; font-weight: bold; font-size: 0.65rem; letter-spacing: 0.5px; background: var(--pico-form-element-background-color); }
         
-        /* 10. Details/Accordion */
-        details { background: var(--pico-card-background-color); border: 1px solid var(--pico-muted-border-color); border-radius: 8px; margin-bottom: 0.5rem; }
+        /* 8. Accordions */
+        details { background: var(--pico-card-background-color); border: 1px solid var(--pico-muted-border-color); border-radius: 8px; margin-bottom: 0.5rem; overflow: hidden; }
         details summary { padding: 14px 16px; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; }
         details summary::-webkit-details-marker { display: none; }
-        details[open] summary { border-bottom: 1px solid var(--pico-muted-border-color); }
-        details > div { padding: 0; background: var(--pico-form-element-background-color); }
+        details[open] summary { border-bottom: 1px solid var(--pico-muted-border-color); background: var(--pico-form-element-background-color); }
+        details > div { padding: 0; background: var(--pico-background-color); }
 
-        /* 11. Bottom Navigation */
-        nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--pico-background-color); border-top: 1px solid var(--pico-muted-border-color); display: flex; justify-content: space-around; align-items: center; z-index: 100; padding: 0; margin: 0; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
-        @media (min-width: 600px) { nav.bottom-nav { left: auto; right: auto; width: 600px; } } /* Keeps nav attached to container on desktop */
-        nav.bottom-nav button { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--pico-muted-color); border-radius: 0; padding: 0; margin: 0; box-shadow: none; gap: 4px; transition: color 0.2s; }
+        /* 9. Fixed Bottom Navigation Bar */
+        nav.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; height: 70px; background-color: var(--pico-background-color); border-top: 1px solid var(--pico-muted-border-color); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding: 0; margin: 0; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+        nav.bottom-nav button { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--pico-muted-color); border-radius: 0; padding: 0; margin: 0; box-shadow: none; gap: 4px; }
         nav.bottom-nav button.active { color: var(--pico-primary); }
         nav.bottom-nav button span { font-size: 0.65rem; font-weight: bold; letter-spacing: 0.5px; }
         nav.bottom-nav svg { width: 22px; height: 22px; }
         
-        /* 12. Floating Action Buttons */
-        .fab-container { position: fixed; bottom: 85px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 90; }
-        @media (min-width: 600px) { .fab-container { right: calc(50% - 280px); } }
+        /* 10. Floating Action Items */
+        .fab-container { position: fixed; bottom: 85px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 900; }
+        @media (min-width: 600px) { .fab-container { right: calc(50% - 285px); } }
         .fab { width: 45px; height: 45px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; transform: translateY(10px); background: var(--pico-primary); color: var(--pico-primary-inverse); box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: none; }
         .fab.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-
-        /* 13. PIN Overlay */
-        #pin-overlay { position: fixed; inset: 0; background: var(--pico-background-color); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .pin-dots { display: flex; gap: 1.5rem; margin-bottom: 2rem; }
-        .pin-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--pico-muted-border-color); transition: background 0.2s; }
-        .pin-dot.filled { background: var(--pico-primary); }
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 280px; }
-        .keypad button { width: 70px; height: 70px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: transparent; border: 1px solid var(--pico-muted-border-color); color: var(--pico-color); transition: background 0.1s; }
-        .keypad button:active { background: var(--pico-form-element-background-color); }
+        .loader { border: 2px solid var(--pico-muted-border-color); border-top: 2px solid var(--pico-primary-inverse); border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px; }
     </style>
 </head>
 <body>
@@ -125,36 +145,36 @@
         <p class="text-muted" style="margin-top:20px; font-weight:bold; letter-spacing:2px; font-size:0.75rem;">LOADING PORTFOLIO</p>
     </div>
 
+    <div id="pin-overlay">
+        <h2 style="margin-bottom:2rem; font-weight:bold; font-size:1.4rem; color:var(--pico-color);">Enter PIN</h2>
+        <div class="pin-dots">
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+            <div class="pin-dot"></div>
+        </div>
+        <p id="pin-error" style="color: #ef4444; display: none; margin-bottom: 1.5rem; font-weight: bold; font-size: 0.85rem;">Incorrect PIN.</p>
+        <div class="keypad">
+            <button onclick="handlePinInput('1')">1</button>
+            <button onclick="handlePinInput('2')">2</button>
+            <button onclick="handlePinInput('3')">3</button>
+            <button onclick="handlePinInput('4')">4</button>
+            <button onclick="handlePinInput('5')">5</button>
+            <button onclick="handlePinInput('6')">6</button>
+            <button onclick="handlePinInput('7')">7</button>
+            <button onclick="handlePinInput('8')">8</button>
+            <button onclick="handlePinInput('9')">9</button>
+            <div></div>
+            <button onclick="handlePinInput('0')">0</button>
+            <button onclick="handlePinInput('clear')">
+                <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"/></svg>
+            </button>
+        </div>
+    </div>
+
     <div id="app-root" class="app-container">
         
-        <div id="pin-overlay">
-            <h2 style="margin-bottom:2rem; font-weight:bold;">Enter PIN</h2>
-            <div class="pin-dots">
-                <div class="pin-dot pin-indicator"></div>
-                <div class="pin-dot pin-indicator"></div>
-                <div class="pin-dot pin-indicator"></div>
-                <div class="pin-dot pin-indicator"></div>
-            </div>
-            <p id="pin-error" style="color: #ef4444; display: none; margin-bottom: 1rem; font-weight: bold; font-size: 0.85rem;">Incorrect PIN.</p>
-            <div class="keypad">
-                <button onclick="handlePinInput('1')">1</button>
-                <button onclick="handlePinInput('2')">2</button>
-                <button onclick="handlePinInput('3')">3</button>
-                <button onclick="handlePinInput('4')">4</button>
-                <button onclick="handlePinInput('5')">5</button>
-                <button onclick="handlePinInput('6')">6</button>
-                <button onclick="handlePinInput('7')">7</button>
-                <button onclick="handlePinInput('8')">8</button>
-                <button onclick="handlePinInput('9')">9</button>
-                <div></div>
-                <button onclick="handlePinInput('0')">0</button>
-                <button onclick="handlePinInput('clear')">
-                    <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"/></svg>
-                </button>
-            </div>
-        </div>
-        
-        <div class="sticky-top">
+        <div class="fixed-header">
             <header class="header-grid">
                 <button onclick="toggleTheme()"><svg id="theme-icon" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"></svg></button>
                 <div>
@@ -178,7 +198,7 @@
         <main id="app-content"></main>
 
         <div id="loading-spinner" style="display:none; justify-content:center; padding: 3rem;">
-            <article aria-busy="true" style="background:transparent; border:none; box-shadow:none;"></article>
+            <article aria-busy="true" style="background:transparent; border:none; box-shadow:none; margin:0;"></article>
         </div>
 
         <div class="fab-container">
@@ -292,20 +312,23 @@
             const errorMsg = document.getElementById('pin-error');
             errorMsg.style.display = 'none';
             if (val === 'clear') enteredPin = enteredPin.slice(0, -1);
-            else if (val === 'submit') { if (enteredPin.length === 4) validatePin(); } 
             else { if (enteredPin.length < 4) enteredPin += val; }
             
             updatePinDisplay();
-            if (enteredPin.length === 4 && val !== 'submit') setTimeout(validatePin, 150);
+            if (enteredPin.length === 4) setTimeout(validatePin, 150);
         }
 
         function updatePinDisplay() {
-            const dots = document.querySelectorAll('.pin-indicator');
+            const dots = document.querySelectorAll('.pin-dot');
             dots.forEach((dot, idx) => {
-                if (idx < enteredPin.length) dot.classList.add('filled');
-                else dot.classList.remove('filled');
+                if (idx < enteredPin.length) {
+                    dot.style.background = 'var(--pico-primary)';
+                } else {
+                    dot.style.background = 'var(--pico-muted-border-color)';
+                }
             });
         }
+        
         function validatePin() {
             if (enteredPin === SECRET_PIN) {
                 sessionStorage.setItem('isUnlocked', 'true');
@@ -321,7 +344,6 @@
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         
-        // --- Pico Native Dark Mode Handling ---
         function applyInitialTheme() {
             const stored = localStorage.getItem('theme');
             const hour = new Date().getHours();
@@ -345,7 +367,7 @@
                 : `<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
             document.getElementById('privacy-icon').innerHTML = isPrivacyMode 
                 ? `<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>` 
-                : `<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+                : `<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
         function switchUser(user, skipFetch = false) {
@@ -401,8 +423,20 @@
             
             const subNav = document.getElementById('sub-nav');
             const profileToggle = document.getElementById('profile-toggle');
+            const headerRoof = document.querySelector('.fixed-header');
+            
             profileToggle.style.display = tab === 'home' ? 'none' : 'flex';
             subNav.style.display = 'flex'; 
+            
+            // Adjust dynamic shifting spacing windows for main content body
+            const mainContent = document.getElementById('app-content');
+            if (tab === 'home') {
+                mainContent.style.paddingTop = '112px';
+            } else if (tab === 'cash' || tab === 'nps') {
+                mainContent.style.paddingTop = '112px';
+            } else {
+                mainContent.style.paddingTop = '155px';
+            }
 
             if (tab === 'home') {
                 let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
@@ -558,7 +592,6 @@
             }
         }
 
-        // Teal Monochrome Palette for Pico
         const tealPalette = ['#0f766e', '#0d9488', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4', '#ccfbf1'];
 
         function renderSharedChart(canvasId, labels, data, totalValue) {
@@ -773,21 +806,21 @@
 
                     return `<tr>
                         <td><strong>${item.fund}</strong><br><span class="text-muted" style="font-size:0.65rem;">${item.scheme}</span></td>
-                        <td>${percentStr}</td>
-                        <td style="color:var(--pico-primary);">${unitsDisplay}</td>
-                        <td><span class="text-muted">${item.nav}</span><br><span class="text-muted" style="font-size:0.6rem;">${navDateDisplay}</span></td>
-                        <td><strong>${totalDisplay}</strong></td>
+                        <td class="text-center">${percentStr}</td>
+                        <td class="text-center" style="color:var(--pico-primary);">${unitsDisplay}</td>
+                        <td class="text-center"><span class="text-muted">${item.nav}</span><br><span class="text-muted" style="font-size:0.6rem;">${navDateDisplay}</span></td>
+                        <td class="text-right"><strong>${totalDisplay}</strong></td>
                     </tr>`;
                 }).join('');
 
                 html += `
                     <div class="flex-between" style="margin-bottom:0.5rem; margin-top:1rem; padding: 0 0.5rem;">
-                        <h2 class="card-header" style="border:none; padding:0; margin:0;">${tierName}</h2>
+                        <h4 style="margin:0; font-size:0.95rem; font-weight:bold;">${tierName}</h4>
                         <span class="text-muted text-xs font-bold">Updated: ${tierTimestampStr}</span>
                     </div>
                     <div class="card table-wrapper">
                         <table class="compact">
-                            <thead><tr><th>Fund/Scheme</th><th class="text-center">%</th><th class="text-center">Units</th><th class="text-center">NAV/Date</th><th class="text-right">Total</th></tr></thead>
+                            <thead><tr><th>Scheme</th><th class="text-center">%</th><th class="text-center">Units</th><th class="text-center">NAV/Date</th><th class="text-right">Total</th></tr></thead>
                             <tbody>${tbodyHtml}</tbody>
                         </table>
                     </div>
@@ -835,7 +868,7 @@
                 else if (typeof formattedRate === 'string' && formattedRate !== "" && formattedRate !== "N/A" && !formattedRate.includes('%')) { let num = parseFloat(formattedRate); if (!isNaN(num) && num > 0 && num < 1) formattedRate = Number((num * 100).toFixed(2)) + '%'; else if (!isNaN(num)) formattedRate = num + '%'; }
                 formattedRate = displayMoney(formattedRate);
                 
-                return `<tr><td><strong>${item.bank}</strong></td><td>${amountDisplay}</td><td class="text-muted">${formattedRate}</td></tr>`;
+                return `<tr><td><strong>${item.bank}</strong></td><td class="text-right">${amountDisplay}</td><td class="text-right text-muted">${formattedRate}</td></tr>`;
             }).join('');
 
             const btnText = isEditingCash ? "Save Changes" : "Edit Values";
@@ -1082,6 +1115,7 @@
             let tbodyHtml = items.map(item => {
                 let formattedRate = String(item.rate); 
                 if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
+                formattedRate = displayMoney(formattedRate);
                 let compactDate = new Date(item.maturityDate).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
 
                 return `<tr>
@@ -1089,7 +1123,7 @@
                     <td class="text-center text-sm"><strong>${displayMoney(item.amount)}</strong></td>
                     ${!isNCD ? `<td class="text-center text-sm"><strong>${displayMoney(item.maturityAmount)}</strong></td>` : ''}
                     <td class="text-center text-muted" style="font-size:0.7rem;">${compactDate}</td>
-                    <td class="text-right" style="color:var(--pico-primary); font-size:0.75rem; font-weight:bold;">${displayMoney(formattedRate)}</td>
+                    <td class="text-right" style="color:var(--pico-primary); font-size:0.75rem; font-weight:bold;">${formattedRate}</td>
                 </tr>`;
             }).join('');
             
