@@ -4,7 +4,6 @@ importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 // 2. INTERCEPT THE BACKGROUND BUTTON CLICK
 self.addEventListener('notificationclick', function(event) {
   if (event.action && event.action.startsWith('btn_completed|')) {
-    
     event.stopImmediatePropagation();
     event.preventDefault();
     event.notification.close();
@@ -16,29 +15,25 @@ self.addEventListener('notificationclick', function(event) {
         fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rowsToUpdate}`, {
             method: 'GET',
             mode: 'no-cors' 
-        })
-        .catch(err => console.error(err))
+        }).catch(err => console.error(err))
       );
     }
   }
 });
 
-// 3. CACHE SETUP (WITH THE MISSING QUOTE FIXED!)
-const CACHE_NAME = 'ai-tracker-v4.01';
+// 3. CACHE SETUP
+const CACHE_NAME = 'ai-tracker-pico-v1.00';
 
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/main.css',
   '/manifest.json'
 ];
 
 // 4. Install Event
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
   );
   self.skipWaiting();
 });
@@ -49,9 +44,7 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
+          if (cache !== CACHE_NAME) return caches.delete(cache);
         })
       );
     })
@@ -59,30 +52,22 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event (Production Optimized: Stale-While-Revalidate)
+// 6. Fetch Event (Stale-While-Revalidate)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return; 
-  
   const url = new URL(event.request.url);
   
-  // GOLDEN RULE: Completely ignore external endpoints (OneSignal, Google Scripts, Chart.js)
-  // This guarantees your third-party SDKs and tracking protection never clash with your offline vault.
   if (url.origin !== self.location.origin) return; 
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      // Fire off a background network request to check for application layout updates
       const fetchPromise = fetch(event.request).then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           let responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
         }
         return networkResponse;
-      }).catch(() => {
-        // Suppress background errors if the device briefly drops connection
-      });
-      
-      // Instantly serve from the vault if it exists, otherwise wait for the network asset
+      }).catch(() => {});
       return cachedResponse || fetchPromise;
     })
   );
