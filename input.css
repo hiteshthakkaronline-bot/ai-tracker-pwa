@@ -1,17 +1,23 @@
 @import "tailwindcss";
 
-/* Enable class-based manual dark mode toggling for Tailwind v4 */
+/* 1. Enable class-based manual dark mode toggling for Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Global Fix: Restore Tailwind v3 soft gray border fallbacks for Light Mode */
+/* 2. Global Light Mode Borders (Soft Gray) */
 *, ::before, ::after {
   border-color: #e5e7eb; /* Equivalent to classic border-gray-200 */
 }
-
-/* Ensure tables collapse and respect clean spacing hierarchy */
 table {
   border-collapse: collapse;
 }
 th, td {
   border-color: #e5e7eb;
+}
+
+/* 3. Global Night Mode Borders (Dampened Muted Gray) */
+.dark *, .dark ::before, .dark ::after {
+  border-color: #374151; /* Equivalent to border-gray-700 */
+}
+.dark th, .dark td {
+  border-color: #374151; /* Softens internal table gridlines in dark mode */
 }
