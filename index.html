@@ -28,16 +28,16 @@
     </script>
     
     <style>
-        /* 1. Opaque Structural Layout (Fixes Scroll Bleeding & Overlaps) */
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--pico-background-color); margin: 0; padding: 0; }
+        /* 1. Opaque Structural Viewports (Fixes Content Scroll Overlaps) */
+        body { font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 0; background: var(--pico-background-color); }
         .app-container { max-width: 600px; margin: 0 auto; background: var(--pico-background-color); min-height: 100vh; position: relative; }
         
         main#app-content { 
-            padding: 155px 12px 90px 12px; /* Precise clearance windows for header and footer */
             display: block; 
+            padding: 160px 12px 95px 12px; /* Fixed structural safety windows for structural headers/footers */
         }
         
-        /* 2. Absolute Isolation for the PIN Overlay (Fixes Background Bleed) */
+        /* 2. Absolute Opaque Isolation for PIN Lock Frame (Fixes Bleeding Screens) */
         #pin-overlay { 
             position: fixed; 
             inset: 0; 
@@ -48,21 +48,21 @@
             align-items: center; 
             justify-content: center; 
         }
-        .pin-dots { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; justify-content: center; }
-        .pin-dot { width: 16px; height: 16px; border-radius: 50%; background: var(--pico-muted-border-color); transition: background 0.15s ease; }
+        .pin-dots-row { display: flex; gap: 1.5rem; margin-bottom: 2.5rem; justify-content: center; align-items: center; height: 20px; }
+        .pin-circle { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--pico-muted-border-color); background: transparent; transition: background 0.1s ease; }
         
-        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 280px; width: 100%; place-items: center; }
-        .keypad button { width: 72px; height: 72px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: transparent; border: 1px solid var(--pico-muted-border-color); color: var(--pico-color); box-shadow: none; -webkit-tap-highlight-color: transparent; }
-        .keypad button:active { background: var(--pico-form-element-background-color); }
+        .pin-keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; max-width: 260px; width: 100%; place-items: center; }
+        .pin-keypad button { width: 72px; height: 72px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: transparent; border: 1px solid var(--pico-muted-border-color); color: var(--pico-color); box-shadow: none; -webkit-tap-highlight-color: transparent; margin: 0; }
+        .pin-keypad button:active { background: var(--pico-form-element-background-color); }
         
-        /* 3. Native App Splash Screen */
+        /* 3. Splash Viewports */
         #native-splash { position: fixed; inset: 0; z-index: 999998; background-color: var(--pico-background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
         .spinner-ring { width: 48px; height: 48px; border: 4px solid var(--pico-muted-border-color); border-top-color: var(--pico-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         #app-root { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
         
-        /* 4. Fixed Header Block */
-        .fixed-header { 
+        /* 4. Opaque Roof Header Block */
+        .fixed-header-roof { 
             position: fixed; 
             top: 0; 
             left: 50%; 
@@ -70,7 +70,7 @@
             width: 100%; 
             max-width: 600px; 
             z-index: 1000; 
-            background-color: var(--pico-background-color); 
+            background-color: var(--pico-background-color);
             border-bottom: 1px solid var(--pico-muted-border-color); 
             padding-top: 8px; 
         }
@@ -78,7 +78,7 @@
         .header-grid button { background: transparent; border: none; color: var(--pico-color); padding: 0; margin: 0; width: auto; box-shadow: none; }
         .header-grid h1 { margin: 0; font-size: 1.15rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 800; }
         
-        /* Sub Navigation & Segmented Tabs */
+        /* Sub Navigation Elements */
         .sub-nav { display: flex; justify-content: space-around; padding-top: 4px; }
         .sub-nav button { flex: 1; background: transparent; border: none; border-bottom: 3px solid transparent; color: var(--pico-muted-color); border-radius: 0; padding: 8px 4px; margin: 0; box-shadow: none; font-size: 0.72rem; font-weight: bold; text-transform: uppercase; }
         .sub-nav button.active { color: var(--pico-primary); border-bottom: 3px solid var(--pico-primary); }
@@ -86,10 +86,10 @@
         .profile-toggle { display: flex; justify-content: center; margin-top: 6px; padding-bottom: 4px; }
         .profile-toggle-inner { display: flex; background: var(--pico-form-element-background-color); border-radius: 20px; padding: 3px; width: 220px; position: relative; }
         .profile-toggle-inner button { flex: 1; margin: 0; padding: 5px 0; font-size: 0.7rem; font-weight: bold; border: none; background: transparent; color: var(--pico-muted-color); box-shadow: none; z-index: 2; }
-        .profile-toggle-inner button.active { color: var(--pico-primary-inverse); transition: color 0.2s; }
+        .profile-toggle-inner button.active { color: var(--pico-primary-inverse); }
         .toggle-slider { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); background: var(--pico-primary); border-radius: 20px; transition: transform 0.25s ease; z-index: 1; }
 
-        /* 5. Custom Semantic Containers */
+        /* 5. Clean Custom Semantic Lists (Recreating Row Hierarchies) */
         .card { background: var(--pico-card-background-color); border: 1px solid var(--pico-muted-border-color); border-radius: 8px; margin-bottom: 1rem; overflow: hidden; }
         .card-header { padding: 12px 16px; text-align: center; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; color: var(--pico-muted-color); letter-spacing: 1px; border-bottom: 1px solid var(--pico-muted-border-color); background: var(--pico-form-element-background-color); }
         
@@ -97,7 +97,7 @@
         .list-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--pico-muted-border-color); }
         .list-row:last-child { border-bottom: none; }
         
-        /* 6. Text Typography & Colors */
+        /* 6. Text Elements & Data Clones */
         .text-right { text-align: right; }
         .text-center { text-align: center; }
         .text-sm { font-size: 0.85rem; }
@@ -110,27 +110,27 @@
         .flex-between { display: flex; justify-content: space-between; align-items: center; }
         .flex-col { display: flex; flex-direction: column; }
         
-        /* 7. Precision Data Tables */
+        /* 7. Precision Adaptive Tables */
         .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table.compact { width: 100%; font-size: 0.75rem; margin: 0; border-collapse: collapse; }
         table.compact th, table.compact td { padding: 10px 8px; border-bottom: 1px solid var(--pico-muted-border-color); }
         table.compact th { color: var(--pico-muted-color); text-transform: uppercase; font-weight: bold; font-size: 0.65rem; letter-spacing: 0.5px; background: var(--pico-form-element-background-color); }
         
-        /* 8. Accordions */
+        /* 8. Accordions Viewports */
         details { background: var(--pico-card-background-color); border: 1px solid var(--pico-muted-border-color); border-radius: 8px; margin-bottom: 0.5rem; overflow: hidden; }
         details summary { padding: 14px 16px; font-weight: bold; list-style: none; display: flex; justify-content: space-between; align-items: center; }
         details summary::-webkit-details-marker { display: none; }
         details[open] summary { border-bottom: 1px solid var(--pico-muted-border-color); background: var(--pico-form-element-background-color); }
         details > div { padding: 0; background: var(--pico-background-color); }
 
-        /* 9. Fixed Bottom Navigation Bar */
-        nav.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; height: 70px; background-color: var(--pico-background-color); border-top: 1px solid var(--pico-muted-border-color); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding: 0; margin: 0; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+        /* 9. Fixed Bottom Opaque Foot Bar */
+        nav.bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; height: 75px; background-color: var(--pico-background-color); border-top: 1px solid var(--pico-muted-border-color); display: flex; justify-content: space-around; align-items: center; z-index: 1000; padding: 0; margin: 0; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
         nav.bottom-nav button { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--pico-muted-color); border-radius: 0; padding: 0; margin: 0; box-shadow: none; gap: 4px; }
         nav.bottom-nav button.active { color: var(--pico-primary); }
         nav.bottom-nav button span { font-size: 0.65rem; font-weight: bold; letter-spacing: 0.5px; }
         nav.bottom-nav svg { width: 22px; height: 22px; }
         
-        /* 10. Floating Action Items */
+        /* 10. Floating Utilities */
         .fab-container { position: fixed; bottom: 85px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 900; }
         @media (min-width: 600px) { .fab-container { right: calc(50% - 285px); } }
         .fab { width: 45px; height: 45px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; transform: translateY(10px); background: var(--pico-primary); color: var(--pico-primary-inverse); box-shadow: 0 4px 10px rgba(0,0,0,0.2); border: none; }
@@ -142,19 +142,19 @@
 
     <div id="native-splash">
         <div class="spinner-ring"></div>
-        <p class="text-muted" style="margin-top:20px; font-weight:bold; letter-spacing:2px; font-size:0.75rem;">LOADING PORTFOLIO</p>
+        <p style="margin-top:20px; font-weight:bold; letter-spacing:2px; font-size:0.75rem; color: var(--pico-muted-color);">LOADING PORTFOLIO</p>
     </div>
 
     <div id="pin-overlay">
-        <h2 style="margin-bottom:2rem; font-weight:bold; font-size:1.4rem; color:var(--pico-color);">Enter PIN</h2>
-        <div class="pin-dots">
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
-            <div class="pin-dot"></div>
+        <h2 style="margin-bottom:2rem; font-weight:bold; font-size:1.4rem; color:var(--pico-color); tracking-wide">Enter PIN</h2>
+        <div class="pin-dots-row">
+            <div class="pin-circle"></div>
+            <div class="pin-circle"></div>
+            <div class="pin-circle"></div>
+            <div class="pin-circle"></div>
         </div>
         <p id="pin-error" style="color: #ef4444; display: none; margin-bottom: 1.5rem; font-weight: bold; font-size: 0.85rem;">Incorrect PIN.</p>
-        <div class="keypad">
+        <div class="pin-keypad">
             <button onclick="handlePinInput('1')">1</button>
             <button onclick="handlePinInput('2')">2</button>
             <button onclick="handlePinInput('3')">3</button>
@@ -174,7 +174,7 @@
 
     <div id="app-root" class="app-container">
         
-        <div class="fixed-header">
+        <div class="fixed-header-roof">
             <header class="header-grid">
                 <button onclick="toggleTheme()"><svg id="theme-icon" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"></svg></button>
                 <div>
@@ -250,6 +250,8 @@
             if (sessionStorage.getItem('isUnlocked') === 'true') {
                 document.getElementById('pin-overlay').style.display = 'none';
                 init(); 
+            } else {
+                updatePinDisplay();
             }
 
             const contentBlock = document.getElementById('app-content');
@@ -319,12 +321,12 @@
         }
 
         function updatePinDisplay() {
-            const dots = document.querySelectorAll('.pin-dot');
+            const dots = document.querySelectorAll('.pin-circle');
             dots.forEach((dot, idx) => {
                 if (idx < enteredPin.length) {
-                    dot.style.background = 'var(--pico-primary)';
+                    dot.style.backgroundColor = 'var(--pico-primary)';
                 } else {
-                    dot.style.background = 'var(--pico-muted-border-color)';
+                    dot.style.backgroundColor = 'transparent';
                 }
             });
         }
@@ -353,6 +355,7 @@
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme); 
             updateIcons();
+            updatePinDisplay();
             if (activeData.length > 0 || tickerData.rows.length > 0) renderView();
         }
         function toggleTheme() { 
@@ -423,19 +426,15 @@
             
             const subNav = document.getElementById('sub-nav');
             const profileToggle = document.getElementById('profile-toggle');
-            const headerRoof = document.querySelector('.fixed-header');
             
             profileToggle.style.display = tab === 'home' ? 'none' : 'flex';
             subNav.style.display = 'flex'; 
             
-            // Adjust dynamic shifting spacing windows for main content body
             const mainContent = document.getElementById('app-content');
-            if (tab === 'home') {
-                mainContent.style.paddingTop = '112px';
-            } else if (tab === 'cash' || tab === 'nps') {
-                mainContent.style.paddingTop = '112px';
+            if (tab === 'home' || tab === 'cash' || tab === 'nps') {
+                mainContent.style.paddingTop = '115px';
             } else {
-                mainContent.style.paddingTop = '155px';
+                mainContent.style.paddingTop = '160px';
             }
 
             if (tab === 'home') {
@@ -725,7 +724,7 @@
                 
                 fundList.forEach(fund => {
                     let sipsHtml = fund.details.map(sip => {
-                        return `<tr><td>${sip.plan}</td><td class="text-muted">${sip.startDate}</td><td class="text-muted">${sip.endDate}</td><td><strong>${displayMoney(sip.amount)}</strong></td></tr>`;
+                        return `<tr><td>${sip.plan}</td><td class="text-muted text-center">${sip.startDate}</td><td class="text-muted text-center">${sip.endDate}</td><td class="text-right"><strong>${displayMoney(sip.amount)}</strong></td></tr>`;
                     }).join('');
 
                     let pType = fund.planType || '-'; let expRatio = fund.expenseRatio ? fund.expenseRatio : '-';
@@ -742,7 +741,7 @@
                             <span class="pill">${displayMoney(fund.totalAmount)}</span>
                         </summary>
                         <div style="padding: 10px;">
-                            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; text-align:center; background:var(--pico-background-color); padding:0.5rem; border-radius:6px; margin-bottom:10px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; text-align:center; background:var(--pico-form-element-background-color); padding:0.5rem; border-radius:6px; margin-bottom:10px;">
                                 <div><span class="text-xs text-muted font-bold uppercase">Large</span><br><strong class="text-sm">${lPct}</strong></div>
                                 <div><span class="text-xs text-muted font-bold uppercase">Mid</span><br><strong class="text-sm">${mPct}</strong></div>
                                 <div><span class="text-xs text-muted font-bold uppercase">Small</span><br><strong class="text-sm">${sPct}</strong></div>
@@ -906,7 +905,7 @@
             }
         }
 
-        function renderDashboard(container) {
+        function renderDashboard(viewDiv) {
             const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
             const classTotals = activeData.reduce((acc, item) => { const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others'; acc[aClass] = (acc[aClass] || 0) + item.amount; return acc; }, {});
             const sortedClasses = Object.keys(classTotals).sort((a, b) => classTotals[b] - classTotals[a]);
@@ -938,7 +937,7 @@
                 </li>`;
             });
             html += `</ul></div>`; 
-            container.innerHTML = html; renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
+            viewDiv.innerHTML = html; renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
         }
 
         function renderHome(container) {
