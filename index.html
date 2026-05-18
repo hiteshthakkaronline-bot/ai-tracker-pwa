@@ -1,20 +1,17 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <meta name="theme-color" content="#5D6B7F" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#2D3748" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#00898a">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <title>AI Tracker</title>
     <link rel="manifest" href="manifest.json">
-     
-    <link rel="stylesheet" href="./main.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.teal.min.css">
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
         window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -31,154 +28,161 @@
     </script>
     
     <style>
-        #native-splash { position: fixed; inset: 0; z-index: 999999; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
-        .spinner-ring { width: 48px; height: 48px; border: 4px solid #f3f4f6; border-top-color: #5D6B7F; border-radius: 50%; animation: spin 1s linear infinite; }
-        .splash-text { margin-top: 20px; font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (prefers-color-scheme: dark) { #native-splash { background-color: #111827; } .spinner-ring { border-color: #374151; border-top-color: #9ca3af; } .splash-text { color: #9ca3af; } }
-        #app-root { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
-        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-        .accordion-content.open { max-height: 2000px; }
-        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;}
+        /* Custom PWA Shell Adjustments over Pico */
+        body { padding-bottom: 80px; } /* Space for bottom nav */
         
-        .keypad-btn { -webkit-tap-highlight-color: transparent; }
+        /* Splash Screen */
+        #native-splash { position: fixed; inset: 0; z-index: 999999; background-color: var(--pico-background-color); display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
+        .spinner-ring { width: 48px; height: 48px; border: 4px solid var(--pico-muted-border-color); border-top-color: var(--pico-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        #app-root { visibility: hidden; opacity: 0; transition: opacity 0.4s ease; }
+        
+        /* Fixed Header */
+        header.top-header { position: sticky; top: 0; z-index: 50; background: var(--pico-background-color); padding: 1rem 0 0 0; border-bottom: 1px solid var(--pico-muted-border-color); margin-bottom: 1rem; }
+        .header-grid { display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; text-align: center; padding: 0 1rem; }
+        .header-grid button { background: transparent; border: none; color: var(--pico-color); padding: 0; margin: 0; width: auto; box-shadow: none; }
+        
+        /* Sub Navigation Tabs */
+        .sub-nav { display: flex; justify-content: space-around; overflow-x: auto; margin-top: 1rem; }
+        .sub-nav button { flex: 1; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--pico-muted-color); border-radius: 0; padding: 0.5rem; margin: 0; box-shadow: none; font-size: 0.8rem; font-weight: bold; }
+        .sub-nav button.active { color: var(--pico-primary); border-bottom: 2px solid var(--pico-primary); }
+
+        /* Profile Segmented Control */
+        .profile-toggle { display: flex; justify-content: center; margin-top: 0.5rem; padding-bottom: 0.5rem; }
+        .profile-toggle-inner { display: flex; background: var(--pico-form-element-background-color); border-radius: 20px; padding: 2px; width: 200px; position: relative; }
+        .profile-toggle-inner button { flex: 1; margin: 0; padding: 4px 0; font-size: 0.7rem; font-weight: bold; border: none; background: transparent; color: var(--pico-muted-color); box-shadow: none; z-index: 2; transition: color 0.3s; }
+        .profile-toggle-inner button.active { color: var(--pico-primary-inverse); }
+        .toggle-slider { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); background: var(--pico-primary); border-radius: 20px; transition: transform 0.3s ease; z-index: 1; }
+
+        /* Bottom Navigation */
+        nav.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--pico-background-color); border-top: 1px solid var(--pico-muted-border-color); display: flex; justify-content: space-around; align-items: center; z-index: 50; padding: 0; margin: 0; box-shadow: 0 -4px 10px rgba(0,0,0,0.05); }
+        nav.bottom-nav button { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: transparent; border: none; color: var(--pico-muted-color); border-radius: 0; padding: 0; margin: 0; box-shadow: none; gap: 4px; }
+        nav.bottom-nav button.active { color: var(--pico-primary); }
+        nav.bottom-nav button span { font-size: 0.6rem; font-weight: bold; }
+        nav.bottom-nav svg { width: 20px; height: 20px; }
+
+        /* Utilities */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .pill { background: var(--pico-primary); color: var(--pico-primary-inverse); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .text-sm { font-size: 0.85rem; }
+        .text-muted { color: var(--pico-muted-color); font-size: 0.75rem;}
+        
+        /* Detail Elements (Accordions) */
+        details { background: var(--pico-card-background-color); border: 1px solid var(--pico-card-border-color); border-radius: var(--pico-border-radius); margin-bottom: var(--pico-spacing); }
+        details summary { padding: 1rem; font-weight: bold; }
+        details > div { padding: 0 1rem 1rem 1rem; overflow-x: auto; }
+        
+        /* PIN Overlay Grid */
+        #pin-overlay { position: fixed; inset: 0; background: var(--pico-background-color); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .pin-dots { display: flex; gap: 1rem; margin-bottom: 2rem; }
+        .pin-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--pico-muted-border-color); }
+        .pin-dot.filled { background: var(--pico-primary); }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; max-width: 250px; }
+        .keypad button { width: 60px; height: 60px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: transparent; border: 1px solid var(--pico-muted-border-color); color: var(--pico-color); }
+        
+        /* Floating Action Buttons */
+        .fab-container { position: fixed; bottom: 85px; right: 15px; display: flex; flex-direction: column; gap: 10px; z-index: 40; }
+        .fab { width: 45px; height: 45px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; transform: translateY(10px); }
+        .fab.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
     </style>
 </head>
-<body class="bg-white dark:bg-gray-900 transition-colors duration-300 pb-24 relative">
+<body>
 
     <div id="native-splash">
         <div class="spinner-ring"></div>
-        <div class="splash-text">LOADING PORTFOLIO</div>
+        <p class="text-muted" style="margin-top:20px; font-weight:bold; letter-spacing:2px;">LOADING PORTFOLIO</p>
     </div>
 
     <div id="app-root">
-
-<div id="pin-overlay" class="fixed inset-0 bg-[#F8F9FA] dark:bg-gray-900 z-[100] flex flex-col px-4 pb-8 transition-opacity duration-500">
-            
-            <div class="flex flex-col items-center justify-center flex-1 w-full">
-                <h2 class="text-xl font-bold text-[#344755] dark:text-gray-300 mb-8 tracking-wide">Enter PIN</h2>
-                
-                <div class="flex gap-5 h-4 items-center justify-center w-full">
-                    <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
-                    <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
-                    <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
-                    <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
-                </div>
-
-                <div id="pin-error" class="text-red-500 font-bold text-sm mt-6 hidden h-5">Incorrect PIN.</div>
+        <div id="pin-overlay">
+            <h2>Enter PIN</h2>
+            <div class="pin-dots">
+                <div class="pin-dot pin-indicator"></div>
+                <div class="pin-dot pin-indicator"></div>
+                <div class="pin-dot pin-indicator"></div>
+                <div class="pin-dot pin-indicator"></div>
             </div>
-
-            <div class="grid grid-cols-3 gap-x-5 gap-y-2 max-w-[260px] w-full mx-auto place-items-center mb-2">
-                
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('1')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">1</span>
-                </button>
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('2')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">2</span>
-                </button>
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('3')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">3</span>
-                </button>
-                
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('4')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">4</span>
-                </button>
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('5')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">5</span>
-                </button>
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('6')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">6</span>
-                </button>
-                
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('7')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">7</span>
-                </button>
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('8')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">8</span>
-                </button>
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('9')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">9</span>
-                </button>
-                
-                <div></div> 
-                
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('0')">
-                    <span class="text-4xl font-light text-[#344755] dark:text-gray-100">0</span>
-                </button>
-                
-                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800 text-[#344755] dark:text-gray-400" onclick="handlePinInput('clear')">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
-                    </svg>
+            <p id="pin-error" style="color: #d81b60; display: none; margin-bottom: 1rem; font-weight: bold; font-size: 0.8rem;">Incorrect PIN.</p>
+            <div class="keypad">
+                <button onclick="handlePinInput('1')">1</button>
+                <button onclick="handlePinInput('2')">2</button>
+                <button onclick="handlePinInput('3')">3</button>
+                <button onclick="handlePinInput('4')">4</button>
+                <button onclick="handlePinInput('5')">5</button>
+                <button onclick="handlePinInput('6')">6</button>
+                <button onclick="handlePinInput('7')">7</button>
+                <button onclick="handlePinInput('8')">8</button>
+                <button onclick="handlePinInput('9')">9</button>
+                <div></div>
+                <button onclick="handlePinInput('0')">0</button>
+                <button onclick="handlePinInput('clear')">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z"/></svg>
                 </button>
             </div>
         </div>
         
-        <div class="sticky top-0 z-50 shadow-md">
-            <header class="bg-[#5D6B7F] dark:bg-[#2D3748] text-white transition-colors duration-300">
-                <div class="p-4 grid grid-cols-[40px_1fr_40px] items-center text-center">
-                    <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
-                    <div>
-                        <h1 id="header-title" class="text-lg font-bold uppercase tracking-tight">Home</h1>
-                        <div id="global-stats" class="text-[10px] opacity-90">Initializing...</div>
-                    </div>
-                    <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
+        <header class="top-header">
+            <div class="header-grid">
+                <button onclick="toggleTheme()"><svg id="theme-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"></svg></button>
+                <div>
+                    <h1 id="header-title" style="margin:0; font-size:1.2rem; text-transform:uppercase;">Home</h1>
+                    <small id="global-stats" class="text-muted">Initializing...</small>
                 </div>
-                
-                <div id="profile-toggle" class="pb-3 flex justify-center transition-all duration-300" style="display: none;">
-                    <div class="bg-black/20 p-1 rounded-full flex relative w-56">
-                        <div id="toggle-slider" class="absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] bg-white dark:bg-gray-700 rounded-full shadow transition-transform duration-300"></div>
-                        <button onclick="switchUser('HT')" id="btn-user-ht" class="flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors">HITESH</button>
-                        <button onclick="switchUser('NCT')" id="btn-user-nct" class="flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors">NEHA</button>
-                    </div>
+                <button onclick="togglePrivacy()"><svg id="privacy-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"></svg></button>
+            </div>
+            
+            <div id="profile-toggle" class="profile-toggle" style="display: none;">
+                <div class="profile-toggle-inner">
+                    <div id="toggle-slider" class="toggle-slider"></div>
+                    <button onclick="switchUser('HT')" id="btn-user-ht" class="active">HITESH</button>
+                    <button onclick="switchUser('NCT')" id="btn-user-nct">NEHA</button>
                 </div>
-            </header>
-            <div id="sub-nav" class="flex border-b border-gray-100 dark:border-gray-700 bg-white dark:bg-gray-800 text-[11px] sm:text-sm shadow-sm transition-colors duration-300"></div>
+            </div>
+            <div id="sub-nav" class="sub-nav"></div>
+        </header>
+
+        <main class="container" id="app-content" style="padding-top: 0;"></main>
+
+        <div id="loading-spinner" style="display:none; justify-content:center; padding: 2rem;">
+            <article aria-busy="true"></article>
         </div>
 
-        <div id="loading-spinner" style="display:none;" class="flex justify-center p-10">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div>
-        </div>
-
-        <main id="app-content" class="p-2 space-y-4"></main>
-
-        <div class="fixed bottom-24 right-4 flex flex-col gap-3 z-40">
-            <button id="fab-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+        <div class="fab-container">
+            <button id="fab-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="fab">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7"></path></svg>
             </button>
-            <button id="fab-back" onclick="switchMainTab('home')" class="w-12 h-12 bg-gray-700 dark:bg-gray-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform" style="display: none;">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m7 7l-7-7 7-7"></path></svg>
+            <button id="fab-back" onclick="switchMainTab('home')" class="fab" style="display: none;">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m7 7l-7-7 7-7"></path></svg>
             </button>
         </div>
 
-        <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-around items-center z-50 shadow-2xl transition-colors">
-            <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
+        <nav class="bottom-nav">
+            <button onclick="switchMainTab('home')" id="nav-home">
+                <svg fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <span>HOME</span>
             </button>
-            <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-900 dark:text-white flex-1 px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">FDs</span>
+            <button onclick="switchMainTab('fds')" id="nav-fds">
+                <svg fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>
+                <span>FDs</span>
             </button>
-            <button onclick="switchMainTab('ncd')" id="nav-ncd" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NCDs</span>
+            <button onclick="switchMainTab('ncd')" id="nav-ncd">
+                <svg fill="currentColor" viewBox="0 0 20 20"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"></path><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+                <span>NCDs</span>
             </button>
-            <button onclick="switchMainTab('mf')" id="nav-mf" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">MFs</span>
+            <button onclick="switchMainTab('mf')" id="nav-mf">
+                <svg fill="currentColor" viewBox="0 0 20 20"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path></svg>
+                <span>MFs</span>
             </button>
-            <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
-                </svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">CASH</span>
+            <button onclick="switchMainTab('cash')" id="nav-cash">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/></svg>
+                <span>CASH</span>
             </button>
-            <button onclick="switchMainTab('nps')" id="nav-nps" class="flex flex-col items-center text-gray-400 flex-1 px-1">
-                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NPS</span>
+            <button onclick="switchMainTab('nps')" id="nav-nps">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>NPS</span>
             </button>
         </nav>
     </div>
@@ -201,20 +205,16 @@
             contentBlock.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; touchstartY = e.changedTouches[0].screenY; }, {passive: true});
             contentBlock.addEventListener('touchend', e => {
                 touchendX = e.changedTouches[0].screenX; touchendY = e.changedTouches[0].screenY;
-                const isScrollableTable = e.target.closest('.overflow-x-auto');
+                const isScrollableTable = e.target.closest('table');
                 if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) return; 
                 handleSwipeDirection();
             }, {passive: true});
+            
             window.addEventListener('scroll', () => {
                 const fabTop = document.getElementById('fab-top');
                 if (!fabTop) return;
-                if (window.scrollY > 150) {
-                    fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    fabTop.classList.add('opacity-100', 'translate-y-0');
-                } else {
-                    fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    fabTop.classList.remove('opacity-100', 'translate-y-0');
-                }
+                if (window.scrollY > 150) fabTop.classList.add('visible');
+                else fabTop.classList.remove('visible');
             }, { passive: true });
         });
 
@@ -232,7 +232,6 @@
             else if (currentTab !== 'cash' && currentTab !== 'nps') activeViews = otherViews;
             
             if(activeViews.length === 0) return;
-
             const currentIndex = activeViews.indexOf(currentSubView);
             const swipeThreshold = 50; 
             
@@ -260,47 +259,29 @@
         let enteredPin = "";
         function handlePinInput(val) {
             const errorMsg = document.getElementById('pin-error');
-            errorMsg.classList.add('hidden');
-            if (val === 'clear') {
-                enteredPin = enteredPin.slice(0, -1);
-            } else if (val === 'submit') {
-                if (enteredPin.length === 4) validatePin();
-            } else {
-                if (enteredPin.length < 4) enteredPin += val;
-            }
+            errorMsg.style.display = 'none';
+            if (val === 'clear') enteredPin = enteredPin.slice(0, -1);
+            else if (val === 'submit') { if (enteredPin.length === 4) validatePin(); } 
+            else { if (enteredPin.length < 4) enteredPin += val; }
             
             updatePinDisplay();
-            if (enteredPin.length === 4 && val !== 'submit') {
-                setTimeout(validatePin, 150);
-            }
+            if (enteredPin.length === 4 && val !== 'submit') setTimeout(validatePin, 150);
         }
 
         function updatePinDisplay() {
             const dots = document.querySelectorAll('.pin-indicator');
             dots.forEach((dot, idx) => {
-                // Clear any lingering text asterisks just in case
-                dot.innerHTML = ''; 
-                
-                if (idx < enteredPin.length) {
-                    // Filled state (Darker dot)
-                    dot.classList.add('bg-[#344755]', 'dark:bg-gray-300');
-                    dot.classList.remove('bg-gray-300', 'dark:bg-gray-600');
-                } else {
-                    // Empty state (Lighter dot)
-                    dot.classList.remove('bg-[#344755]', 'dark:bg-gray-300');
-                    dot.classList.add('bg-gray-300', 'dark:bg-gray-600');
-                }
+                if (idx < enteredPin.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
             });
         }
         function validatePin() {
             if (enteredPin === SECRET_PIN) {
                 sessionStorage.setItem('isUnlocked', 'true');
-                const overlay = document.getElementById('pin-overlay');
-                overlay.classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+                document.getElementById('pin-overlay').style.display = 'none';
                 init();
             } else {
-                document.getElementById('pin-error').classList.remove('hidden');
+                document.getElementById('pin-error').style.display = 'block';
                 enteredPin = "";
                 updatePinDisplay();
             }
@@ -309,29 +290,31 @@
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         
+        // --- Pico Native Dark Mode Handling ---
         function applyInitialTheme() {
             const stored = localStorage.getItem('theme');
             const hour = new Date().getHours();
             setTheme(stored || ((hour >= 18 || hour < 6) ? 'dark' : 'light'));
         }
-
         function setTheme(theme) {
-            const el = document.documentElement;
-            theme === 'dark' ? el.classList.add('dark') : el.classList.remove('dark');
-            localStorage.setItem('theme', theme); updateIcons();
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme); 
+            updateIcons();
             if (activeData.length > 0 || tickerData.rows.length > 0) renderView();
         }
-
-        function toggleTheme() { setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark'); }
+        function toggleTheme() { 
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            setTheme(isDark ? 'light' : 'dark'); 
+        }
 
         function updateIcons() {
-            const isDark = document.documentElement.classList.contains('dark');
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             document.getElementById('theme-icon').innerHTML = isDark 
-                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />` 
-                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
+                ? `<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />` 
+                : `<path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
             document.getElementById('privacy-icon').innerHTML = isPrivacyMode 
-                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>` 
-                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+                ? `<path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>` 
+                : `<path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
         function switchUser(user, skipFetch = false) {
@@ -341,19 +324,15 @@
             const slider = document.getElementById('toggle-slider');
             const btnHt = document.getElementById('btn-user-ht');
             const btnNct = document.getElementById('btn-user-nct');
+            
             if (user === 'HT') {
                 slider.style.transform = 'translateX(0)';
-                btnHt.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors";
-                btnNct.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors";
+                btnHt.classList.add('active'); btnNct.classList.remove('active');
             } else {
                 slider.style.transform = 'translateX(100%)';
-                btnNct.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors";
-                btnHt.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors";
+                btnNct.classList.add('active'); btnHt.classList.remove('active');
             }
-            
-            if (!skipFetch && currentTab !== 'home') {
-                switchMainTab(currentTab);
-            }
+            if (!skipFetch && currentTab !== 'home') switchMainTab(currentTab);
         }
 
         function applyData(tab, data) {
@@ -377,8 +356,7 @@
         async function switchMainTab(tab) {
             currentTab = tab;
             localStorage.setItem('lastActiveTab', tab);
-            isEditingCash = false; 
-            isEditingNPS = false; 
+            isEditingCash = false; isEditingNPS = false; 
             
             const titles = { 
                 'home': 'Net Worth', 
@@ -392,40 +370,31 @@
             
             const subNav = document.getElementById('sub-nav');
             const profileToggle = document.getElementById('profile-toggle');
-            
             profileToggle.style.display = tab === 'home' ? 'none' : 'flex';
             subNav.style.display = 'flex'; 
-            
-            const activeClass = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
-            const inactiveClass = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
 
             if (tab === 'home') {
                 let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
                 currentSubView = ['dashboard', 'networth', 'tickers'].includes(savedSubView) ? savedSubView : 'dashboard';
                 subNav.innerHTML = `
-                    <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? activeClass : inactiveClass}" id="btn-dashboard">Dashboard</button>
-                    <button onclick="showSubView('networth')" class="${currentSubView === 'networth' ? activeClass : inactiveClass}" id="btn-networth">Net Worth</button>
-                    <button onclick="showSubView('tickers')" class="${currentSubView === 'tickers' ? activeClass : inactiveClass}" id="btn-tickers">Tickers</button>
-                `;
+                    <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? 'active' : ''}" id="btn-dashboard">Dashboard</button>
+                    <button onclick="showSubView('networth')" class="${currentSubView === 'networth' ? 'active' : ''}" id="btn-networth">Net Worth</button>
+                    <button onclick="showSubView('tickers')" class="${currentSubView === 'tickers' ? 'active' : ''}" id="btn-tickers">Tickers</button>`;
             } else if (tab === 'mf') {
                 let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
                 currentSubView = ['dashboard', 'details'].includes(savedSubView) ? savedSubView : 'dashboard';
                 subNav.innerHTML = `
-                    <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? activeClass : inactiveClass}" id="btn-dashboard">Market Cap Allocation</button>
-                    <button onclick="showSubView('details')" class="${currentSubView === 'details' ? activeClass : inactiveClass}" id="btn-details">SIP Details</button>
-                `;
+                    <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? 'active' : ''}" id="btn-dashboard">Market Cap</button>
+                    <button onclick="showSubView('details')" class="${currentSubView === 'details' ? 'active' : ''}" id="btn-details">SIP Details</button>`;
             } else if (tab === 'cash' || tab === 'nps') {
-                currentSubView = tab;
-                subNav.style.display = 'none'; 
+                currentSubView = tab; subNav.style.display = 'none'; 
             } else {
                 let savedSubView = localStorage.getItem('lastActiveSubView') || 'maturity';
                 currentSubView = ['maturity', 'bank'].includes(savedSubView) ? savedSubView : 'maturity';
-                
                 const bankText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
                 subNav.innerHTML = `
-                    <button onclick="showSubView('maturity')" class="${currentSubView === 'maturity' ? activeClass : inactiveClass}" id="btn-maturity">Maturity</button>
-                    <button onclick="showSubView('bank')" class="${currentSubView === 'bank' ? activeClass : inactiveClass}" id="btn-bank">${bankText}</button>
-                `;
+                    <button onclick="showSubView('maturity')" class="${currentSubView === 'maturity' ? 'active' : ''}" id="btn-maturity">Maturity</button>
+                    <button onclick="showSubView('bank')" class="${currentSubView === 'bank' ? 'active' : ''}" id="btn-bank">${bankText}</button>`;
             }
 
             const backBtn = document.getElementById('fab-back');
@@ -433,16 +402,13 @@
 
             ['home', 'fds', 'ncd', 'mf', 'cash', 'nps'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
-                if(el) el.className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
+                if(el) { el.classList.remove('active'); if(t===tab) el.classList.add('active'); }
             });
 
             const reqTabKey = tab === 'home' ? tab : (tab === 'mf' ? 'mf_data' : tab + '_' + currentUser);
 
             if (memoryCache[reqTabKey]) {
-                applyData(tab, memoryCache[reqTabKey].rawData);
-                updateStats();
-                renderView();
-                return;
+                applyData(tab, memoryCache[reqTabKey].rawData); updateStats(); renderView(); return;
             }
 
             document.getElementById('loading-spinner').style.display = 'flex';
@@ -450,96 +416,56 @@
             document.getElementById('global-stats').innerHTML = 'Fetching data...';
             
             const paramMap = { 
-                'home': 'HOME', 
-                'fds': currentUser === 'HT' ? 'HT' : 'NCT', 
-                'ncd': 'NCD', 
-                'cash': currentUser === 'HT' ? 'CASH_HT' : 'CASH_NCT', 
+                'home': 'HOME', 'fds': currentUser === 'HT' ? 'HT' : 'NCT', 
+                'ncd': 'NCD', 'cash': currentUser === 'HT' ? 'CASH_HT' : 'CASH_NCT', 
                 'nps': currentUser === 'HT' ? 'NPS_HT' : 'NPS_NCT' 
             };
 
             let networkDataReceived = false;
-
             try {
                 let data;
-
-                // 🚀 THE PARALLEL FETCH LOGIC FOR MFs
                 if (tab === 'mf') {
-                    const urls = [
-                        `${API_URL}?action=getHTSips`,
-                        `${API_URL}?action=getNCTSips`,
-                        `${API_URL}?action=getHTMarketCap`,
-                        `${API_URL}?action=getNCTMarketCap`
-                    ];
-
-                    // Fire all 4 endpoints at the exact same time
-                    const [ht, nct, htMarketCap, nctMarketCap] = await Promise.all(
-                        urls.map(url => fetch(url).then(r => r.json()))
-                    );
-
-                    // Reconstruct the single payload structure your UI relies on
+                    const urls = [`${API_URL}?action=getHTSips`, `${API_URL}?action=getNCTSips`, `${API_URL}?action=getHTMarketCap`, `${API_URL}?action=getNCTMarketCap`];
+                    const [ht, nct, htMarketCap, nctMarketCap] = await Promise.all(urls.map(url => fetch(url).then(r => r.json())));
                     data = { ht, htMarketCap, nct, nctMarketCap };
-                    
                     networkDataReceived = true;
                     memoryCache[reqTabKey] = { rawData: data };
-
-                    // Cache the finalized payload for instant loading next time
                     const cache = await caches.open('ai-tracker-data-v1');
                     cache.put(`${API_URL}?action=getMFs`, new Response(JSON.stringify(data)));
-
                 } else {
-                    // Standard Single-Fetch Logic for FDs, NCDs, Cash, NPS
                     const reqUrl = `${API_URL}?user=${paramMap[tab]}`;
-                    
                     caches.open('ai-tracker-data-v1').then(cache => {
                         cache.match(reqUrl).then(response => {
                             if (response) {
                                 response.json().then(cachedData => {
                                     if (!networkDataReceived) {
-                                        applyData(tab, cachedData);
-                                        updateStats();
-                                        renderView();
+                                        applyData(tab, cachedData); updateStats(); renderView();
                                     }
                                 }).catch(() => {}); 
                             }
                         });
                     });
-
                     const response = await fetch(reqUrl);
                     data = await response.json();
                     if (data.error) throw new Error(data.error);
                     
-                    networkDataReceived = true;
-                    memoryCache[reqTabKey] = { rawData: data };
+                    networkDataReceived = true; memoryCache[reqTabKey] = { rawData: data };
                     const cache = await caches.open('ai-tracker-data-v1');
                     cache.put(reqUrl, new Response(JSON.stringify(data)));
                 }
 
                 if (currentTab === tab) {
                     if (!isEditingCash && !isEditingNPS) {
-                        applyData(tab, data);
-                        updateStats(); // This will now safely format the data using the fix from the previous step!
-                        
-                        Object.keys(domCache).forEach(key => {
-                            if (key.startsWith(reqTabKey + '_')) {
-                                domCache[key].remove();
-                                delete domCache[key];
-                            }
-                        });
+                        applyData(tab, data); updateStats(); 
+                        Object.keys(domCache).forEach(key => { if (key.startsWith(reqTabKey + '_')) { domCache[key].remove(); delete domCache[key]; } });
                         renderView();
                     }
-                } else {
-                    Object.keys(domCache).forEach(key => {
-                        if (key.startsWith(reqTabKey + '_')) {
-                            domCache[key].remove();
-                            delete domCache[key];
-                        }
-                    });
                 }
             } catch (e) {
                 if (!networkDataReceived) {
                     document.getElementById('loading-spinner').style.display = 'none';
                     document.getElementById('app-content').style.display = 'block';
-                    document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">Connection Error:<br>${e.message}</div>`;
+                    document.getElementById('app-content').innerHTML = `<article style="border-color: red;"><p style="color:red; text-align:center;">Connection Error:<br>${e.message}</p></article>`;
                     document.getElementById('global-stats').innerHTML = 'Error loading';
                 }
             }
@@ -549,86 +475,66 @@
             currentSubView = view;
             localStorage.setItem('lastActiveSubView', view);
             
-            const active = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-gray-900 dark:border-white transition-colors";
-            const inactive = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
-            
             if (currentTab === 'home') {
-                document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
-                document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
-                document.getElementById('btn-tickers').className = view === 'tickers' ? active : inactive;
+                ['dashboard', 'networth', 'tickers'].forEach(v => {
+                    const btn = document.getElementById('btn-'+v);
+                    if(btn) { btn.classList.remove('active'); if(v===view) btn.classList.add('active'); }
+                });
             } else if (currentTab === 'mf') {
-                document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
-                document.getElementById('btn-details').className = view === 'details' ? active : inactive;
+                ['dashboard', 'details'].forEach(v => {
+                    const btn = document.getElementById('btn-'+v);
+                    if(btn) { btn.classList.remove('active'); if(v===view) btn.classList.add('active'); }
+                });
             } else if (currentTab !== 'cash' && currentTab !== 'nps') {
-                document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
-                document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
+                ['maturity', 'bank'].forEach(v => {
+                    const btn = document.getElementById('btn-'+v);
+                    if(btn) { btn.classList.remove('active'); if(v===view) btn.classList.add('active'); }
+                });
             }
             renderView();
         }
 
         function togglePrivacy() { 
-            isPrivacyMode = !isPrivacyMode;
-            updateIcons(); 
-            updateStats(); 
-            
-            domCache = {};
-            document.getElementById('app-content').innerHTML = ''; 
-            
-            renderView(); 
+            isPrivacyMode = !isPrivacyMode; updateIcons(); updateStats(); 
+            domCache = {}; document.getElementById('app-content').innerHTML = ''; renderView(); 
         }
 
         function displayMoney(amt) {
-            if (typeof amt === 'string' && amt.includes('%')) {
-                return isPrivacyMode && !isEditingCash && !isEditingNPS ? amt.replace(/[0-9]/g, '●') : amt;
-            }
+            if (typeof amt === 'string' && amt.includes('%')) return isPrivacyMode && !isEditingCash && !isEditingNPS ? amt.replace(/[0-9]/g, '●') : amt;
             return isPrivacyMode && !isEditingCash && !isEditingNPS ? fmt.format(amt).replace(/[0-9]/g, '●') : fmt.format(amt); 
         }
 
         function init() { 
-            let savedUser = localStorage.getItem('currentUser') || 'HT';
-            switchUser(savedUser, true);
-            const savedTab = localStorage.getItem('lastActiveTab') || 'home';
-            switchMainTab(savedTab);
+            let savedUser = localStorage.getItem('currentUser') || 'HT'; switchUser(savedUser, true);
+            const savedTab = localStorage.getItem('lastActiveTab') || 'home'; switchMainTab(savedTab);
         }
 
         function updateStats() {
             let total = 0;
-            
-            // THE FIX: Safely handle the new MF Active/Inactive structure
             if (currentTab === 'mf') {
-                if (activeData && activeData.active) {
-                    // Sum only the active SIPs for the top header stat
-                    total = activeData.active.reduce((s, item) => s + (item.totalAmount || 0), 0);
-                }
+                if (activeData && activeData.active) total = activeData.active.reduce((s, item) => s + (item.totalAmount || 0), 0);
             } else if (Array.isArray(activeData)) {
-                // Standard math for FDs, NCDs, Cash, NPS (which are still normal arrays)
                 total = activeData.reduce((s, item) => s + (item.totalAmount !== undefined ? item.totalAmount : (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount)), 0);
             }
 
-            if (currentTab === 'home' || currentTab === 'cash' || currentTab === 'nps') {
-                document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
-            } else if (currentTab === 'mf') {
-                document.getElementById('global-stats').innerHTML = `Active SIPs: ${displayMoney(total)}`;
-            } else if (currentTab === 'ncd') {
-                document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
-            } else {
+            if (currentTab === 'home' || currentTab === 'cash' || currentTab === 'nps') document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
+            else if (currentTab === 'mf') document.getElementById('global-stats').innerHTML = `Active SIPs: ${displayMoney(total)}`;
+            else if (currentTab === 'ncd') document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)}`;
+            else {
                 let mat = 0;
-                if (Array.isArray(activeData)) {
-                    mat = activeData.reduce((s, f) => s + (f.maturityAmount || 0), 0);
-                }
+                if (Array.isArray(activeData)) mat = activeData.reduce((s, f) => s + (f.maturityAmount || 0), 0);
                 document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)} | Mat: ${displayMoney(mat)}`;
             }
         }
 
+        // Teal Monochrome Palette for Pico
+        const tealPalette = ['#004D4D', '#006666', '#008080', '#009999', '#00B2B2', '#00CCCC', '#00E5E5', '#33FFFF', '#66FFFF', '#99FFFF'];
+
         function renderSharedChart(canvasId, labels, data, totalValue) {
             const ctx = document.getElementById(canvasId);
             if (!ctx) return;
-            
             if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
             
-            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4', '#84CC16', '#6366F1'];
-
-            // THE FIX: Custom plugin to draw labels directly on the doughnut slices
             const sliceLabelPlugin = {
                 id: 'sliceLabels',
                 afterDatasetsDraw(chart) {
@@ -640,26 +546,14 @@
                     meta.data.forEach((element, index) => {
                         const value = data.datasets[0].data[index];
                         const percentage = total > 0 ? (value / total) : 0;
-
-                        // Only draw text if the slice is large enough (> 5% of the total) to prevent overlap
                         if (percentage > 0.05) {
                             const centerPoint = element.tooltipPosition();
-                            
-                            // "Not so prominent manner": Muted white with subtle shadow
                             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
                             ctx.font = '600 10px system-ui, -apple-system, sans-serif';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-                            ctx.shadowBlur = 4;
-
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)'; ctx.shadowBlur = 4;
                             let labelText = data.labels[index];
-                            
-                            // Truncate long text so it doesn't bleed out of the slice boundaries
-                            if (labelText.length > 12) {
-                                labelText = labelText.substring(0, 10) + '..';
-                            }
-
+                            if (labelText.length > 12) labelText = labelText.substring(0, 10) + '..';
                             ctx.fillText(labelText, centerPoint.x, centerPoint.y);
                         }
                     });
@@ -669,31 +563,13 @@
 
             chartInstances[canvasId] = new Chart(ctx, { 
                 type: 'doughnut', 
-                data: { 
-                    labels: labels, 
-                    datasets: [{ 
-                        data: data, 
-                        backgroundColor: bgColors.slice(0, labels.length), 
-                        borderWidth: 0, 
-                        hoverOffset: 4 
-                    }] 
-                },
-                plugins: [sliceLabelPlugin], // Inject the custom text plugin here
+                data: { labels: labels, datasets: [{ data: data, backgroundColor: tealPalette.slice(0, labels.length), borderWidth: 0, hoverOffset: 4 }] },
+                plugins: [sliceLabelPlugin],
                 options: { 
-                    responsive: true, 
-                    maintainAspectRatio: true, 
-                    cutout: '65%', 
+                    responsive: true, maintainAspectRatio: true, cutout: '65%', 
                     plugins: { 
                         legend: { display: false }, 
-                        tooltip: { 
-                            callbacks: { 
-                                label: function(context) {
-                                    const val = context.raw; 
-                                    const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%'; 
-                                    return ` ${context.label}: ${displayMoney(val)} (${displayMoney(pct)})`;
-                                }
-                            }
-                        }
+                        tooltip: { callbacks: { label: function(context) { const val = context.raw; const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%'; return ` ${context.label}: ${displayMoney(val)} (${displayMoney(pct)})`; } } }
                     }
                 }
             });
@@ -707,25 +583,18 @@
             const reqTabKey = currentTab === 'home' ? currentTab : (currentTab === 'mf' ? 'mf_data_' + currentUser : currentTab + '_' + currentUser);
             const viewKey = reqTabKey + '_' + currentSubView;
 
-            Array.from(container.children).forEach(child => {
-                child.style.display = 'none';
-            });
+            Array.from(container.children).forEach(child => child.style.display = 'none');
             
             const hasTickers = currentTab === 'home' && currentSubView === 'tickers' && tickerData.rows.length > 0;
             if (activeData.length === 0 && !hasTickers && !mfTotals) { 
-                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>';
-                domCache = {}; 
-                return; 
+                container.innerHTML = '<article><p class="text-center text-muted">No active records found.</p></article>';
+                domCache = {}; return; 
             }
 
-            if (domCache[viewKey]) {
-                domCache[viewKey].style.display = 'block';
-                return;
-            }
+            if (domCache[viewKey]) { domCache[viewKey].style.display = 'block'; return; }
 
             const viewDiv = document.createElement('div');
             viewDiv.id = 'view-' + viewKey;
-            
             container.appendChild(viewDiv);
             domCache[viewKey] = viewDiv;
 
@@ -733,11 +602,9 @@
                 if (currentSubView === 'dashboard') renderDashboard(viewDiv);
                 else if (currentSubView === 'networth') renderHome(viewDiv); 
                 else if (currentSubView === 'tickers') renderTickers(viewDiv);
-            } else if (currentTab === 'cash') {
-                renderCash(viewDiv);
-            } else if (currentTab === 'nps') {
-                renderNPS(viewDiv);
-            } else if (currentTab === 'mf') {
+            } else if (currentTab === 'cash') renderCash(viewDiv);
+            else if (currentTab === 'nps') renderNPS(viewDiv);
+            else if (currentTab === 'mf') {
                 if (currentSubView === 'dashboard') renderMFDashboard(viewDiv);
                 else renderMFDetails(viewDiv);
             } else {
@@ -747,572 +614,308 @@
         }
 
         function renderMFDashboard(container) {
-            if (!mfTotals) {
-                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No market cap data found.</p>';
-                return;
-            }
-
+            if (!mfTotals) return;
             const labels = ['Large Cap', 'Mid Cap', 'Small Cap'];
             const chartData = [mfTotals.large, mfTotals.mid, mfTotals.small];
             const totalInv = mfTotals.total;
-            
-            if (mfTotals.other > (totalInv * 0.01)) {
-                labels.push('Other / Debt');
-                chartData.push(mfTotals.other);
-            }
+            if (mfTotals.other > (totalInv * 0.01)) { labels.push('Other / Debt'); chartData.push(mfTotals.other); }
 
-            const reqTabKey = currentTab + '_' + currentUser;
-            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
-            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
+            const canvasId = `chart-${currentTab}_${currentUser}-${currentSubView}`;
             
             let html = `
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
-                    <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Market Cap Allocation</h2>
-                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
-                    <div class="mt-4 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
-                        Total Invested: ${displayMoney(totalInv)}
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
-                    <ul class="divide-y dark:divide-gray-700">`;
+                <article class="text-center">
+                    <header><small class="text-muted uppercase">Market Cap Allocation</small></header>
+                    <div style="max-width:240px; margin:0 auto;"><canvas id="${canvasId}"></canvas></div>
+                    <footer class="text-muted"><small>Total Invested: ${displayMoney(totalInv)}</small></footer>
+                </article>
+                <article style="padding:0;">
+                    <table class="striped" style="margin:0;"><tbody>`;
             
             labels.forEach((label, i) => {
-                const amount = chartData[i]; 
-                const percent = totalInv > 0 ? (amount / totalInv * 100).toFixed(2) + '%' : '0.00%';
-                
-                // THE FIX: Applied the same 'flex-1 min-w-0' logic here to prevent mobile stretching
+                const amount = chartData[i]; const percent = totalInv > 0 ? (amount / totalInv * 100).toFixed(2) + '%' : '0.00%';
                 html += `
-                <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
-                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
-                    </div>
-                    <div class="text-right flex flex-col flex-shrink-0">
-                        <span class="font-bold text-sm leading-tight">${displayMoney(amount)}</span>
-                        <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
-                    </div>
-                 </li>`;
+                <tr>
+                    <td>
+                        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${tealPalette[i % tealPalette.length]}; margin-right:8px;"></span>
+                        <strong class="text-sm">${label}</strong>
+                    </td>
+                    <td class="text-right">
+                        <strong>${displayMoney(amount)}</strong><br>
+                        <small class="text-muted">${displayMoney(percent)}</small>
+                    </td>
+                </tr>`;
             });
-            html += `</ul></div>`;
-            
-            container.innerHTML = html; 
-            renderSharedChart(canvasId, labels, chartData, totalInv);
+            html += `</tbody></table></article>`;
+            container.innerHTML = html; renderSharedChart(canvasId, labels, chartData, totalInv);
         }
 
         function renderMFDetails(container, fundsDataObj) {
-            // Check if we passed the specific object (e.g., mfData.ht), otherwise fallback to the global activeData
             const dataToRender = fundsDataObj || activeData; 
             let finalHtml = '';
 
             const buildSection = (fundList, title) => {
                 if (!fundList || fundList.length === 0) return '';
-                
-                let html = `<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-5 mb-2 px-2">${title}</h3>`;
+                let html = `<h6>${title}</h6>`;
                 
                 fundList.forEach(fund => {
-                    // 1. Nested SIP Table Rows (Plan, Start, End, Amt)
                     let sipsHtml = fund.details.map(sip => {
-                        return `
-                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-                            <td class="p-2 text-left font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight min-w-[60px]">${sip.plan}</span></td>
-                            <td class="p-2 text-center text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${sip.startDate}</td>
-                            <td class="p-2 text-center text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${sip.endDate}</td>
-                            <td class="p-2 text-right font-bold text-gray-900 dark:text-white align-middle">${displayMoney(sip.amount)}</td>
-                        </tr>`;
+                        return `<tr><td class="text-sm">${sip.plan}</td><td class="text-center text-muted text-sm">${sip.startDate}</td><td class="text-center text-muted text-sm">${sip.endDate}</td><td class="text-right text-sm"><strong>${displayMoney(sip.amount)}</strong></td></tr>`;
                     }).join('');
 
-                    // 2. Stars
-                    let starsHtml = '';
-                    if (fund.rating && !isNaN(fund.rating)) {
-                        let rating = parseInt(fund.rating);
-                        let starColor = 'text-green-500 dark:text-green-400'; 
-                        if (rating <= 2) starColor = 'text-red-500 dark:text-red-400';
-                        else if (rating === 3) starColor = 'text-amber-500 dark:text-amber-400'; 
-
-                        const starSvg = `<svg class="w-3 h-3 drop-shadow-sm ${starColor}" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>`;
-                        starsHtml = `<div class="flex items-center gap-[1px] mt-0.5" title="${rating} Star Rating">`;
-                        for (let i = 0; i < rating; i++) {
-                            starsHtml += starSvg;
-                        }
-                        starsHtml += `</div>`;
-                    }
-
-                    // 3. Dropdown Details (4-Column Grid + Plan/Exp)
-                    let pType = fund.planType || '-';
-                    let expRatio = fund.expenseRatio ? fund.expenseRatio : '-';
+                    let pType = fund.planType || '-'; let expRatio = fund.expenseRatio ? fund.expenseRatio : '-';
                     if (expRatio !== '-' && !String(expRatio).includes('%')) expRatio += '%';
                     let lPct = fund.large !== undefined ? (Number(fund.large).toFixed(2) + '%') : '-';
                     let mPct = fund.medium !== undefined ? (Number(fund.medium).toFixed(2) + '%') : '-';
                     let sPct = fund.small !== undefined ? (Number(fund.small).toFixed(2) + '%') : '-';
-                    
                     let alphaVal = (fund.alphaEfficiency !== undefined && fund.alphaEfficiency !== null && fund.alphaEfficiency !== '') ? fund.alphaEfficiency : '-';
 
-                    let detailsHtml = `
-                    <div class="px-3 py-3 bg-gray-100/80 dark:bg-gray-800/80 border-b dark:border-gray-700 flex flex-col gap-2">
-                        <div class="grid grid-cols-4 gap-2 bg-white dark:bg-gray-700 p-2 rounded border dark:border-gray-600 text-center text-[10px] shadow-sm">
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Large</div><div class="font-bold text-gray-800 dark:text-gray-200">${lPct}</div></div>
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Mid</div><div class="font-bold text-gray-800 dark:text-gray-200">${mPct}</div></div>
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gray-200">${sPct}</div></div>
-                            
-                            <div><div class="text-purple-500 dark:text-purple-400 mb-0.5 font-bold uppercase">Alpha</div><div class="font-bold text-gray-800 dark:text-gray-200 truncate" title="${alphaVal}">${alphaVal}</div></div>
-                        </div>
-                        
-                        <div class="flex justify-between text-[10px] text-gray-600 dark:text-gray-400 px-1 mt-1">
-                            <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Plan:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${pType}</span></div>
-                            <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Exp Ratio:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${expRatio}</span></div>
-                        </div>
-                    </div>`;
-
-                    // 4. Main HTML Assembly
                     html += `
-                    <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
-                        <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center gap-2 border-b dark:border-gray-700 text-left active:bg-gray-100 dark:active:bg-gray-600 transition-colors">
-                            <div class="flex flex-col w-2/3">
-                                <div class="flex items-center flex-wrap gap-x-2 gap-y-1">
-                                    <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${fund.fund}</span>
-                                    ${starsHtml}
-                                </div>
+                    <details>
+                        <summary class="flex-between">
+                            <span class="text-sm">${fund.fund}</span>
+                            <span class="pill">${displayMoney(fund.totalAmount)}</span>
+                        </summary>
+                        <div>
+                            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem; text-align:center; background:var(--pico-form-element-background-color); padding:0.5rem; border-radius:var(--pico-border-radius); margin-bottom:1rem;">
+                                <div><small class="text-muted">Large</small><br><strong>${lPct}</strong></div>
+                                <div><small class="text-muted">Mid</small><br><strong>${mPct}</strong></div>
+                                <div><small class="text-muted">Small</small><br><strong>${sPct}</strong></div>
+                                <div><small style="color:var(--pico-primary);">Alpha</small><br><strong>${alphaVal}</strong></div>
                             </div>
-                            <span class="font-bold text-[#5D6B7F] dark:text-gray-200 bg-gray-200/50 dark:bg-gray-700 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-gray-300 dark:border-gray-600">
-                                ${displayMoney(fund.totalAmount)}
-                            </span>
-                        </button>
-                        
-                        <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar flex flex-col">
-                            ${detailsHtml}
-                            <table class="w-full text-[10px] dark:text-gray-300">
-                                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">
-                                    <tr>
-                                        <th class="p-2 text-left whitespace-nowrap">Plan</th>
-                                        <th class="p-2 text-center whitespace-nowrap">Start</th>
-                                        <th class="p-2 text-center whitespace-nowrap">End</th>
-                                        <th class="p-2 text-right whitespace-nowrap">Amt</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y dark:divide-gray-700">
-                                    ${sipsHtml}
-                                </tbody>
+                            <div class="flex-between text-muted" style="margin-bottom:1rem;"><small>Plan: <strong>${pType}</strong></small><small>Exp: <strong>${expRatio}</strong></small></div>
+                            <table class="striped text-sm">
+                                <thead><tr><th>Plan</th><th class="text-center">Start</th><th class="text-center">End</th><th class="text-right">Amt</th></tr></thead>
+                                <tbody>${sipsHtml}</tbody>
                             </table>
                         </div>
-                    </div>`;
+                    </details>`;
                 });
                 return html;
             };
 
-            // Safely route the new {active: [], inactive: []} object structure
             if (dataToRender && dataToRender.active !== undefined) {
                 finalHtml += buildSection(dataToRender.active, "ACTIVE SIPs");
                 finalHtml += buildSection(dataToRender.inactive, "INACTIVE SIPs");
             } else if (Array.isArray(dataToRender)) {
                 finalHtml += buildSection(dataToRender, "SIP Details");
             }
-
             container.innerHTML = finalHtml;
         }
 
         function renderNPS(container) {
             let tiers = activeData.reduce((acc, item) => {
-                let t = item.tier || "Tier 1";
-                if (!acc[t]) acc[t] = [];
-                acc[t].push(item);
-                return acc;
+                let t = item.tier || "Tier 1"; if (!acc[t]) acc[t] = []; acc[t].push(item); return acc;
             }, {});
             
             let html = ``;
-
-            const btnText = isEditingNPS ? "Save" : "Edit";
-            const btnColor = isEditingNPS ? "bg-green-600 hover:bg-green-700" : "bg-[#5D6B7F] hover:bg-gray-700";
+            const btnText = isEditingNPS ? "Save Changes" : "Edit Values";
 
             Object.keys(tiers).sort().forEach(tierName => {
-                
-                let latestTimeMs = 0;
-                let tierTimestampStr = "Never";
-                
+                let latestTimeMs = 0; let tierTimestampStr = "Never";
                 tiers[tierName].forEach(item => {
                     if (item.lastUpdated && item.lastUpdated !== "") {
                         let d = new Date(item.lastUpdated).getTime();
-                        if (!isNaN(d) && d > latestTimeMs) {
-                            latestTimeMs = d;
-                            tierTimestampStr = new Date(item.lastUpdated).toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'});
-                        } else if (latestTimeMs === 0) {
-                            tierTimestampStr = item.lastUpdated; 
-                        }
+                        if (!isNaN(d) && d > latestTimeMs) { latestTimeMs = d; tierTimestampStr = new Date(item.lastUpdated).toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'}); } 
+                        else if (latestTimeMs === 0) tierTimestampStr = item.lastUpdated; 
                     }
                 });
 
                 let tbodyHtml = tiers[tierName].map(item => {
                     let globalIdx = activeData.indexOf(item); 
-
                     let unitsDisplay = isEditingNPS 
-                        ? `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${item.units}" class="w-[65px] px-1 py-1 text-center mx-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold text-xs" />`
-                        : `${item.units}`;
+                        ? `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${item.units}" style="width:80px; padding:2px; margin:0 auto; text-align:center; height:auto; min-height:auto;" />`
+                        : `<strong>${item.units}</strong>`;
                     
                     let percentStr = item.percent;
                     if (typeof percentStr === 'number') percentStr = Number((percentStr * 100).toFixed(2)) + '%';
                     else if (typeof percentStr === 'string' && percentStr !== "" && !percentStr.includes('%')) {
                         let n = parseFloat(percentStr);
-                        if (!isNaN(n) && n > 0 && n < 1) percentStr = Number((n * 100).toFixed(2)) + '%';
-                        else if (!isNaN(n)) percentStr = n + '%';
+                        if (!isNaN(n) && n > 0 && n < 1) percentStr = Number((n * 100).toFixed(2)) + '%'; else if (!isNaN(n)) percentStr = n + '%';
                     }
-
                     percentStr = displayMoney(percentStr);
                     let totalDisplay = typeof item.total === 'number' ? displayMoney(item.total) : item.total;
                     let navDateDisplay = item.navDate ? new Date(item.navDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'}) : '';
 
-                    return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-xs">
-                        <td class="px-1 py-2 text-center font-bold text-gray-800 dark:text-white align-middle leading-tight min-w-[70px] break-words whitespace-normal">${item.fund}</td>
-                        <td class="px-1 py-2 text-center text-gray-700 dark:text-gray-300 align-middle leading-tight min-w-[80px] break-words whitespace-normal">${item.scheme}</td>
-                        <td class="px-1 py-2 text-center text-gray-500 dark:text-gray-400 align-middle">${percentStr}</td>
-                        <td class="px-1 py-2 text-center font-bold text-blue-600 dark:text-blue-400 align-middle">${unitsDisplay}</td>
-                        <td class="px-1 py-2 text-center text-gray-700 dark:text-gray-300 align-middle">${item.nav}</td>
-                        <td class="px-1 py-2 text-center text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle text-[10px]">${navDateDisplay}</td>
-                        <td class="px-1 py-2 text-center font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap align-middle">${totalDisplay}</td>
+                    return `<tr>
+                        <td class="text-sm"><strong>${item.fund}</strong><br><span class="text-muted">${item.scheme}</span></td>
+                        <td class="text-center text-sm">${percentStr}</td>
+                        <td class="text-center text-sm" style="color:var(--pico-primary);">${unitsDisplay}</td>
+                        <td class="text-center text-sm"><span class="text-muted">${item.nav}</span><br><small class="text-muted" style="font-size:0.65rem;">${navDateDisplay}</small></td>
+                        <td class="text-right text-sm"><strong>${totalDisplay}</strong></td>
                     </tr>`;
                 }).join('');
 
                 html += `
-                    <div class="flex justify-between items-end mt-4 mb-2 ml-1 pr-1">
-                        <h3 class="font-bold text-gray-700 dark:text-gray-300 uppercase text-xs tracking-wider">${tierName}</h3>
-                        <div class="text-[9px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
-                            Updated: <span class="text-gray-800 dark:text-gray-200">${tierTimestampStr}</span>
-                        </div>
+                    <div class="flex-between" style="margin-bottom:0.5rem; margin-top:1.5rem;">
+                        <h6 style="margin:0;">${tierName}</h6>
+                        <small class="text-muted">Updated: ${tierTimestampStr}</small>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 overflow-hidden">
-                        <div class="overflow-x-auto hide-scrollbar">
-                            <table class="w-full text-xs">
-                                <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
-                                    <tr>
-                                        <th class="px-1 py-2 text-center">Fund</th>
-                                        <th class="px-1 py-2 text-center">Scheme</th>
-                                        <th class="px-1 py-2 text-center">%</th>
-                                        <th class="px-1 py-2 text-center">Units</th>
-                                        <th class="px-1 py-2 text-center">NAV</th>
-                                        <th class="px-1 py-2 text-center">Date</th>
-                                        <th class="px-1 py-2 text-center">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${tbodyHtml}</tbody>
-                            </table>
-                        </div>
-                    </div>
+                    <article style="padding:0; overflow-x:auto;">
+                        <table class="striped" style="margin:0;">
+                            <thead><tr><th>Fund/Scheme</th><th class="text-center">%</th><th class="text-center">Units</th><th class="text-center">NAV/Date</th><th class="text-right">Total</th></tr></thead>
+                            <tbody>${tbodyHtml}</tbody>
+                        </table>
+                    </article>
                 `;
             });
-            
-            html += `
-                <div class="flex justify-end px-1 mb-8">
-                    <button id="nps-action-btn" onclick="handleNPSAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
-                        ${btnText}
-                    </button>
-                </div>
-            `;
+            html += `<div style="text-align:right; margin-bottom:2rem;"><button id="nps-action-btn" onclick="handleNPSAction()">${btnText}</button></div>`;
             container.innerHTML = html;
         }
 
         async function handleNPSAction() {
-            const reqTabKey = currentTab + '_' + currentUser;
-            const viewKey = reqTabKey + '_' + currentSubView;
-
-            if (!isEditingNPS) {
-                isEditingNPS = true;
-                if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
-                renderView();
-            } else {
-                const btn = document.getElementById('nps-action-btn');
-                btn.innerHTML = '<span class="loader"></span> Saving';
-                btn.disabled = true;
-
-                const updates = [];
-                let inputsFound = false;
+            const viewKey = currentTab + '_' + currentUser + '_' + currentSubView;
+            if (!isEditingNPS) { isEditingNPS = true; if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; } renderView(); } 
+            else {
+                const btn = document.getElementById('nps-action-btn'); btn.setAttribute('aria-busy', 'true'); btn.disabled = true;
+                const updates = []; let inputsFound = false;
                 
                 activeData.forEach((item, index) => {
                     const input = document.getElementById('nps-input-' + index);
-                    if(input) {
-                        inputsFound = true;
-                        const newVal = parseFloat(input.value) || 0;
-                        if (item.units !== newVal) {
-                            item.units = newVal; 
-                            updates.push({ row: item.row, col: item.col, dtCol: item.dtCol, units: newVal });
-                        }
-                    }
+                    if(input) { inputsFound = true; const newVal = parseFloat(input.value) || 0; if (item.units !== newVal) { item.units = newVal; updates.push({ row: item.row, col: item.col, dtCol: item.dtCol, units: newVal }); } }
                 });
                 
-                if (inputsFound && updates.length === 0) {
-                    isEditingNPS = false;
-                    if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
-                    renderView();
-                    return;
-                }
-
+                if (inputsFound && updates.length === 0) { isEditingNPS = false; if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; } renderView(); return; }
                 const targetKeyword = currentUser === 'HT' ? "HT NPS" : "NCT NPS";
-
                 try {
-                    const response = await fetch(API_URL, {
-                        method: "POST",
-                        body: JSON.stringify({ action: "UPDATE_NPS", keyword: targetKeyword, updates: updates })
-                    });
+                    const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "UPDATE_NPS", keyword: targetKeyword, updates: updates }) });
                     const result = await response.json();
-                    
                     if(result.error) throw new Error(result.error);
                     
                     isEditingNPS = false;
-
-                    if (result.timestamp) {
-                        updates.forEach(u => {
-                            let match = activeData.find(a => a.row === u.row);
-                            if (match) match.lastUpdated = result.timestamp;
-                        });
-                    }
-
-                    const freshData = { items: activeData };
-                    memoryCache[reqTabKey] = { rawData: freshData };
-                    
+                    if (result.timestamp) updates.forEach(u => { let match = activeData.find(a => a.row === u.row); if (match) match.lastUpdated = result.timestamp; });
+                    const freshData = { items: activeData }; memoryCache[currentTab + '_' + currentUser] = { rawData: freshData };
                     const reqUrl = `${API_URL}?user=${targetKeyword === 'HT NPS' ? 'NPS_HT' : 'NPS_NCT'}`;
-                    caches.open('ai-tracker-data-v1').then(cache => {
-                        cache.put(reqUrl, new Response(JSON.stringify(freshData)));
-                    });
-                    
+                    caches.open('ai-tracker-data-v1').then(cache => { cache.put(reqUrl, new Response(JSON.stringify(freshData))); });
                     if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
-
-                    updateStats();
-                    renderView();
-                } catch(e) {
-                    alert("Save failed: " + e.message);
-                    btn.innerHTML = 'Save';
-                    btn.disabled = false;
-                }
+                    updateStats(); renderView();
+                } catch(e) { alert("Save failed: " + e.message); btn.removeAttribute('aria-busy'); btn.disabled = false; }
             }
         }
 
         function renderCash(container) {
             let tbodyHtml = activeData.map((item, index) => {
-                let amountDisplay = isEditingCash 
-                    ? `<input type="number" id="cash-input-${index}" value="${item.amount}" class="w-full max-w-[120px] px-2 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
-                    : `${displayMoney(item.amount)}`;
-
+                let amountDisplay = isEditingCash ? `<input type="number" id="cash-input-${index}" value="${item.amount}" style="width:100px; padding:2px; text-align:right; margin:0; height:auto; min-height:auto;" />` : `<strong>${displayMoney(item.amount)}</strong>`;
                 let formattedRate = item.interest;
-                if (typeof formattedRate === 'number') {
-                    formattedRate = Number((formattedRate * 100).toFixed(2)) + '%';
-                } else if (typeof formattedRate === 'string' && formattedRate !== "" && formattedRate !== "N/A" && !formattedRate.includes('%')) {
-                    let num = parseFloat(formattedRate);
-                    if (!isNaN(num) && num > 0 && num < 1) formattedRate = Number((num * 100).toFixed(2)) + '%';
-                    else if (!isNaN(num)) formattedRate = num + '%';
-                }
-                
+                if (typeof formattedRate === 'number') formattedRate = Number((formattedRate * 100).toFixed(2)) + '%';
+                else if (typeof formattedRate === 'string' && formattedRate !== "" && formattedRate !== "N/A" && !formattedRate.includes('%')) { let num = parseFloat(formattedRate); if (!isNaN(num) && num > 0 && num < 1) formattedRate = Number((num * 100).toFixed(2)) + '%'; else if (!isNaN(num)) formattedRate = num + '%'; }
                 formattedRate = displayMoney(formattedRate);
                 
-                return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <td class="p-3 text-left font-bold text-gray-800 dark:text-white align-middle">${item.bank}</td>
-                    <td class="p-3 text-right font-bold text-gray-900 dark:text-gray-200 align-middle">${amountDisplay}</td>
-                    <td class="p-3 text-right text-gray-500 dark:text-gray-400 align-middle">${formattedRate}</td>
-                </tr>`;
+                return `<tr><td class="text-sm"><strong>${item.bank}</strong></td><td class="text-right text-sm">${amountDisplay}</td><td class="text-right text-sm text-muted">${formattedRate}</td></tr>`;
             }).join('');
 
-            const btnText = isEditingCash ? "Save" : "Edit";
-            const btnColor = isEditingCash ? "bg-green-600 hover:bg-green-700" : "bg-[#5D6B7F] hover:bg-gray-700";
-            
+            const btnText = isEditingCash ? "Save Changes" : "Edit Values";
             container.innerHTML = `
-                <div class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2 px-1">
-                    Last Updated: <span class="text-gray-800 dark:text-gray-200">${cashTimestamp}</span>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 overflow-hidden">
-                    <table class="w-full text-sm">
-                        <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
-                            <tr>
-                                <th class="p-3 text-left">Bank</th>
-                                <th class="p-3 text-right">Amount</th>
-                                <th class="p-3 text-right">Interest</th>
-                            </tr>
-                        </thead>
+                <div style="text-align:right; margin-bottom:0.5rem;"><small class="text-muted">Last Updated: ${cashTimestamp}</small></div>
+                <article style="padding:0; overflow-x:auto;">
+                    <table class="striped" style="margin:0;">
+                        <thead><tr><th>Bank</th><th class="text-right">Amount</th><th class="text-right">Interest</th></tr></thead>
                         <tbody>${tbodyHtml}</tbody>
                     </table>
-                </div>
-                <div class="flex justify-end px-1 mb-8">
-                    <button id="cash-action-btn" onclick="handleCashAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
-                        ${btnText}
-                    </button>
-                </div>
+                </article>
+                <div style="text-align:right; margin-bottom:2rem;"><button id="cash-action-btn" onclick="handleCashAction()">${btnText}</button></div>
             `;
         }
 
         async function handleCashAction() {
-            const reqTabKey = currentTab + '_' + currentUser;
-            const viewKey = reqTabKey + '_' + currentSubView;
-
-            if (!isEditingCash) {
-                isEditingCash = true;
-                if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
-                renderView();
-            } else {
-                const btn = document.getElementById('cash-action-btn');
-                btn.innerHTML = '<span class="loader"></span> Saving';
-                btn.disabled = true;
-
+            const viewKey = currentTab + '_' + currentUser + '_' + currentSubView;
+            if (!isEditingCash) { isEditingCash = true; if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; } renderView(); } 
+            else {
+                const btn = document.getElementById('cash-action-btn'); btn.setAttribute('aria-busy', 'true'); btn.disabled = true;
                 const updates = [];
-                activeData.forEach((item, index) => {
-                    const input = document.getElementById('cash-input-' + index);
-                    if(input) {
-                        const newVal = parseFloat(input.value) || 0;
-                        item.amount = newVal; 
-                        updates.push({ row: item.row, col: item.col, amount: newVal });
-                    }
-                });
-                
+                activeData.forEach((item, index) => { const input = document.getElementById('cash-input-' + index); if(input) { const newVal = parseFloat(input.value) || 0; item.amount = newVal; updates.push({ row: item.row, col: item.col, amount: newVal }); } });
                 const targetKeyword = currentUser === 'HT' ? "HT Cash" : "NCT Cash";
-                
                 try {
-                    const response = await fetch(API_URL, {
-                        method: "POST",
-                        body: JSON.stringify({ action: "UPDATE_CASH", keyword: targetKeyword, updates: updates })
-                    });
+                    const response = await fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "UPDATE_CASH", keyword: targetKeyword, updates: updates }) });
                     const result = await response.json();
-                    
                     if(result.error) throw new Error(result.error);
-                    
-                    cashTimestamp = result.timestamp;
-                    isEditingCash = false;
-                    
-                    const freshData = { items: activeData, lastUpdated: cashTimestamp };
-                    memoryCache[reqTabKey] = { rawData: freshData };
-                    
+                    cashTimestamp = result.timestamp; isEditingCash = false;
+                    const freshData = { items: activeData, lastUpdated: cashTimestamp }; memoryCache[currentTab + '_' + currentUser] = { rawData: freshData };
                     const reqUrl = `${API_URL}?user=${targetKeyword === 'HT Cash' ? 'CASH_HT' : 'CASH_NCT'}`;
-                    caches.open('ai-tracker-data-v1').then(cache => {
-                        cache.put(reqUrl, new Response(JSON.stringify(freshData)));
-                    });
-                    
+                    caches.open('ai-tracker-data-v1').then(cache => { cache.put(reqUrl, new Response(JSON.stringify(freshData))); });
                     if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
-
-                    updateStats();
-                    renderView();
-                } catch(e) {
-                    alert("Save failed: " + e.message);
-                    btn.innerHTML = 'Save';
-                    btn.disabled = false;
-                }
+                    updateStats(); renderView();
+                } catch(e) { alert("Save failed: " + e.message); btn.removeAttribute('aria-busy'); btn.disabled = false; }
             }
         }
 
         function renderDashboard(container) {
             const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
-            const classTotals = activeData.reduce((acc, item) => {
-                const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
-                acc[aClass] = (acc[aClass] || 0) + item.amount; return acc;
-            }, {});
+            const classTotals = activeData.reduce((acc, item) => { const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others'; acc[aClass] = (acc[aClass] || 0) + item.amount; return acc; }, {});
             const sortedClasses = Object.keys(classTotals).sort((a, b) => classTotals[b] - classTotals[a]);
             const chartData = sortedClasses.map(key => classTotals[key]);
-            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
-
-            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
-            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
+            const canvasId = `chart-${currentTab}-${currentSubView}`;
             
-            // Reduced outer padding (p-4 instead of p-6) to save edge space
             let html = `
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
-                    <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
-                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
-                    <ul class="divide-y dark:divide-gray-700">`;
+                <article class="text-center">
+                    <header><small class="text-muted uppercase">Asset Allocation</small></header>
+                    <div style="max-width:240px; margin:0 auto;"><canvas id="${canvasId}"></canvas></div>
+                </article>
+                <article style="padding:0;">
+                    <table class="striped" style="margin:0;"><tbody>`;
             
             sortedClasses.forEach((label, i) => {
-                const amount = classTotals[label]; 
-                const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
-                
-                // THE FIX: Using 'flex-1 min-w-0' allows the text to dynamically shrink and truncate (...) without stretching the container horizontally.
+                const amount = classTotals[label]; const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
                 html += `
-                <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
-                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
-                    </div>
-                    <div class="text-right flex flex-col flex-shrink-0">
-                        <span class="font-bold text-sm leading-tight">${displayMoney(amount)}</span>
-                        <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
-                    </div>
-                </li>`;
+                <tr>
+                    <td>
+                        <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${tealPalette[i % tealPalette.length]}; margin-right:8px;"></span>
+                        <strong class="text-sm">${label}</strong>
+                    </td>
+                    <td class="text-right">
+                        <strong>${displayMoney(amount)}</strong><br>
+                        <small class="text-muted">${displayMoney(percent)}</small>
+                    </td>
+                </tr>`;
             });
-            html += `</ul></div>`; 
-            container.innerHTML = html;
-            renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
+            html += `</tbody></table></article>`; 
+            container.innerHTML = html; renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
         }
 
         function renderHome(container) {
             const totalAmount = activeData.reduce((sum, item) => sum + item.amount, 0);
             const sortedData = [...activeData].sort((a, b) => b.amount - a.amount);
-            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
-                <div class="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center dark:text-white border-b dark:border-gray-600 gap-2">
-                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5">Asset</h3><h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/5 text-center">Class</h3><h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5 text-right">Allocation</h3>
-                </div><ul class="divide-y dark:divide-gray-700">`;
+            let html = `
+                <article style="padding:0;">
+                    <table class="striped" style="margin:0;">
+                        <thead><tr><th>Asset</th><th class="text-center">Class</th><th class="text-right">Allocation</th></tr></thead>
+                        <tbody>`;
 
             sortedData.forEach(item => {
                 const percent = totalAmount > 0 ? (item.amount / totalAmount * 100).toFixed(2) + '%' : '0.00%';
-                html += `<li class="p-3 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors gap-2">
-                    <div class="font-semibold text-gray-800 dark:text-white w-2/5 leading-tight break-words">${item.asset}</div>
-                    <div class="text-[10px] font-bold text-[#5D6B7F] dark:text-gray-400 w-1/5 text-center leading-tight uppercase tracking-wide break-words">${item.assetClass || '-'}</div>
-                    <div class="w-2/5 text-right flex flex-col justify-center"><span class="font-bold text-sm leading-tight">${displayMoney(item.amount)}</span><span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400 mt-1">${displayMoney(percent)}</span></div></li>`;
+                html += `<tr>
+                    <td class="text-sm" style="max-width:100px; word-wrap:break-word;"><strong>${item.asset}</strong></td>
+                    <td class="text-center text-muted"><small>${item.assetClass || '-'}</small></td>
+                    <td class="text-right"><strong>${displayMoney(item.amount)}</strong><br><small class="text-muted">${displayMoney(percent)}</small></td>
+                </tr>`;
             });
-            container.innerHTML = html + `</ul></div>`;
+            container.innerHTML = html + `</tbody></table></article>`;
         }
 
        function renderTickers(container) {
-            if (!tickerData || !tickerData.rows || tickerData.rows.length === 0) { 
-                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No ticker data found.</p>'; 
-                return; 
-            }
-            
-            // 1 & 2. Create a dedicated formatter that ALWAYS shows 2 decimals and ignores Privacy Mode
-            const tickerFmt = new Intl.NumberFormat('en-IN', { 
-                style: 'currency', 
-                currency: 'INR', 
-                minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
-            });
-
-            // 3. Reduced padding to px-2 and removed the forced "w-2/5" width to pull columns closer
-            let theadHtml = `<tr><th class="px-2 py-2 text-left whitespace-nowrap">TICKER</th>`;
-            for (let i = 1; i < tickerData.headers.length; i++) { 
-                theadHtml += `<th class="px-2 py-2 text-right whitespace-nowrap">${String(tickerData.headers[i]).toUpperCase()}</th>`; 
-            }
+            if (!tickerData || !tickerData.rows || tickerData.rows.length === 0) { container.innerHTML = '<article><p class="text-center text-muted">No ticker data found.</p></article>'; return; }
+            const tickerFmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            let theadHtml = `<tr><th>TICKER</th>`;
+            for (let i = 1; i < tickerData.headers.length; i++) theadHtml += `<th class="text-right">${String(tickerData.headers[i]).toUpperCase()}</th>`; 
             theadHtml += `</tr>`;
             
             let tbodyHtml = tickerData.rows.map(row => {
-                let rowHtml = `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"><td class="px-2 py-2 text-left font-bold text-gray-800 dark:text-white align-middle whitespace-nowrap">${row.ticker}</td>`;
-                
+                let rowHtml = `<tr><td class="text-sm"><strong>${row.ticker}</strong></td>`;
                 row.values.forEach((val, idx) => {
-                    const headerName = String(tickerData.headers[idx + 1]).toUpperCase(); 
-                    let displayVal = val; 
-                    let colorClass = "text-gray-800 dark:text-gray-200 font-semibold";
-                    
+                    const headerName = String(tickerData.headers[idx + 1]).toUpperCase(); let displayVal = val; let colorStyle = "";
                     if (headerName.includes('%')) { 
                         let num = parseFloat(val); 
                         if (!isNaN(num)) {
-                            if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) { 
-                                displayVal = (num * 100).toFixed(2) + '%'; 
-                            }
-                            if (num > 0) { 
-                                colorClass = "text-green-600 dark:text-green-400 font-bold"; 
-                                if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal;
-                            } else if (num < 0) { 
-                                colorClass = "text-red-600 dark:text-red-400 font-bold"; 
-                            } else { 
-                                colorClass = "text-gray-500 font-bold"; 
-                            }
+                            if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) displayVal = (num * 100).toFixed(2) + '%'; 
+                            if (num > 0) { colorStyle = "color:var(--pico-form-element-valid-active-border-color); font-weight:bold;"; if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal; } 
+                            else if (num < 0) { colorStyle = "color:var(--pico-form-element-invalid-active-border-color); font-weight:bold;"; } 
+                            else { colorStyle = "color:var(--pico-muted-color);"; }
                         }
-                    } else { 
-                        // It is a standard number/value. Format with 2 decimals natively.
-                        let num = parseFloat(val);
-                        if (!isNaN(num)) {
-                            displayVal = tickerFmt.format(num);
-                        }
-                    }
-                    
-                    // Notice we completely removed the "displayMoney()" privacy wrapper from here
-                    rowHtml += `<td class="px-2 py-2 text-right ${colorClass} align-middle whitespace-nowrap">${displayVal}</td>`;
+                    } else { let num = parseFloat(val); if (!isNaN(num)) displayVal = tickerFmt.format(num); }
+                    rowHtml += `<td class="text-right text-sm" style="${colorStyle}">${displayVal}</td>`;
                 });
                 return rowHtml + `</tr>`;
             }).join('');
-            
-            container.innerHTML = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-8 overflow-hidden"><div class="overflow-x-auto hide-scrollbar"><table class="w-full text-sm"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-xs border-b dark:border-gray-600">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table></div></div>`;
+            container.innerHTML = `<article style="padding:0; overflow-x:auto;"><table class="striped" style="margin:0;"><thead>${theadHtml}</thead><tbody>${tbodyHtml}</tbody></table></article>`;
         }
 
         function renderMaturity(container) {
@@ -1320,27 +923,24 @@
             const groups = activeData.reduce((acc, item) => {
                 const d = new Date(item.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
                 if(!acc[y]) acc[y] = { months: {}, total: 0 }; if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
-                acc[y].months[m].items.push(item); acc[y].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount); acc[y].months[m].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount);
-                return acc;
+                acc[y].months[m].items.push(item); acc[y].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount); acc[y].months[m].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount); return acc;
             }, {});
             
             const chartLabels = []; const chartData = [];
             Object.keys(groups).sort().forEach(y => { chartLabels.push(y); chartData.push(groups[y].total); });
+            const canvasId = `chart-${currentTab}_${currentUser}-${currentSubView}`;
             
-            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
-            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
-            
-            let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
+            let html = `<article class="text-center"><header><small class="text-muted uppercase">Maturity Timeline</small></header><div style="max-width:200px; margin:0 auto;"><canvas id="${canvasId}"></canvas></div></article>`;
             
             Object.keys(groups).sort().forEach(y => {
                 const yearlyTotal = groups[y].total; const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
-                html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg"><span>${y}</span> <span>${displayMoney(yearPercent + '%')}, ${displayMoney(yearlyTotal)}</span></button><div class="accordion-content">`;
+                html += `<details><summary class="flex-between"><span>${y}</span> <span class="text-muted" style="font-size:0.8rem;">${displayMoney(yearPercent + '%')}, <strong style="color:var(--pico-color);">${displayMoney(yearlyTotal)}</strong></span></summary><div>`;
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
                     groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                     const monthlyTotal = groups[y].months[m].total; const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
-                    html += `<div class="border-l-4 border-[#5D6B7F] ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${displayMoney(percent + '%')}, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
+                    html += `<details><summary class="flex-between text-sm"><span>${m}</span> <span class="text-muted" style="font-size:0.75rem;">${displayMoney(percent + '%')}, <strong style="color:var(--pico-color);">${displayMoney(monthlyTotal)}</strong></span></summary><div>${renderTable(groups[y].months[m].items)}</div></details>`;
                 });
-                html += `</div></div>`;
+                html += `</div></details>`;
             });
             container.innerHTML = html; renderSharedChart(canvasId, chartLabels, chartData, grandTotalVal);
         }
@@ -1357,23 +957,13 @@
                 return acc;
             }, {});
 
-            // Sort logic: Largest total investment amount at the top, lowest at the bottom
             const sortedBanks = Object.keys(groups).sort((a, b) => groups[b].inv - groups[a].inv);
-            const chartLabels = sortedBanks; 
-            const chartData = sortedBanks.map(k => groups[k].inv);
-
-            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
-            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
+            const chartLabels = sortedBanks; const chartData = sortedBanks.map(k => groups[k].inv);
+            const canvasId = `chart-${currentTab}_${currentUser}-${currentSubView}`;
             
             let html = '';
-            
-            // THE FIX: Only render the Chart container if the tab is NOT NCD
             if (currentTab !== 'ncd') {
-                html += `
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
-                    <h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Bank Allocation</h2>
-                    <div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div>
-                </div>`;
+                html += `<article class="text-center"><header><small class="text-muted uppercase">Bank Allocation</small></header><div style="max-width:200px; margin:0 auto;"><canvas id="${canvasId}"></canvas></div></article>`;
             }
 
             sortedBanks.forEach(key => {
@@ -1381,104 +971,67 @@
                 const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
                 const percentOfTotal = (grandTotalInv > 0) ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%' : '0.0%';
                
-                const mRate = displayMoney(weightedAvgRate);
-                const mPercent = displayMoney(percentOfTotal);
-
+                const mRate = displayMoney(weightedAvgRate); const mPercent = displayMoney(percentOfTotal);
                 let statsHtml = currentTab === 'ncd' 
-                    ? `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>` 
-                    : `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Inv: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].inv)}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
-                
+                    ? `<strong>${mPercent}</strong> | Rate: <strong>${mRate}</strong>` 
+                    : `<strong>${mPercent}</strong> | Inv: <strong>${displayMoney(groups[key].inv)}</strong> | Rate: <strong>${mRate}</strong>`;
                 let pillAmount = currentTab === 'ncd' ? displayMoney(groups[key].inv) : displayMoney(groups[key].total);
 
                 html += `
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
-                    <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center gap-2 border-b dark:border-gray-700 text-left active:bg-gray-100 dark:active:bg-gray-600 transition-colors">
-                        <div class="flex flex-col w-2/3">
-                            <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${key}</span>
-                            <span class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 leading-tight">${statsHtml}</span>
+                <details>
+                    <summary class="flex-between">
+                        <div style="line-height:1.2;">
+                            <span class="text-sm">${key}</span><br>
+                            <small class="text-muted" style="font-size:0.7rem; font-weight:normal;">${statsHtml}</small>
                         </div>
-                        <span class="font-bold text-[#5D6B7F] dark:text-gray-200 bg-gray-200/50 dark:bg-gray-700 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-gray-300 dark:border-gray-600">
-                            ${pillAmount}
-                        </span>
-                    </button>
-                    <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">
-                        ${renderTable(groups[key].items)}
-                    </div>
-                </div>`;
+                        <span class="pill">${pillAmount}</span>
+                    </summary>
+                    <div>${renderTable(groups[key].items)}</div>
+                </details>`;
             });
-            
             container.innerHTML = html; 
-            
-            // THE FIX: Only call the chart rendering function if the tab is NOT NCD
-            if (currentTab !== 'ncd') {
-                renderSharedChart(canvasId, chartLabels, chartData, grandTotalInv);
-            }
+            if (currentTab !== 'ncd') renderSharedChart(canvasId, chartLabels, chartData, grandTotalInv);
         }
 
         function renderTable(items) {
             const isNCD = currentTab === 'ncd';
             const isMaturity = currentSubView === 'maturity';
             
-            // THE FIX: Removed 'whitespace-nowrap' and reduced padding so the browser can fluidly wrap the text inside the screen bounds.
             let theadHtml = `<tr>
-                ${isMaturity ? `<th class="px-1 py-2 text-center w-[25%]">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}
-                <th class="px-1 py-2 text-center">Amt</th>
-                ${!isNCD ? `<th class="px-1 py-2 text-center">Mat.Amt</th>` : ''}
-                <th class="px-1 py-2 text-center">Date</th>
-                <th class="px-1 py-2 text-center w-[15%]">Rate</th>
+                ${isMaturity ? `<th class="text-center">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}
+                <th class="text-center">Amt</th>
+                ${!isNCD ? `<th class="text-center">Mat.Amt</th>` : ''}
+                <th class="text-center">Date</th>
+                <th class="text-center">Rate</th>
             </tr>`;
             
             let tbodyHtml = items.map(item => {
                 let formattedRate = String(item.rate); 
                 if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
-                formattedRate = displayMoney(formattedRate);
-                
-                // THE FIX: Date formatting shifted to DD/MM/YY (e.g. 15/10/24) to drastically cut horizontal width.
                 let compactDate = new Date(item.maturityDate).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
 
                 return `<tr>
-                    ${isMaturity ? `<td class="px-1 py-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto text-[9px]">${isNCD ? item.company : item.bank}</span></td>` : ''}
-                    <td class="px-1 py-2 text-center font-semibold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.amount)}</td>
-                    ${!isNCD ? `<td class="px-1 py-2 text-center font-bold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.maturityAmount)}</td>` : ''}
-                    <td class="px-1 py-2 text-center font-medium text-gray-600 dark:text-gray-400 align-middle text-[9px] break-words">${compactDate}</td>
-                    <td class="px-1 py-2 text-center align-middle font-medium text-[9px] break-words">${formattedRate}</td>
+                    ${isMaturity ? `<td class="text-center text-muted" style="font-size:0.75rem;">${isNCD ? item.company : item.bank}</td>` : ''}
+                    <td class="text-center text-sm"><strong>${displayMoney(item.amount)}</strong></td>
+                    ${!isNCD ? `<td class="text-center text-sm"><strong>${displayMoney(item.maturityAmount)}</strong></td>` : ''}
+                    <td class="text-center text-muted text-sm">${compactDate}</td>
+                    <td class="text-center text-sm" style="color:var(--pico-primary);">${displayMoney(formattedRate)}</td>
                 </tr>`;
             }).join('');
             
-            return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600 text-[9px]">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
+            return `<table class="striped" style="margin:0;"><thead>${theadHtml}</thead><tbody>${tbodyHtml}</tbody></table>`;
         }
     </script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const action = urlParams.get('action');
-    const rows = urlParams.get('rows');
-
-    if (action === 'markCompleted' && rows) {
-        // 1. Instantly clean the URL so the user sees nothing on screen
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // 2. Log to the backend/console for troubleshooting
-        console.log(`[Silent Action] Marking rows ${rows} as completed...`);
-
-        // Paste your actual Google Web App URL below
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
-
-        // 3. Silently ping the backend
-        fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rows}`)
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    console.log("✅ Success: Tasks marked as completed in Google Sheets.");
-                } else {
-                    console.error("❌ Failed: Backend did not return success status.");
-                }
-            })
-            .catch(error => {
-                console.error("❌ Network Error: Failed to contact Google Script backend.", error);
-            });
-    }
-});
-</script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const action = urlParams.get('action'); const rows = urlParams.get('rows');
+        if (action === 'markCompleted' && rows) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
+            fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rows}`).catch(error => console.error(error));
+        }
+    });
+    </script>
 </body>
 </html>
