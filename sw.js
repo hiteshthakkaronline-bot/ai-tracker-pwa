@@ -22,7 +22,7 @@ self.addEventListener('notificationclick', function(event) {
 });
 
 // 3. CACHE SETUP
-const CACHE_NAME = 'ai-tracker-pico-v1.00';
+const CACHE_NAME = 'ai-tracker-pico-v1.01';
 
 const ASSETS_TO_CACHE = [
   '/',
