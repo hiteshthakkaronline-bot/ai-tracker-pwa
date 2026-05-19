@@ -24,28 +24,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        OneSignalDeferred.push(async function(OneSignal) {
-            await OneSignal.init({
-                appId: "18d1e593-4b61-4987-befb-c5933694288b", 
-                safari_web_id: "web.onesignal.auto.220e9b0b-02d4-465b-a5d3-49d3d287ceee", 
-                notifyButton: { 
-                    enable: true,
-                    // FORCE THE WIDGET TO RENDER IN YOUR SPECIFIED DOM CONTAINER
-                    displayPredicate: function() { return true; },
-                    showCredit: false
-                },
-                serviceWorkerParam: { scope: "./" },
-                serviceWorkerPath: "sw.js"
-            });
-            
-            // CRITICAL ADDITION: Link this device to your specific user profile so the token saves permanently
-            const activeUserSession = localStorage.getItem('currentUser') || 'HT';
-            await OneSignal.login(activeUserSession);
-
-            OneSignal.Slidedown.promptPush();
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "18d1e593-4b61-4987-befb-c5933694288b",
+          safari_web_id: "web.onesignal.auto.220e9b0b-02d4-465b-a5d3-49d3d287ceee",
+          notifyButton: {
+            enable: true, 
+            position: 'bottom-left', 
+          },
+          serviceWorkerParam: { scope: "/ai-tracker-pwa/" },
+          serviceWorkerPath: "ai-tracker-pwa/sw.js"
         });
+      });
     </script>
+
     
     <style>
         /* 1. Splash Screen & Base Loaders */
