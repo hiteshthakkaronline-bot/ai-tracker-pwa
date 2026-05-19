@@ -383,11 +383,7 @@
                 btnNct.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors";
                 btnHt.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors";
             }
-            
-            // 🌟 ADD THIS CRITICAL LINE HERE:
-            // Synchronizes the backend tracking token to your active layout user context
-            updateOneSignalUserContext(user);
-            
+                     
             if (!skipFetch && currentTab !== 'home') {
                 switchMainTab(currentTab);
             }
