@@ -40,16 +40,6 @@
 
             // Keep the slidedown active for first-time prompts
             OneSignal.Slidedown.promptPush();
-
-            // Track subscription changes cleanly to keep the browser sandbox synchronized
-            OneSignal.User.PushSubscription.addEventListener("change", function(event) {
-                const isSubscribed = event.current.token != null;
-                localStorage.setItem('pwa_push_subscribed', isSubscribed ? 'true' : 'false');
-            });
-
-            // Cache state on boot sequence
-            const initiallySubscribed = OneSignal.User.PushSubscription.token != null;
-            localStorage.setItem('pwa_push_subscribed', initiallySubscribed ? 'true' : 'false');
         });
     </script>
     
