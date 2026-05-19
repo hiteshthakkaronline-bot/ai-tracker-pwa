@@ -22,18 +22,22 @@ self.addEventListener('notificationclick', function(event) {
 });
 
 // 3. CACHE SETUP
-const CACHE_NAME = 'ai-tracker-pico-v1.01';
+const CACHE_NAME = 'ai-tracker-tailwind-v5.00';
 
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  'https://cdn.tailwindcss.com',
+  'https://cdn.jsdelivr.net/npm/chart.js'
 ];
 
 // 4. Install Event
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(ASSETS_TO_CACHE);
+    })
   );
   self.skipWaiting();
 });
@@ -44,7 +48,9 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) return caches.delete(cache);
+          if (cache !== CACHE_NAME) {
+            return caches.delete(cache);
+          }
         })
       );
     })
@@ -52,22 +58,27 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event (Stale-While-Revalidate)
+// 6. Fetch Event (Stale-While-Revalidate Strategy for production layout stability)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return; 
+  
   const url = new URL(event.request.url);
   
-  if (url.origin !== self.location.origin) return; 
+  // Allow external scripts (Tailwind & Chart.js CDNs) to be served from cache offline
+  const isTargetCDN = url.href === 'https://cdn.tailwindcss.com' || url.href === 'https://cdn.jsdelivr.net/npm/chart.js';
+  
+  if (url.origin !== self.location.origin && !isTargetCDN) return; 
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+        if (networkResponse && networkResponse.status === 200) {
           let responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
         }
         return networkResponse;
       }).catch(() => {});
+      
       return cachedResponse || fetchPromise;
     })
   );
