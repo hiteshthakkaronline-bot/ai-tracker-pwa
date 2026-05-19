@@ -61,6 +61,7 @@
     </script>
     
     <style>
+        /* 1. Splash Screen & Base Loaders */
         #native-splash { position: fixed; inset: 0; z-index: 999999; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
         .spinner-ring { width: 48px; height: 48px; border: 4px solid #f3f4f6; border-top-color: #5D6B7F; border-radius: 50%; animation: spin 1s linear infinite; }
         .splash-text { margin-top: 20px; font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; }
@@ -72,12 +73,32 @@
         .loader { border: 2px solid #f3f3f3; border-top: 2px solid #ffffff; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; display: inline-block; vertical-align: middle; margin-right: 8px;}
         .keypad-btn { -webkit-tap-highlight-color: transparent; }
         
-        /* Fixed Border Custom Resets to ensure light/dark balance */
+        /* 2. Global Border Resets (Light/Dark balance) */
         *, ::before, ::after { border-color: #e5e7eb; }
         .dark *, .dark ::before, .dark ::after { border-color: #374151; }
+
+        /* 3. Explicit Layout Boundaries (Fixes Scroll Bleeding) */
+        body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+        main#app-content { 
+            padding-top: 130px !important; 
+            padding-bottom: 110px !important; 
+        }
+        
+        /* Shift content down further when the Profile Toggle (HT/NEHA) is visible */
+        body:has(#profile-toggle[style*="display: flex"]) main#app-content,
+        body:has(#profile-toggle:not([style*="display: none"])) main#app-content { 
+            padding-top: 175px !important; 
+        }
+
+        /* 4. OneSignal Native Widget Isolation (Forces Bell to Top Layer) */
+        .onesignal-bell-launcher, 
+        #onesignal-bell-container,
+        #onesignal-slidedown-container {
+            z-index: 999999 !important;
+        }
     </style>
-</head>
-<body class="bg-white dark:bg-gray-900 transition-colors duration-300 pb-24 relative">
+    </head>
+    <body class="bg-white dark:bg-gray-900 transition-colors duration-300 pb-24 relative">
 
     <div id="native-splash">
         <div class="spinner-ring"></div>
