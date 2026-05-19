@@ -22,15 +22,16 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-   <script>
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
+            // 1. Core SDK Initialization Rules
             await OneSignal.init({
                 appId: "18d1e593-4b61-4987-befb-c5933694288b", 
                 safari_web_id: "web.onesignal.auto.220e9b0b-02d4-465b-a5d3-49d3d287ceee", 
                 notifyButton: { 
-                    enable: true, // Keeps OneSignal's native floating bell active
+                    enable: true, // Native floating bell controller
                     position: 'bottom-left', 
                     offset: { bottom: '85px', right: '15px' } 
                 },
@@ -38,9 +39,26 @@
                 serviceWorkerPath: "sw.js"
             });
 
-            // Keep the slidedown active for first-time prompts
+            // 2. Map current identified profile context to the subscription token
+            // This prevents anonymous reset loops across application instances
+            const initialUser = localStorage.getItem('currentUser') || 'HT';
+            await OneSignal.login(initialUser);
+
+            // 3. Trigger native slide dialog prompts for registration permissions
             OneSignal.Slidedown.promptPush();
         });
+
+        // 4. Update identification aliases dynamically when switching dashboard tabs
+        // Overrides the native user pool context on the tracking server smoothly
+        function updateOneSignalUserContext(user) {
+            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            window.OneSignalDeferred.push(async function(OneSignal) {
+                if (OneSignal && OneSignal.User) {
+                    await OneSignal.login(user);
+                    console.log(`[OneSignal] Identity bound to permanent profile alias: ${user}`);
+                }
+            });
+        }
     </script>
     
     <style>
@@ -358,6 +376,10 @@
                 btnNct.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-[#5D6B7F] dark:text-white transition-colors";
                 btnHt.className = "flex-1 relative z-10 text-[11px] font-bold py-1.5 text-white/70 dark:text-gray-400 transition-colors";
             }
+            
+            // 🌟 ADD THIS CRITICAL LINE HERE:
+            // Forces OneSignal to link your device token to the selected profile account context
+            updateOneSignalUserContext(user);
             
             if (!skipFetch && currentTab !== 'home') {
                 switchMainTab(currentTab);
