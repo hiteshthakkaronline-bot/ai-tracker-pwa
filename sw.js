@@ -65,8 +65,8 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
   // 🚀 CRITICAL ONE-SIGNAL BYPASS RULE:
-  // If the request is bound for OneSignal endpoints, exit immediately and let the browser
-  // handle it cleanly over the live network. This stops the subscription from resetting!
+  // If the request is bound for OneSignal endpoints or subdomains, exit immediately and let 
+  // the browser handle it natively over the live internet. This stops the button from resetting!
   if (url.origin.includes('onesignal') || url.href.includes('onesignal.com')) {
     return; 
   }
