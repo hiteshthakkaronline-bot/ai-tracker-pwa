@@ -28,7 +28,10 @@
         OneSignalDeferred.push(async function(OneSignal) {
             await OneSignal.init({
                 appId: "18d1e593-4b61-4987-befb-c5933694288b",
-                notifyButton: { enable: true },
+                notifyButton: {
+                enable: true, 
+                position: 'bottom-left', 
+              },
                 serviceWorkerParam: { scope: "/" },
                 serviceWorkerPath: "sw.js"
             });
