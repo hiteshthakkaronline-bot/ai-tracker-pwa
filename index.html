@@ -377,14 +377,14 @@
             }
             
             // 🌟 ADD THIS CRITICAL LINE HERE:
-            // Forces OneSignal to link your device token to the selected profile account context
+            // Synchronizes the backend tracking token to your active layout user context
             updateOneSignalUserContext(user);
             
             if (!skipFetch && currentTab !== 'home') {
                 switchMainTab(currentTab);
             }
         }
-
+        
         function applyData(tab, data) {
             if (tab === 'home') {
                 activeData = data.assets || []; 
