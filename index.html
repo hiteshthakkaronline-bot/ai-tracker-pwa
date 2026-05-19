@@ -24,6 +24,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
+    // ADD THIS AT THE VERY TOP OF YOUR SCRIPT TAG
+    window.updateOneSignalUserContext = function(user) {
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        window.OneSignalDeferred.push(async function(OneSignal) {
+            if (OneSignal && OneSignal.login) {
+                await OneSignal.login(user);
+                console.log(`[OneSignal] Identity bound to: ${user}`);
+            }
+        });
+    };
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
@@ -36,6 +46,12 @@
           serviceWorkerParam: { scope: "/" },
           serviceWorkerPath: "sw.js"
         });
+
+        // ADD THESE TWO LINES INSIDE THE BLOCK:
+        const activeUserSession = localStorage.getItem('currentUser') || 'HT';
+        await OneSignal.login(activeUserSession);
+        
+        OneSignal.Slidedown.promptPush();
       });
     </script>
 
