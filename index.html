@@ -22,42 +22,24 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
         window.OneSignalDeferred = window.OneSignalDeferred || [];
         OneSignalDeferred.push(async function(OneSignal) {
-            // 1. Initialize SDK
             await OneSignal.init({
                 appId: "18d1e593-4b61-4987-befb-c5933694288b", 
                 safari_web_id: "web.onesignal.auto.220e9b0b-02d4-465b-a5d3-49d3d287ceee", 
-                notifyButton: { 
-                    enable: true, // Native floating bell controller
-                    position: 'bottom-left', 
-                    offset: { bottom: '85px', right: '15px' } 
-                },
+                notifyButton: { enable: true, position: 'bottom-left', offset: { bottom: '85px', right: '15px' } },
                 serviceWorkerParam: { scope: "/" },
                 serviceWorkerPath: "sw.js"
             });
-
-            // 2. Bind current profile session context to the device token
-            // This prevents anonymous session resets across app restarts
+            
+            // CRITICAL ADDITION: Link this device to your specific user profile so the token saves permanently
             const activeUserSession = localStorage.getItem('currentUser') || 'HT';
             await OneSignal.login(activeUserSession);
 
-            // 3. Keep the prompt sequence active for clean fallback permissions
             OneSignal.Slidedown.promptPush();
         });
-
-        // 4. Update identification context dynamically when toggling users
-        function updateOneSignalUserContext(user) {
-            window.OneSignalDeferred = window.OneSignalDeferred || [];
-            window.OneSignalDeferred.push(async function(OneSignal) {
-                if (OneSignal && OneSignal.User) {
-                    await OneSignal.login(user);
-                    console.log(`[OneSignal] Identity bound to profile alias: ${user}`);
-                }
-            });
-        }
     </script>
     
     <style>
