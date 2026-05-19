@@ -22,22 +22,17 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
-     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({
-          appId: "18d1e593-4b61-4987-befb-c5933694288b",
-          notifyButton: { enable: true },
-          // This path must match exactly where your sw.js is located
-          serviceWorkerParam: { scope: "/" },
-          serviceWorkerPath: "sw.js" 
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        OneSignalDeferred.push(async function(OneSignal) {
+            await OneSignal.init({
+                appId: "18d1e593-4b61-4987-befb-c5933694288b",
+                notifyButton: { enable: true },
+                serviceWorkerParam: { scope: "/" },
+                serviceWorkerPath: "sw.js"
+            });
         });
-    
-        // Ensure we are logged in so the dashboard sees the User ID
-        const activeUserSession = localStorage.getItem('currentUser') || 'HT';
-        await OneSignal.login(activeUserSession);
-      });
     </script>
     
     <style>
