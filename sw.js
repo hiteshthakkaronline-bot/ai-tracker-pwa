@@ -58,15 +58,23 @@ self.addEventListener('activate', (event) => {
   return self.clients.claim();
 });
 
-// 6. Fetch Event (Stale-While-Revalidate Strategy for production layout stability)
+// 6. Fetch Event (Optimized Stale-While-Revalidate with OneSignal & CDN Passthroughs)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return; 
   
   const url = new URL(event.request.url);
   
-  // Allow external scripts (Tailwind & Chart.js CDNs) to be served from cache offline
+  // 🚀 CRITICAL ONE-SIGNAL BYPASS RULE:
+  // If the request is bound for OneSignal endpoints, exit immediately and let the browser
+  // handle it cleanly over the live network. This stops the subscription from resetting!
+  if (url.origin.includes('onesignal') || url.href.includes('onesignal.com')) {
+    return; 
+  }
+  
+  // Allow external layout engine scripts (Tailwind & Chart.js CDNs) to be served from cache offline
   const isTargetCDN = url.href === 'https://cdn.tailwindcss.com' || url.href === 'https://cdn.jsdelivr.net/npm/chart.js';
   
+  // Guard clause for other cross-origin background requests
   if (url.origin !== self.location.origin && !isTargetCDN) return; 
 
   event.respondWith(
