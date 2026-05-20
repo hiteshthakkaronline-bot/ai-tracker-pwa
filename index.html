@@ -52,18 +52,22 @@
         *, ::before, ::after { border-color: #e5e7eb; }
         .dark *, .dark ::before, .dark ::after { border-color: #374151; }
 
-        /* 3. Explicit Layout Boundaries (Optimized to fix large gaps) */
+        /* 3. Explicit Layout Boundaries (The Gap Fix) */
         body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
         
-        main#app-content { 
-            padding-top: 110px !important; 
+        #app-content { 
+            padding-top: 90px !important; /* Shrunk to fit default header exactly */
             padding-bottom: 90px !important; 
         }
 
-        /* Automatically adjust padding when Profile Toggle (HT/NEHA) is expanded */
-        body:has(#profile-toggle[style*="display: flex"]) main#app-content,
-        body:has(#profile-toggle[style*="display: block"]) main#app-content { 
-            padding-top: 150px !important; 
+        /* Automatically adjust padding ONLY when the Profile Toggle is open */
+        body:has(#profile-toggle[style*="display: flex"]) #app-content { 
+            padding-top: 135px !important; /* Shrunk to eliminate the massive gap */
+        }
+
+        /* Kill accidental margins from Tailwind space-y-4 on the first element */
+        #app-content > *:first-child {
+            margin-top: 0 !important;
         }
 
         /* 4. OneSignal Native Widget Isolation */
