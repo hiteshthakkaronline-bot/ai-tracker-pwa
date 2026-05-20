@@ -62,7 +62,7 @@
 
         /* Automatically adjust padding when Profile Toggle (HT/NEHA) is expanded */
         body:has(#profile-toggle[style*="display: flex"]) main#app-content,
-        body:has(#profile-toggle:not([style*="display: none"])) main#app-content { 
+        body:has(#profile-toggle[style*="display: block"]) main#app-content { 
             padding-top: 150px !important; 
         }
 
