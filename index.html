@@ -52,20 +52,18 @@
         *, ::before, ::after { border-color: #e5e7eb; }
         .dark *, .dark ::before, .dark ::after { border-color: #374151; }
 
-        /* 3. Explicit Layout Boundaries (The Gap Fix) */
+        /* 3. Explicit Layout Boundaries (The TRUE Gap Fix) */
         body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
         
         #app-content { 
-            padding-top: 90px !important; /* Shrunk to fit default header exactly */
+            /* Let the sticky header do the work! Just a tiny 10px buffer for breathing room */
+            padding-top: 10px !important; 
+            
+            /* Keep bottom padding so content doesn't hide behind the fixed bottom nav bar */
             padding-bottom: 90px !important; 
         }
 
-        /* Automatically adjust padding ONLY when the Profile Toggle is open */
-        body:has(#profile-toggle[style*="display: flex"]) #app-content { 
-            padding-top: 135px !important; /* Shrunk to eliminate the massive gap */
-        }
-
-        /* Kill accidental margins from Tailwind space-y-4 on the first element */
+        /* Kill accidental margins from Tailwind's space-y-4 on the first element */
         #app-content > *:first-child {
             margin-top: 0 !important;
         }
