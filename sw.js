@@ -30,8 +30,8 @@ self.addEventListener('notificationclick', function(event) {
 // It will handle all other normal taps on the notification body
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
-// 3. FORCE CACHE UPDATE (Bumped to v5.11 to ensure immediate update)
-const CACHE_NAME = 'ai-tracker-v5.11';
+// 3. FORCE CACHE UPDATE (Bumped to v5.12 to ensure immediate update)
+const CACHE_NAME = 'ai-tracker-v5.12';
 const ASSETS_TO_CACHE = ['/', '/index.html', '/manifest.json'];
 
 // 4. Install and activate immediately
@@ -47,8 +47,15 @@ self.addEventListener('activate', (event) => {
 // 5. Fetch: Pass through OneSignal calls, cache everything else
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
+    
+    // Ignore OneSignal requests
     if (url.origin.includes('onesignal')) return; 
     
+    // CRITICAL FIX: Bypass the Service Worker cache for all Google Apps Script API calls.
+    // This forces the browser to actually hit the network and get fresh numbers/tickers.
+    if (url.origin.includes('script.google.com')) return; 
+    
+    // For everything else (HTML, CSS), use the cache-first strategy
     event.respondWith(
         caches.match(event.request).then((response) => response || fetch(event.request))
     );
