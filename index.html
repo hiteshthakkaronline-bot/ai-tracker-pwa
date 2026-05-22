@@ -53,7 +53,11 @@
         .dark *, .dark ::before, .dark ::after { border-color: #374151; }
 
         /* 3. Explicit Layout Boundaries (The TRUE Gap Fix) */
-        body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+        body { 
+            overflow-x: hidden; 
+            -webkit-text-size-adjust: 100%; 
+            touch-action: manipulation; /* ADD THIS: Disables native double-tap to zoom */
+        }
         
         #app-content { 
             /* Let the sticky header do the work! Just a tiny 10px buffer for breathing room */
@@ -215,37 +219,56 @@
     <script>
         let touchstartX = 0; let touchendX = 0; let touchstartY = 0; let touchendY = 0;
         window.addEventListener('DOMContentLoaded', () => {
-            applyInitialTheme();
-            const root = document.getElementById('app-root');
-            const splash = document.getElementById('native-splash');
-            root.style.visibility = 'visible'; root.style.opacity = '1';
-            setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
-
-            if (sessionStorage.getItem('isUnlocked') === 'true') {
-                document.getElementById('pin-overlay').style.display = 'none';
-                init(); 
-            }
-
-            const contentBlock = document.getElementById('app-content');
-            contentBlock.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; touchstartY = e.changedTouches[0].screenY; }, {passive: true});
-            contentBlock.addEventListener('touchend', e => {
-                touchendX = e.changedTouches[0].screenX; touchendY = e.changedTouches[0].screenY;
-                const isScrollableTable = e.target.closest('.overflow-x-auto');
-                if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) return; 
-                handleSwipeDirection();
-            }, {passive: true});
-            window.addEventListener('scroll', () => {
-                const fabTop = document.getElementById('fab-top');
-                if (!fabTop) return;
-                if (window.scrollY > 150) {
-                    fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    fabTop.classList.add('opacity-100', 'translate-y-0');
-                } else {
-                    fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-                    fabTop.classList.remove('opacity-100', 'translate-y-0');
-                }
-            }, { passive: true });
-        });
+                    applyInitialTheme();
+                    const root = document.getElementById('app-root');
+                    const splash = document.getElementById('native-splash');
+                    root.style.visibility = 'visible'; root.style.opacity = '1';
+                    setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
+        
+                    if (sessionStorage.getItem('isUnlocked') === 'true') {
+                        document.getElementById('pin-overlay').style.display = 'none';
+                        init(); 
+                    }
+        
+                    // --- DOUBLE TAP TO HIDE/UNHIDE LOGIC ---
+                    let lastTapTime = 0;
+                    root.addEventListener('touchstart', (e) => {
+                        // Ignore the double-tap if the user is interacting with a button, input field, or the PIN keypad
+                        if (e.target.closest('button, input, .keypad-btn')) return;
+        
+                        const currentTime = new Date().getTime();
+                        const tapLength = currentTime - lastTapTime;
+        
+                        // If the second tap happens within 300 milliseconds of the first
+                        if (tapLength < 300 && tapLength > 0) {
+                            togglePrivacy(); // Flip the visibility
+                            e.preventDefault(); // Stop native double-tap zoom
+                        }
+                        lastTapTime = currentTime;
+                    }, { passive: false });
+                    // ---------------------------------------
+        
+                    const contentBlock = document.getElementById('app-content');
+                    contentBlock.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; touchstartY = e.changedTouches[0].screenY; }, {passive: true});
+                    contentBlock.addEventListener('touchend', e => {
+                        touchendX = e.changedTouches[0].screenX; touchendY = e.changedTouches[0].screenY;
+                        const isScrollableTable = e.target.closest('.overflow-x-auto');
+                        if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) return; 
+                        handleSwipeDirection();
+                    }, {passive: true});
+                    
+                    window.addEventListener('scroll', () => {
+                        const fabTop = document.getElementById('fab-top');
+                        if (!fabTop) return;
+                        if (window.scrollY > 150) {
+                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                            fabTop.classList.add('opacity-100', 'translate-y-0');
+                        } else {
+                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                            fabTop.classList.remove('opacity-100', 'translate-y-0');
+                        }
+                    }, { passive: true });
+                });
 
         function handleSwipeDirection() {
             const dx = touchendX - touchstartX; const dy = touchendY - touchstartY;
