@@ -439,7 +439,7 @@
             
             // Safely hide the user flip button on the Home tab
             if (profileToggle) {
-                profileToggle.style.display = tab === 'home' ? 'none' : 'flex';
+                profileToggle.style.display = (tab === 'home' || tab === 'ncd') ? 'none' : 'flex';
             }
             subNav.style.display = 'flex'; 
             
