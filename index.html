@@ -398,6 +398,21 @@
         function switchUser(user, skipFetch = false) {
             currentUser = user;
             localStorage.setItem('currentUser', currentUser);
+
+            // --- THEME SWITCHING LOGIC ---
+            const metaLight = document.querySelector('meta[media="(prefers-color-scheme: light)"]');
+            const metaDark = document.querySelector('meta[media="(prefers-color-scheme: dark)"]');
+
+            if (user === 'HT') {
+                document.body.classList.remove('theme-nct');
+                if(metaLight) metaLight.setAttribute('content', '#334155'); // Deep Slate
+                if(metaDark) metaDark.setAttribute('content', '#1e293b');
+            } else {
+                document.body.classList.add('theme-nct');
+                if(metaLight) metaLight.setAttribute('content', '#be185d'); // Rich Berry
+                if(metaDark) metaDark.setAttribute('content', '#831843');
+            }
+            // -----------------------------
             
             // Sync the text inside the new FAB
             const fabInitials = document.getElementById('fab-user-initials');
