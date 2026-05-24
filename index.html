@@ -943,7 +943,7 @@
             container.innerHTML = finalHtml;
         }
 
-        function renderNPS(container) {
+       function renderNPS(container) {
             try {
                 if (!activeData || activeData.length === 0) {
                     container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No NPS records found.</p>';
@@ -997,13 +997,22 @@
                             percentStr = Number((percentStr * 100).toFixed(2)) + '%';
                         } else if (typeof percentStr === 'string' && percentStr !== "" && !percentStr.includes('%')) {
                             let n = parseFloat(percentStr);
-                            if (!isNaN(n) && n > 0 && n < 1) percentStr = Number((n * 100).toFixed(2)) + '%';
-                            else if (!isNaN(n)) percentStr = n + '%';
+                            if (!isNaN(n)) percentStr = (n > 0 && n < 1) ? Number((n * 100).toFixed(2)) + '%' : n + '%';
                         }
 
                         let maskedPercent = displayMoney(percentStr);
-                        let totalDisplay = typeof item.total === 'number' ? displayMoney(item.total) : item.total;
-                        let navDateDisplay = item.navDate ? new Date(item.navDate).toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'}) : '';
+                        let totalDisplay = typeof item.total === 'number' ? displayMoney(item.total) : (item.total || '-');
+                        
+                        // SAFE DATE FORMATTING
+                        let navDateDisplay = '';
+                        if (item.navDate) {
+                            let d = new Date(item.navDate);
+                            if (!isNaN(d.getTime())) {
+                                navDateDisplay = d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'});
+                            } else {
+                                navDateDisplay = item.navDate; // Fallback to raw string if date is unreadable
+                            }
+                        }
 
                         return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-xs">
                             <td class="px-1 py-2 text-center font-bold text-gray-800 dark:text-white align-middle leading-tight min-w-[70px] break-words whitespace-normal">${item.fund || '-'}</td>
@@ -1054,10 +1063,8 @@
                 
                 container.innerHTML = html;
             } catch (error) {
-                // If it crashes, it will force an un-ignorable popup on your screen
-                alert("Critical Error in NPS: " + error.message);
+                container.innerHTML = `<div class="p-6 m-4 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">NPS Render Error:<br>${error.message}</div>`;
                 console.error("NPS Crash:", error);
-                container.innerHTML = `<div class="p-6 m-4 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">System crashed while rendering NPS:<br>${error.message}</div>`;
             }
         }
 
