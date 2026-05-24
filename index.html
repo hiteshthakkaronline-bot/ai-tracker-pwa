@@ -94,14 +94,6 @@
         #onesignal-slidedown-container {
             z-index: 999999 !important;
         }
-
-        /* GLOBAL BORDER THEME ENFORCER */
-        /* This forces all grey borders to use your dynamic Brand Color */
-        .border-gray-100, .border-gray-200, .border-gray-300, 
-        .border-gray-600, .border-gray-700, .divide-gray-700, 
-        .dark\:border-gray-600, .dark\:border-gray-700, .dark\:divide-gray-700 {
-            border-color: var(--brand-color) !important;
-        }
     </style>
 
     </head>
@@ -182,10 +174,8 @@
                     <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
                 </div>           
             </header>
-            <div id="sub-nav" 
-                 class="flex border-b bg-white dark:bg-gray-800 text-[11px] sm:text-sm shadow-sm transition-colors duration-300" 
-                 style="border-color: var(--brand-color) !important;">
-            </div>
+            <div id="sub-nav" class="flex border-b border-brand dark:border-branddark bg-white dark:bg-gray-800 text-[11px] sm:text-sm shadow-sm transition-colors duration-300">
+                </div>
         </div>
 
         <div id="loading-spinner" style="display:none;" class="flex justify-center p-10">
