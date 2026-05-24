@@ -585,12 +585,12 @@
                     });
                 }
             } catch (e) {
-                if (!networkDataReceived) {
-                    document.getElementById('loading-spinner').style.display = 'none';
-                    document.getElementById('app-content').style.display = 'block';
-                    document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">Connection Error:<br>${e.message}</div>`;
-                    document.getElementById('global-stats').innerHTML = 'Error loading';
-                }
+                // ALWAYS show the error if something crashes, regardless of network status!
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('app-content').style.display = 'block';
+                document.getElementById('app-content').innerHTML = `<div class="p-6 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">System Error:<br>${e.message}</div>`;
+                document.getElementById('global-stats').innerHTML = 'Error loading';
+                console.error("App Crash:", e);
             }
         }
 
