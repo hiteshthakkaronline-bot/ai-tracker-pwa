@@ -16,7 +16,12 @@
         tailwind.config = {
             darkMode: 'class',
             theme: {
-                extend: {}
+                extend: {
+                    colors: {
+                        brand: 'var(--brand-color)',
+                        branddark: 'var(--brand-dark)'
+                    }
+                }
             }
         }
     </script>
@@ -36,9 +41,20 @@
     </script>
     
     <style>
+        /* Dynamic Theme Colors */
+        :root {
+            /* HT Colors (Deep Slate) */
+            --brand-color: #334155; 
+            --brand-dark: #1e293b;  
+        }
+        body.theme-nct {
+            /* NCT Colors (Rich Berry) */
+            --brand-color: #be185d; 
+            --brand-dark: #831843;  
+        }
         /* 1. Splash Screen & Base Loaders */
         #native-splash { position: fixed; inset: 0; z-index: 999999; background-color: #ffffff; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.4s ease; }
-        .spinner-ring { width: 48px; height: 48px; border: 4px solid #f3f4f6; border-top-color: #5D6B7F; border-radius: 50%; animation: spin 1s linear infinite; }
+        .spinner-ring { width: 48px; height: 48px; border: 4px solid #f3f4f6; border-top-color: var(--brand-color); border-radius: 50%; animation: spin 1s linear infinite; }
         .splash-text { margin-top: 20px; font-family: system-ui, -apple-system, sans-serif; font-size: 12px; font-weight: 700; color: #6b7280; letter-spacing: 2px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (prefers-color-scheme: dark) { #native-splash { background-color: #111827; } .spinner-ring { border-color: #374151; border-top-color: #9ca3af; } .splash-text { color: #9ca3af; } }
@@ -148,7 +164,7 @@
         </div>
         
         <div class="sticky top-0 z-50 shadow-md">
-            <header class="bg-[#5D6B7F] dark:bg-[#2D3748] text-white transition-colors duration-300">
+            <header class="bg-brand dark:bg-branddark text-white transition-colors duration-300">
                 <div class="p-4 grid grid-cols-[40px_1fr_40px] items-center text-center">
                     <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
                     <div>
@@ -162,7 +178,7 @@
         </div>
 
         <div id="loading-spinner" style="display:none;" class="flex justify-center p-10">
-            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-[#5D6B7F]" style="border-right-color: transparent;"></div>
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-brand" style="border-right-color: transparent;"></div>
         </div>
 
         <main id="app-content" class="p-2 space-y-4"></main>
@@ -172,7 +188,7 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </button>
             
-            <button id="fab-back" onclick="switchMainTab('home')" class="w-12 h-12 bg-[#5D6B7F] dark:bg-gray-700 text-white rounded-full flex items-center justify-center shadow border border-white/20 active:scale-95 transition-transform" style="display: none;">
+            <button id="fab-back" onclick="switchMainTab('home')" class="w-12 h-12 bg-brand dark:bg-gray-700 text-white rounded-full flex items-center justify-center shadow border border-white/20 active:scale-95 transition-transform" style="display: none;">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m7 7l-7-7 7-7"></path></svg>
             </button>
 
@@ -952,7 +968,7 @@
                 
                 let html = ``;
                 const btnText = isEditingNPS ? "Save" : "Edit";
-                const btnColor = isEditingNPS ? "bg-green-600 hover:bg-green-700" : "bg-[#5D6B7F] hover:bg-gray-700";
+                const btnColor = isEditingNPS ? "bg-green-600 hover:bg-green-700" : "bg-brand hover:bg-gray-700";
 
                 Object.keys(tiers).sort().forEach(tierName => {
                     let latestTimeMs = 0;
@@ -1161,7 +1177,7 @@
             }).join('');
 
             const btnText = isEditingCash ? "Save" : "Edit";
-            const btnColor = isEditingCash ? "bg-green-600 hover:bg-green-700" : "bg-[#5D6B7F] hover:bg-gray-700";
+            const btnColor = isEditingCash ? "bg-green-600 hover:bg-green-700" : "bg-brand hover:bg-gray-700";
             
             container.innerHTML = `
                 <div class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2 px-1">
@@ -1384,7 +1400,7 @@
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
                     groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                     const monthlyTotal = groups[y].months[m].total; const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
-                    html += `<div class="border-l-4 border-[#5D6B7F] ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${displayMoney(percent + '%')}, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
+                    html += `<div class="border-l-4 border-brand ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${displayMoney(percent + '%')}, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
                 });
                 html += `</div></div>`;
             });
