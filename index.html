@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <meta name="theme-color" content="#5D6B7F" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#2D3748" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#334155" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
     <title>AI Tracker</title>
@@ -810,7 +810,7 @@
                 else if (currentSubView === 'tickers') renderTickers(viewDiv);
             } else if (currentTab === 'cash') {
                 renderCash(viewDiv);
-            } else if (currentTab === 'nps') {
+            } else if (currentTab === 'nav-nps' || currentTab === 'nps') {
                 renderNPS(viewDiv);
             } else if (currentTab === 'mf') {
                 if (currentSubView === 'dashboard') renderMFDashboard(viewDiv);
@@ -819,6 +819,88 @@
                 if (currentSubView === 'maturity') renderMaturity(viewDiv);
                 else renderBankOrCompany(viewDiv);
             }
+        }
+
+        // --- DYNAMIC DELTA ACCUMULATION ENGINES ---
+        function getAssetDeltaBadge(assetName, currentAmount) {
+            const snapshotKey = 'asset_snapshot_' + currentUser;
+            const snapshot = JSON.parse(localStorage.getItem(snapshotKey) || '{}');
+            
+            if (snapshot[assetName] === undefined) return '';
+            
+            const prevAmount = snapshot[assetName];
+            const diff = currentAmount - prevAmount;
+            
+            if (diff > 0) {
+                return `<span class="text-[10px] text-green-600 dark:text-green-400 font-extrabold flex items-center justify-end gap-0.5">▲ ${displayMoney(diff)}</span>`;
+            } else if (diff < 0) {
+                return `<span class="text-[10px] text-red-600 dark:text-red-400 font-extrabold flex items-center justify-end gap-0.5">▼ ${displayMoney(Math.abs(diff))}</span>`;
+            }
+            return '';
+        }
+
+        function saveAssetSnapshot(assetsArray) {
+            if (!assetsArray || assetsArray.length === 0) return;
+            const snapshotKey = 'asset_snapshot_' + currentUser;
+            const currentSnapshot = {};
+            
+            assetsArray.forEach(item => {
+                const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
+                currentSnapshot[aClass] = (currentSnapshot[aClass] || 0) + item.amount;
+            });
+            
+            localStorage.setItem(snapshotKey, JSON.stringify(currentSnapshot));
+        }
+
+        function renderDashboard(container) {
+            const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
+            const classTotals = activeData.reduce((acc, item) => {
+                const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
+                acc[aClass] = (acc[aClass] || 0) + item.amount; return acc;
+            }, {});
+            const sortedClasses = Object.keys(classTotals).sort((a, b) => classTotals[b] - classTotals[a]);
+            const chartData = sortedClasses.map(key => classTotals[key]);
+            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
+
+            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
+            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
+            
+            let html = `
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
+                    <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
+                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
+                    <ul class="divide-y dark:divide-gray-700">`;
+            
+            sortedClasses.forEach((label, i) => {
+                const amount = classTotals[label]; 
+                const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
+                
+                // Fetch context session variation badge
+                const deltaBadge = getAssetDeltaBadge(label, amount);
+                
+                html += `
+                <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                    <div class="flex items-center gap-2 flex-1 min-w-0">
+                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
+                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
+                    </div>
+                    <div class="text-right flex flex-col flex-shrink-0 items-end justify-center">
+                        <div class="flex flex-col items-end leading-tight">
+                            <span class="font-bold text-sm text-gray-900 dark:text-white">${displayMoney(amount)}</span>
+                            ${deltaBadge}
+                        </div>
+                        <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400 mt-0.5">${displayMoney(percent)}</span>
+                    </div>
+                </li>`;
+            });
+            html += `</ul></div>`; 
+            container.innerHTML = html;
+            renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
+
+            // Commit dynamic footprint baseline
+            saveAssetSnapshot(activeData);
         }
 
         function renderMFDashboard(container) {
@@ -1283,48 +1365,6 @@
                     btn.disabled = false;
                 }
             }
-        }
-
-        function renderDashboard(container) {
-            const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
-            const classTotals = activeData.reduce((acc, item) => {
-                const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
-                acc[aClass] = (acc[aClass] || 0) + item.amount; return acc;
-            }, {});
-            const sortedClasses = Object.keys(classTotals).sort((a, b) => classTotals[b] - classTotals[a]);
-            const chartData = sortedClasses.map(key => classTotals[key]);
-            const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
-
-            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
-            const canvasId = `chart-${reqTabKey}-${currentSubView}`;
-            
-            let html = `
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
-                    <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
-                    <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
-                </div>
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
-                    <ul class="divide-y dark:divide-gray-700">`;
-            
-            sortedClasses.forEach((label, i) => {
-                const amount = classTotals[label]; 
-                const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
-                
-                html += `
-                <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <div class="flex items-center gap-2 flex-1 min-w-0">
-                        <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
-                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
-                    </div>
-                    <div class="text-right flex flex-col flex-shrink-0">
-                        <span class="font-bold text-sm leading-tight">${displayMoney(amount)}</span>
-                        <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
-                    </div>
-                </li>`;
-            });
-            html += `</ul></div>`; 
-            container.innerHTML = html;
-            renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
         }
 
         function renderHome(container) {
