@@ -25,7 +25,7 @@ self.addEventListener('notificationclick', function(event) {
 importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. FORCE CACHE UPDATE 
-const CACHE_NAME = 'ai-tracker-v5.26';
+const CACHE_NAME = 'ai-tracker-v5.27';
 const ASSETS_TO_CACHE = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', (event) => {
