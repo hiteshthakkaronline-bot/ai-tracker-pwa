@@ -852,7 +852,7 @@
             localStorage.setItem(snapshotKey, JSON.stringify(currentSnapshot));
         }
 
-        function renderDashboard(container) {
+         function renderDashboard(container) {
             const grandTotal = activeData.reduce((sum, item) => sum + item.amount, 0);
             const classTotals = activeData.reduce((acc, item) => {
                 const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
@@ -877,7 +877,7 @@
                 const amount = classTotals[label]; 
                 const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
                 
-                // Fetch context session variation badge
+                // Fetch session change indicators
                 const deltaBadge = getAssetDeltaBadge(label, amount);
                 
                 html += `
@@ -887,11 +887,12 @@
                         <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
                     </div>
                     <div class="text-right flex flex-col flex-shrink-0 items-end justify-center">
-                        <div class="flex flex-col items-end leading-tight">
-                            <span class="font-bold text-sm text-gray-900 dark:text-white">${displayMoney(amount)}</span>
+                        <span class="font-bold text-sm text-gray-900 dark:text-white leading-tight">${displayMoney(amount)}</span>
+                        
+                        <div class="flex items-center gap-1.5 mt-0.5 leading-none">
                             ${deltaBadge}
+                            <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
                         </div>
-                        <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400 mt-0.5">${displayMoney(percent)}</span>
                     </div>
                 </li>`;
             });
@@ -899,9 +900,10 @@
             container.innerHTML = html;
             renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
 
-            // Commit dynamic footprint baseline
+            // Commit historical snapshot framework
             saveAssetSnapshot(activeData);
         }
+
 
         function renderMFDashboard(container) {
             if (!mfTotals) {
