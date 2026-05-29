@@ -26,7 +26,12 @@ importScripts("https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.sw.js");
 
 // 3. FORCE CACHE UPDATE 
 const CACHE_NAME = 'ai-tracker-v5.30';
-const ASSETS_TO_CACHE = ['/', '/index.html', '/manifest.json'];
+const ASSETS_TO_CACHE = [
+    '/', 
+    '/index.html', 
+    '/manifest.json',
+    '/tailwind.js' // Added to cache permanently offline!
+];
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
