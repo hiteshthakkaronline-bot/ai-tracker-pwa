@@ -244,32 +244,48 @@
                     applyInitialTheme();
                     const root = document.getElementById('app-root');
                     const splash = document.getElementById('native-splash');
+                    
+                    // --- TAILWIND CDN GATEKEEPER ---
+                    // If the network timed out or dropped the style engine, handle it gracefully
+                    if (!window.tailwind) {
+                        const splashText = document.querySelector('.splash-text');
+                        if (splashText) {
+                            splashText.innerHTML = "NETWORK TIMEOUT<br><span style='font-size:10px; font-weight:normal; opacity:0.75; block-size: auto; display:block; margin-top:5px; max-width:200px; text-align:center; line-height:1.4;'>Style engine failed to load. Please check connection and try again.</span>";
+                            splashText.style.color = "#ef4444";
+                        }
+                        const spinner = document.querySelector('.spinner-ring');
+                        if (spinner) {
+                            spinner.style.borderTopColor = "#ef4444";
+                            spinner.style.animationPlayState = "paused"; // Freeze spinner as an error flag
+                        }
+                        return; // HARD STOP: Keep the unstyled app completely hidden behind the splash screen
+                    }
+                    // -------------------------------
+        
                     root.style.visibility = 'visible'; root.style.opacity = '1';
                     setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
-
+        
                     if (sessionStorage.getItem('isUnlocked') === 'true') {
                         document.getElementById('pin-overlay').style.display = 'none';
                         init(); 
                     }
-
+        
                     // --- DOUBLE TAP TO HIDE/UNHIDE LOGIC ---
                     let lastTapTime = 0;
                     root.addEventListener('touchstart', (e) => {
-                        // Ignore the double-tap if the user is interacting with a button, input field, or the PIN keypad
                         if (e.target.closest('button, input, .keypad-btn')) return;
-
+        
                         const currentTime = new Date().getTime();
                         const tapLength = currentTime - lastTapTime;
-
-                        // If the second tap happens within 300 milliseconds of the first
+        
                         if (tapLength < 300 && tapLength > 0) {
-                            togglePrivacy(); // Flip the visibility
-                            e.preventDefault(); // Stop native double-tap zoom
+                            togglePrivacy(); 
+                            e.preventDefault(); 
                         }
                         lastTapTime = currentTime;
                     }, { passive: false });
                     // ---------------------------------------
-
+        
                     const contentBlock = document.getElementById('app-content');
                     contentBlock.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; touchstartY = e.changedTouches[0].screenY; }, {passive: true});
                     contentBlock.addEventListener('touchend', e => {
@@ -278,7 +294,7 @@
                         if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) return; 
                         handleSwipeDirection();
                     }, {passive: true});
-
+                    
                     window.addEventListener('scroll', () => {
                         const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
