@@ -44,12 +44,12 @@
         /* Dynamic Theme Colors */
         :root {
             /* HT Colors (Deep Slate) */
-            --brand-color: #334155; 
+            --brand-color: #334155;
             --brand-dark: #1e293b;  
         }
         body.theme-nct {
             /* NCT Colors (Rich Berry) */
-            --brand-color: #be185d; 
+            --brand-color: #be185d;
             --brand-dark: #831843;  
         }
         /* 1. Splash Screen & Base Loaders */
@@ -70,25 +70,24 @@
 
         /* ADD YOUR NEW CODE HERE */
         #sub-nav { 
-            border-bottom-color: var(--brand-color) !important; 
+            border-bottom-color: var(--brand-color) !important;
         }
         .dark #sub-nav { 
-            border-bottom-color: var(--brand-dark) !important; 
+            border-bottom-color: var(--brand-dark) !important;
         }
 
         /* 3. Explicit Layout Boundaries (The TRUE Gap Fix) */
         body { 
-            overflow-x: hidden; 
+            overflow-x: hidden;
             -webkit-text-size-adjust: 100%; 
             touch-action: manipulation; /* ADD THIS: Disables native double-tap to zoom */
         }
 
         #app-content { 
             /* Let the sticky header do the work! Just a tiny 10px buffer for breathing room */
-            padding-top: 10px !important; 
-
+            padding-top: 10px !important;
             /* Keep bottom padding so content doesn't hide behind the fixed bottom nav bar */
-            padding-bottom: 90px !important; 
+            padding-bottom: 90px !important;
         }
 
         /* Kill accidental margins from Tailwind's space-y-4 on the first element */
@@ -116,11 +115,13 @@
 
         <div id="pin-overlay" class="fixed inset-0 bg-[#F8F9FA] dark:bg-gray-900 z-[99999] flex flex-col px-4 pb-8 transition-opacity duration-500">
             <div class="flex flex-col items-center justify-center flex-1 w-full">
+           
                 <h2 class="text-xl font-bold text-[#344755] dark:text-gray-300 mb-8 tracking-wide">Enter PIN</h2>
 
                 <div class="flex gap-5 h-4 items-center justify-center w-full">
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
+          
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
                 </div>
@@ -128,29 +129,35 @@
                 <div id="pin-error" class="text-red-500 font-bold text-sm mt-6 hidden h-5">Incorrect PIN Ley.</div>
             </div>
 
+ 
             <div class="grid grid-cols-3 gap-x-5 gap-y-2 max-w-[260px] w-full mx-auto place-items-center mb-2">
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('1')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">1</span>
                 </button>
+           
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('2')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">2</span>
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('3')">
+             
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">3</span>
                 </button>
 
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('4')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">4</span>
                 </button>
+    
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('5')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">5</span>
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('6')">
+      
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">6</span>
                 </button>
 
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('7')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">7</span>
+             
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('8')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">8</span>
@@ -159,12 +166,18 @@
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">9</span>
                 </button>
 
-                <div></div> 
+                <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800 text-[#344755] dark:text-gray-400" onclick="handleBioKeypadClick()">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.257M5.47 18.63-1.123 2.457A9.97 9.97 0 0112 2.25c2.78 0 5.318 1.13 7.158 2.965m-1.718 13.416a9.96 9.96 0 01-3.692 2A9.948 9.948 0 0112 21c-1.34 0-2.61-.263-3.775-.743m10.36-1.532a7.48 7.48 0 01-2.453 1.833M5.47 18.63A9.93 9.93 0 013.75 12c0-2.722 1.085-5.192 2.85-7.004M12 7.5a3 3 0 00-3 3v2.324m3-5.324a3 3 0 013 3v2.324m-6-.324a4.5 4.5 0 019 0v.383m-9-.383A4.5 4.5 0 0012 15a4.5 4.5 0 003.264-1.391" />
+                    </svg>
+                </button> 
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('0')">
+             
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">0</span>
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800 text-[#344755] dark:text-gray-400" onclick="handlePinInput('clear')">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+              
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
                     </svg>
                 </button>
@@ -176,6 +189,7 @@
                 <div class="p-4 grid grid-cols-[40px_1fr_40px] items-center text-center">
                     <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
                     <div>
+    
                         <h1 id="header-title" class="text-lg font-bold uppercase tracking-tight">Home</h1>
                         <div id="global-stats" class="text-[10px] opacity-90">Initializing...</div>
                     </div>
@@ -186,6 +200,7 @@
                 </div>
         </div>
 
+      
         <div id="loading-spinner" style="display:none;" class="flex justify-center p-10">
             <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-brand" style="border-right-color: transparent;"></div>
         </div>
@@ -194,7 +209,8 @@
 
         <div class="fixed bottom-24 right-4 flex flex-col items-center gap-3 z-40">
             <button id="fab-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-brand dark:bg-branddark text-white rounded-full flex items-center justify-center shadow border border-white/20 active:scale-95 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+   
+                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </button>
 
             <button id="fab-back" onclick="switchMainTab('home')" class="w-12 h-12 bg-brand dark:bg-gray-700 text-white rounded-full flex items-center justify-center shadow border border-white/20 active:scale-95 transition-transform" style="display: none;">
@@ -209,6 +225,7 @@
         <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-around items-center z-50 shadow-2xl transition-colors">
             <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-1 px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+              
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
             </button>
             <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-400 flex-1 px-1">
@@ -225,47 +242,56 @@
             </button>
             <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-1 px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          
                     <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">CASH</span>
             </button>
             <button onclick="switchMainTab('nps')" id="nav-nps" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+        
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NPS</span>
             </button>
+  
         </nav>
     </div>
 
     <script>
-        let touchstartX = 0; let touchendX = 0; let touchstartY = 0; let touchendY = 0;
+        let touchstartX = 0;
+        let touchendX = 0; let touchstartY = 0; let touchendY = 0;
         window.addEventListener('DOMContentLoaded', () => {
                     applyInitialTheme();
                     const root = document.getElementById('app-root');
                     const splash = document.getElementById('native-splash');
                     
+           
                     // --- SECURITY GATEKEEPER ---
                     if (!window.tailwind) {
                         const splashText = document.querySelector('.splash-text');
                         if (splashText) {
+            
                             splashText.innerHTML = "OFFLINE BOOT FAILURE<br><span style='font-size:10px; font-weight:normal; opacity:0.75; display:block; margin-top:5px;'>Style library missing. Clear cache and try again.</span>";
                             splashText.style.color = "#ef4444";
                         }
+              
                         const spinner = document.querySelector('.spinner-ring');
                         if (spinner) {
                             spinner.style.borderTopColor = "#ef4444";
                             spinner.style.animationPlayState = "paused";
                         }
-                        return; 
+                        return;
                     }
 
-                    root.style.visibility = 'visible'; root.style.opacity = '1';
+                    root.style.visibility = 'visible';
+                    root.style.opacity = '1';
                     setTimeout(() => { if (splash) splash.style.display = 'none'; }, 400);
-
                     if (sessionStorage.getItem('isUnlocked') === 'true') {
                         document.getElementById('pin-overlay').style.display = 'none';
                         init(); 
+                    } else {
+                        setTimeout(performBiometricUnlock, 500);
                     }
 
                     // --- DOUBLE TAP TO HIDE/UNHIDE LOGIC ---
@@ -276,9 +302,11 @@
                         const currentTime = new Date().getTime();
                         const tapLength = currentTime - lastTapTime;
 
+            
                         if (tapLength < 300 && tapLength > 0) {
                             togglePrivacy(); 
                             e.preventDefault(); 
+                      
                         }
                         lastTapTime = currentTime;
                     }, { passive: false });
@@ -290,24 +318,27 @@
                         touchendX = e.changedTouches[0].screenX; touchendY = e.changedTouches[0].screenY;
                         const isScrollableTable = e.target.closest('.overflow-x-auto');
                         if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) return; 
+          
                         handleSwipeDirection();
                     }, {passive: true});
-
                     window.addEventListener('scroll', () => {
                         const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
                         if (window.scrollY > 150) {
+                
                             fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
                             fabTop.classList.add('opacity-100', 'translate-y-0');
                         } else {
                             fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+ 
                             fabTop.classList.remove('opacity-100', 'translate-y-0');
                         }
                     }, { passive: true });
-                });
+        });
 
         function handleSwipeDirection() {
-            const dx = touchendX - touchstartX; const dy = touchendY - touchstartY;
+            const dx = touchendX - touchstartX;
+            const dy = touchendY - touchstartY;
             if (Math.abs(dy) > Math.abs(dx)) return;
 
             const homeViews = ['dashboard', 'networth', 'tickers'];
@@ -324,8 +355,10 @@
             const currentIndex = activeViews.indexOf(currentSubView);
             const swipeThreshold = 50; 
 
-            if (dx < -swipeThreshold && currentIndex < activeViews.length - 1) { showSubView(activeViews[currentIndex + 1]); } 
-            else if (dx > swipeThreshold && currentIndex > 0) { showSubView(activeViews[currentIndex - 1]); }
+            if (dx < -swipeThreshold && currentIndex < activeViews.length - 1) { showSubView(activeViews[currentIndex + 1]);
+            } 
+            else if (dx > swipeThreshold && currentIndex > 0) { showSubView(activeViews[currentIndex - 1]);
+            }
         }
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
@@ -336,13 +369,12 @@
         let mfTotals = null;
         let tickerData = { headers: [], rows: [] };
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
-
         let cashTimestamp = "Never";
         let isEditingCash = false;
         let isEditingNPS = false;
 
         let memoryCache = {}; 
-        let domCache = {}; 
+        let domCache = {};
         let chartInstances = {}; 
 
         let enteredPin = "";
@@ -370,12 +402,105 @@
                 if (idx < enteredPin.length) {
                     dot.classList.add('bg-[#344755]', 'dark:bg-gray-300');
                     dot.classList.remove('bg-gray-300', 'dark:bg-gray-600');
+                
                 } else {
                     dot.classList.remove('bg-[#344755]', 'dark:bg-gray-300');
                     dot.classList.add('bg-gray-300', 'dark:bg-gray-600');
                 }
             });
         }
+
+        // --- NEW BIOMETRIC WEBAUTHN ENGINES (OPTION 1) ---
+        let shouldRegisterBioNext = false;
+
+        function textToBuffer(text) {
+            return new Uint8Array(text.split('').map(c => c.charCodeAt(0))).buffer;
+        }
+        function bufferToBase64(buffer) {
+            return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+        }
+        function base64ToBuffer(base64) {
+            return new Uint8Array(atob(base64).split('').map(c => c.charCodeAt(0))).buffer;
+        }
+
+        function handleBioKeypadClick() {
+            const savedCredId = localStorage.getItem('bio_cred_id_' + currentUser);
+            if (savedCredId) {
+                performBiometricUnlock();
+            } else {
+                shouldRegisterBioNext = true;
+                alert("🔒 Biometrics not set up yet. Enter your correct 4-digit PIN now to link biometrics to this device.");
+            }
+        }
+
+        async function registerLocalBiometrics() {
+            try {
+                const challenge = crypto.getRandomValues(new Uint8Array(32));
+                const userId = "user_" + currentUser + "_" + new Date().getTime();
+                
+                const publicKeyOptions = {
+                    challenge: challenge,
+                    rp: { name: "AI Tracker PWA" },
+                    user: {
+                        id: textToBuffer(userId),
+                        name: currentUser,
+                        displayName: currentUser + " Profile"
+                    },
+                    pubKeyCredParams: [
+                        { type: "public-key", alg: -7 },  // ES256
+                        { type: "public-key", alg: -257 } // RS256
+                    ],
+                    authenticatorSelection: {
+                        authenticatorAttachment: "platform", 
+                        userVerification: "required"
+                    },
+                    timeout: 60000
+                };
+
+                const credential = await navigator.credentials.create({ publicKey: publicKeyOptions });
+                if (credential) {
+                    localStorage.setItem('bio_cred_id_' + currentUser, bufferToBase64(credential.rawId));
+                    alert("✅ Device biometrics paired successfully for " + currentUser + "!");
+                    return true;
+                }
+            } catch (err) {
+                console.error("Biometric Pairing Failed:", err);
+                alert("❌ Pairing Failed: " + err.message);
+            }
+            return false;
+        }
+
+        async function performBiometricUnlock() {
+            const savedCredId = localStorage.getItem('bio_cred_id_' + currentUser);
+            if (!savedCredId) return;
+
+            try {
+                const challenge = crypto.getRandomValues(new Uint8Array(32));
+                const publicKeyOptions = {
+                    challenge: challenge,
+                    allowCredentials: [{
+                        type: 'public-key',
+                        id: base64ToBuffer(savedCredId)
+                    }],
+                    userVerification: "required",
+                    timeout: 60000
+                };
+
+                const assertion = await navigator.credentials.get({ publicKey: publicKeyOptions });
+                if (assertion) {
+                    sessionStorage.setItem('isUnlocked', 'true');
+                    const overlay = document.getElementById('pin-overlay');
+                    if (overlay) {
+                        overlay.classList.add('opacity-0', 'pointer-events-none');
+                        setTimeout(() => { overlay.style.display = 'none'; }, 500);
+                    }
+                    init();
+                }
+            } catch (err) {
+                console.warn("Biometric modal dismissed, fallback to PIN input:", err.message);
+            }
+        }
+
         function validatePin() {
             if (enteredPin === SECRET_PIN) {
                 sessionStorage.setItem('isUnlocked', 'true');
@@ -383,16 +508,21 @@
                 overlay.classList.add('opacity-0', 'pointer-events-none');
                 setTimeout(() => { overlay.style.display = 'none'; }, 500);
                 init();
+                
+                if (shouldRegisterBioNext) {
+                    shouldRegisterBioNext = false;
+                    setTimeout(registerLocalBiometrics, 600);
+                }
             } else {
                 document.getElementById('pin-error').classList.remove('hidden');
                 enteredPin = "";
                 updatePinDisplay();
+                shouldRegisterBioNext = false;
             }
         }
 
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
         function applyInitialTheme() {
             const stored = localStorage.getItem('theme');
             const hour = new Date().getHours();
@@ -406,16 +536,19 @@
             if (activeData.length > 0 || tickerData.rows.length > 0) renderView();
         }
 
-        function toggleTheme() { setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark'); }
+        function toggleTheme() { setTheme(document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+        }
 
         function updateIcons() {
             const isDark = document.documentElement.classList.contains('dark');
             document.getElementById('theme-icon').innerHTML = isDark 
-                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />` 
+                ?
+                `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />` 
                 : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />`;
             document.getElementById('privacy-icon').innerHTML = isPrivacyMode 
-                ? `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>` 
-                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
+                ?
+                `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268-2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"></path>` 
+                : `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>`;
         }
 
         function switchUser(user, skipFetch = false) {
@@ -440,15 +573,16 @@
             // Sync the text inside the new FAB
             const fabInitials = document.getElementById('fab-user-initials');
             if (fabInitials) {
-                fabInitials.innerText = user === 'HT' ? 'HT' : 'NC';
+                fabInitials.innerText = user === 'HT' ?
+                'HT' : 'NC';
             }
 
             // Safe OneSignal integration
-            window.OneSignalDeferred = window.OneSignalDeferred || [];
+            window.OneSignalDeferred = window.OneSignalDeferred ||
+            [];
             window.OneSignalDeferred.push(async function(OneSignal) {
                 if (OneSignal.login) await OneSignal.login(user);
             });
-
             if (!skipFetch && currentTab !== 'home') {
                 switchMainTab(currentTab);
             }
@@ -456,15 +590,19 @@
 
         function applyData(tab, data) {
             if (tab === 'home') {
-                activeData = data.assets || []; 
+                activeData = data.assets ||
+                []; 
                 tickerData = data.tickers || { headers: [], rows: [] };
             } else if (tab === 'cash') {
-                activeData = data.items || []; 
+                activeData = data.items ||
+                []; 
                 cashTimestamp = data.lastUpdated || "Never";
             } else if (tab === 'nps') {
-                activeData = data.items || []; 
+                activeData = data.items ||
+                []; 
             } else if (tab === 'mf') {
-                activeData = currentUser === 'HT' ? (data.ht || []) : (data.nct || []);
+                activeData = currentUser === 'HT' ?
+                (data.ht || []) : (data.nct || []);
                 mfTotals = currentUser === 'HT' ? (data.htMarketCap || null) : (data.nctMarketCap || null);
             } else {
                 activeData = data;
@@ -480,36 +618,41 @@
 
             const titles = { 
                 'home': 'Net Worth', 
-                'fds': currentUser === 'HT' ? "Hitesh FD's" : "NCT FD's", 
+                'fds': currentUser === 'HT' ?
+                "Hitesh FD's" : "NCT FD's", 
                 'ncd': 'HT NCDs', 
-                'mf': currentUser === 'HT' ? 'HT MF SIPs' : 'NCT MF SIPs',
-                'cash': currentUser === 'HT' ? 'HT Cash' : 'NCT Cash', 
-                'nps': currentUser === 'HT' ? 'HT NPS' : 'NCT NPS' 
+                'mf': currentUser === 'HT' ?
+                'HT MF SIPs' : 'NCT MF SIPs',
+                'cash': currentUser === 'HT' ?
+                'HT Cash' : 'NCT Cash', 
+                'nps': currentUser === 'HT' ?
+                'HT NPS' : 'NCT NPS' 
             };
             document.getElementById('header-title').innerText = titles[tab];
 
             const subNav = document.getElementById('sub-nav');
             const profileToggle = document.getElementById('profile-toggle');
-
             // Safely hide the user flip button on the Home tab
             if (profileToggle) {
-                profileToggle.style.display = (tab === 'home' || tab === 'ncd') ? 'none' : 'flex';
+                profileToggle.style.display = (tab === 'home' || tab === 'ncd') ?
+                'none' : 'flex';
             }
-            subNav.style.display = 'flex'; 
-
+            subNav.style.display = 'flex';
             const activeClass = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-brand dark:border-white transition-colors";
             const inactiveClass = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
-
             if (tab === 'home') {
-                let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
+                let savedSubView = localStorage.getItem('lastActiveSubView') ||
+                'dashboard';
                 currentSubView = ['dashboard', 'networth', 'tickers'].includes(savedSubView) ? savedSubView : 'dashboard';
                 subNav.innerHTML = `
                     <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? activeClass : inactiveClass}" id="btn-dashboard">Dashboard</button>
                     <button onclick="showSubView('networth')" class="${currentSubView === 'networth' ? activeClass : inactiveClass}" id="btn-networth">Net Worth</button>
                     <button onclick="showSubView('tickers')" class="${currentSubView === 'tickers' ? activeClass : inactiveClass}" id="btn-tickers">Tickers</button>
+          
                 `;
             } else if (tab === 'mf') {
-                let savedSubView = localStorage.getItem('lastActiveSubView') || 'dashboard';
+                let savedSubView = localStorage.getItem('lastActiveSubView') ||
+                'dashboard';
                 currentSubView = ['dashboard', 'details'].includes(savedSubView) ? savedSubView : 'dashboard';
                 subNav.innerHTML = `
                     <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? activeClass : inactiveClass}" id="btn-dashboard">Market Cap Allocation</button>
@@ -519,7 +662,8 @@
                 currentSubView = tab;
                 subNav.style.display = 'none'; 
             } else {
-                let savedSubView = localStorage.getItem('lastActiveSubView') || 'maturity';
+                let savedSubView = localStorage.getItem('lastActiveSubView') ||
+                'maturity';
                 currentSubView = ['maturity', 'bank'].includes(savedSubView) ? savedSubView : 'maturity';
 
                 const bankText = (tab === 'ncd') ? 'NBFC-wise' : 'Bank-wise';
@@ -531,14 +675,11 @@
 
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
-
             ['home', 'fds', 'ncd', 'mf', 'cash', 'nps'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
                 if(el) el.className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
-
             const reqTabKey = tab === 'home' ? tab : (tab === 'mf' ? 'mf_data' : tab + '_' + currentUser);
-
             if (memoryCache[reqTabKey]) {
                 applyData(tab, memoryCache[reqTabKey].rawData);
                 updateStats();
@@ -552,54 +693,54 @@
 
             const paramMap = { 
                 'home': 'HOME', 
-                'fds': currentUser === 'HT' ? 'HT' : 'NCT', 
+                'fds': currentUser === 'HT' ?
+                'HT' : 'NCT', 
                 'ncd': 'NCD', 
-                'cash': currentUser === 'HT' ? 'CASH_HT' : 'CASH_NCT', 
-                'nps': currentUser === 'HT' ? 'NPS_HT' : 'NPS_NCT' 
+                'cash': currentUser === 'HT' ?
+                'CASH_HT' : 'CASH_NCT', 
+                'nps': currentUser === 'HT' ?
+                'NPS_HT' : 'NPS_NCT' 
             };
 
             let networkDataReceived = false;
-
             try {
                 let data;
-
                 if (tab === 'mf') {
                     const urls = [
                         `${API_URL}?action=getHTSips`,
                         `${API_URL}?action=getNCTSips`,
                         `${API_URL}?action=getHTMarketCap`,
+ 
                         `${API_URL}?action=getNCTMarketCap`
                     ];
-
                     const [ht, nct, htMarketCap, nctMarketCap] = await Promise.all(
                         urls.map(url => fetch(url).then(r => r.json()))
                     );
-
                     data = { ht, htMarketCap, nct, nctMarketCap };
 
                     networkDataReceived = true;
                     memoryCache[reqTabKey] = { rawData: data };
-
                     const cache = await caches.open('ai-tracker-data-v1');
                     cache.put(`${API_URL}?action=getMFs`, new Response(JSON.stringify(data)));
 
                 } else {
                     const reqUrl = `${API_URL}?user=${paramMap[tab]}`;
-
                     caches.open('ai-tracker-data-v1').then(cache => {
                         cache.match(reqUrl).then(response => {
                             if (response) {
                                 response.json().then(cachedData => {
+        
                                     if (!networkDataReceived) {
                                         applyData(tab, cachedData);
+                             
                                         updateStats();
                                         renderView();
                                     }
+             
                                 }).catch(() => {}); 
                             }
                         });
                     });
-
                     const response = await fetch(reqUrl);
                     data = await response.json();
                     if (data.error) throw new Error(data.error);
@@ -618,7 +759,8 @@
                         Object.keys(domCache).forEach(key => {
                             if (key.startsWith(reqTabKey + '_')) {
                                 domCache[key].remove();
-                                delete domCache[key];
+                                delete 
+                                domCache[key];
                             }
                         });
                         renderView();
@@ -627,7 +769,8 @@
                     Object.keys(domCache).forEach(key => {
                         if (key.startsWith(reqTabKey + '_')) {
                             domCache[key].remove();
-                            delete domCache[key];
+   
+                             delete domCache[key];
                         }
                     });
                 }
@@ -646,16 +789,19 @@
 
             const active = "flex-1 p-2 font-bold text-gray-900 dark:text-white border-b-2 border-brand dark:border-white transition-colors";
             const inactive = "flex-1 p-2 font-bold text-gray-400 dark:text-gray-500 border-none transition-colors";
-
             if (currentTab === 'home') {
-                document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
+                document.getElementById('btn-dashboard').className = view === 'dashboard' ?
+                active : inactive;
                 document.getElementById('btn-networth').className = view === 'networth' ? active : inactive;
-                document.getElementById('btn-tickers').className = view === 'tickers' ? active : inactive;
+                document.getElementById('btn-tickers').className = view === 'tickers' ?
+                active : inactive;
             } else if (currentTab === 'mf') {
-                document.getElementById('btn-dashboard').className = view === 'dashboard' ? active : inactive;
+                document.getElementById('btn-dashboard').className = view === 'dashboard' ?
+                active : inactive;
                 document.getElementById('btn-details').className = view === 'details' ? active : inactive;
             } else if (currentTab !== 'cash' && currentTab !== 'nps') {
-                document.getElementById('btn-maturity').className = view === 'maturity' ? active : inactive;
+                document.getElementById('btn-maturity').className = view === 'maturity' ?
+                active : inactive;
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
             }
             renderView();
@@ -674,13 +820,16 @@
 
         function displayMoney(amt) {
             if (typeof amt === 'string' && amt.includes('%')) {
-                return isPrivacyMode && !isEditingCash && !isEditingNPS ? amt.replace(/[0-9]/g, '●') : amt;
+                return isPrivacyMode && !isEditingCash && !isEditingNPS ?
+                amt.replace(/[0-9]/g, '●') : amt;
             }
-            return isPrivacyMode && !isEditingCash && !isEditingNPS ? fmt.format(amt).replace(/[0-9]/g, '●') : fmt.format(amt); 
+            return isPrivacyMode && !isEditingCash && !isEditingNPS ?
+                fmt.format(amt).replace(/[0-9]/g, '●') : fmt.format(amt); 
         }
 
         function init() { 
-            let savedUser = localStorage.getItem('currentUser') || 'HT';
+            let savedUser = localStorage.getItem('currentUser') ||
+            'HT';
             switchUser(savedUser, true);
             const savedTab = localStorage.getItem('lastActiveTab') || 'home';
             switchMainTab(savedTab);
@@ -688,7 +837,6 @@
 
         function updateStats() {
             let total = 0;
-
             if (currentTab === 'mf') {
                 if (activeData && activeData.active) {
                     total = activeData.active.reduce((s, item) => s + (item.totalAmount || 0), 0);
@@ -708,7 +856,8 @@
                 if (Array.isArray(activeData)) {
                     mat = activeData.reduce((s, f) => s + (f.maturityAmount || 0), 0);
                 }
-                document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)} | Mat: ${displayMoney(mat)}`;
+                document.getElementById('global-stats').innerHTML = `Inv: ${displayMoney(total)} |
+                Mat: ${displayMoney(mat)}`;
             }
         }
 
@@ -719,7 +868,6 @@
             if (chartInstances[canvasId]) chartInstances[canvasId].destroy();
 
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6', '#14B8A6', '#F97316', '#06B6D4', '#84CC16', '#6366F1'];
-
             const sliceLabelPlugin = {
                 id: 'sliceLabels',
                 afterDatasetsDraw(chart) {
@@ -727,23 +875,26 @@
                     ctx.save();
                     const meta = chart.getDatasetMeta(0);
                     const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-
                     meta.data.forEach((element, index) => {
                         const value = data.datasets[0].data[index];
                         const percentage = total > 0 ? (value / total) : 0;
 
                         if (percentage > 0.05) {
-                            const centerPoint = element.tooltipPosition();
+       
+                             const centerPoint = element.tooltipPosition();
 
                             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
                             ctx.font = '600 10px system-ui, -apple-system, sans-serif';
+        
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+               
                             ctx.shadowBlur = 4;
 
                             let labelText = data.labels[index];
                             if (labelText.length > 12) {
+                      
                                 labelText = labelText.substring(0, 10) + '..';
                             }
 
@@ -753,28 +904,32 @@
                     ctx.restore();
                 }
             };
-
             chartInstances[canvasId] = new Chart(ctx, { 
                 type: 'doughnut', 
                 data: { 
                     labels: labels, 
                     datasets: [{ 
+               
                         data: data, 
                         backgroundColor: bgColors.slice(0, labels.length), 
                         borderWidth: 0, 
                         hoverOffset: 4 
+          
                     }] 
                 },
                 plugins: [sliceLabelPlugin], 
                 options: { 
                     responsive: true, 
+               
                     maintainAspectRatio: true, 
                     cutout: '65%', 
                     plugins: { 
                         legend: { display: false }, 
+                    
                         tooltip: { 
                             callbacks: { 
                                 label: function(context) {
+                              
                                     const val = context.raw; 
                                     const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%';
                                     return ` ${context.label}: ${displayMoney(val)} (${displayMoney(pct)})`;
@@ -783,7 +938,8 @@
                         }
                     }
                 }
-            });
+       
+             });
         }
 
         function renderView() {
@@ -791,13 +947,13 @@
             const container = document.getElementById('app-content');
             container.style.display = 'block';
 
-            const reqTabKey = currentTab === 'home' ? currentTab : (currentTab === 'mf' ? 'mf_data_' + currentUser : currentTab + '_' + currentUser);
+            const reqTabKey = currentTab === 'home' ?
+                currentTab : (currentTab === 'mf' ? 'mf_data_' + currentUser : currentTab + '_' + currentUser);
             const viewKey = reqTabKey + '_' + currentSubView;
 
             Array.from(container.children).forEach(child => {
                 child.style.display = 'none';
             });
-
             const hasTickers = currentTab === 'home' && currentSubView === 'tickers' && tickerData.rows.length > 0;
             if (activeData.length === 0 && !hasTickers && !mfTotals) { 
                 container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No active records found.</p>';
@@ -842,7 +998,6 @@
             const labels = ['Large Cap', 'Mid Cap', 'Small Cap'];
             const chartData = [mfTotals.large, mfTotals.mid, mfTotals.small];
             const totalInv = mfTotals.total;
-
             if (mfTotals.other > (totalInv * 0.01)) {
                 labels.push('Other / Debt');
                 chartData.push(mfTotals.other);
@@ -851,32 +1006,35 @@
             const reqTabKey = currentTab + '_' + currentUser;
             const canvasId = `chart-${reqTabKey}-${currentSubView}`;
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
-
             let html = `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
                     <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Market Cap Allocation</h2>
                     <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
+                
                     <div class="mt-4 text-[10px] text-gray-400 dark:text-gray-500 font-medium tracking-wide">
                         Total Invested: ${displayMoney(totalInv)}
                     </div>
                 </div>
                 
+            
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
                     <ul class="divide-y dark:divide-gray-700">`;
-
             labels.forEach((label, i) => {
                 const amount = chartData[i]; 
                 const percent = totalInv > 0 ? (amount / totalInv * 100).toFixed(2) + '%' : '0.00%';
 
                 html += `
                 <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <div class="flex items-center gap-2 flex-1 min-w-0">
+  
+                  <div class="flex items-center gap-2 flex-1 min-w-0">
                         <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
                         <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
+              
                     </div>
                     <div class="text-right flex flex-col flex-shrink-0">
                         <span class="font-bold text-sm leading-tight">${displayMoney(amount)}</span>
                         <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
+               
                     </div>
                  </li>`;
             });
@@ -887,26 +1045,28 @@
         }
 
         function renderMFDetails(container, fundsDataObj) {
-            const dataToRender = fundsDataObj || activeData; 
+            const dataToRender = fundsDataObj ||
+            activeData; 
             let finalHtml = '';
 
             const buildSection = (fundList, title) => {
                 if (!fundList || fundList.length === 0) return '';
-
                 let html = `<h3 class="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mt-5 mb-2 px-2">${title}</h3>`;
-
                 fundList.forEach(fund => {
                     let sipsHtml = fund.details.map(sip => {
                         return `
                         <tr class="hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+                     
                             <td class="p-2 text-left font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight min-w-[60px]">${sip.plan}</span></td>
                             <td class="p-2 text-center text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${sip.startDate}</td>
                             <td class="p-2 text-center text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${sip.endDate}</td>
+              
                             <td class="p-2 text-right font-bold text-gray-900 dark:text-white align-middle">${displayMoney(sip.amount)}</td>
                         </tr>`;
                     }).join('');
 
                     let starsHtml = '';
+             
                     if (fund.rating && !isNaN(fund.rating)) {
                         let rating = parseInt(fund.rating);
                         let starColor = 'text-green-500 dark:text-green-400'; 
@@ -921,59 +1081,71 @@
                         starsHtml += `</div>`;
                     }
 
-                    let pType = fund.planType || '-';
+                    let pType = fund.planType ||
+                    '-';
                     let expRatio = fund.expenseRatio ? fund.expenseRatio : '-';
                     if (expRatio !== '-' && !String(expRatio).includes('%')) expRatio += '%';
                     let lPct = fund.large !== undefined ? (Number(fund.large).toFixed(2) + '%') : '-';
-                    let mPct = fund.medium !== undefined ? (Number(fund.medium).toFixed(2) + '%') : '-';
+                    let mPct = fund.medium !== undefined ?
+                    (Number(fund.medium).toFixed(2) + '%') : '-';
                     let sPct = fund.small !== undefined ? (Number(fund.small).toFixed(2) + '%') : '-';
-
                     let alphaVal = (fund.alphaEfficiency !== undefined && fund.alphaEfficiency !== null && fund.alphaEfficiency !== '') ? fund.alphaEfficiency : '-';
-
                     let detailsHtml = `
                     <div class="px-3 py-3 bg-gray-100/80 dark:bg-gray-800/80 border-b dark:border-gray-700 flex flex-col gap-2">
                         <div class="grid grid-cols-4 gap-2 bg-white dark:bg-gray-700 p-2 rounded border dark:border-gray-600 text-center text-[10px] shadow-sm">
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Large</div><div class="font-bold text-gray-800 dark:text-gray-200">${lPct}</div></div>
+                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 
+                            font-bold uppercase">Large</div><div class="font-bold text-gray-800 dark:text-gray-200">${lPct}</div></div>
                             <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Mid</div><div class="font-bold text-gray-800 dark:text-gray-200">${mPct}</div></div>
                             <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gray-200">${sPct}</div></div>
+                        
                             <div><div class="text-purple-500 dark:text-purple-400 mb-0.5 font-bold uppercase">Alpha</div><div class="font-bold text-gray-800 dark:text-gray-200 truncate" title="${alphaVal}">${alphaVal}</div></div>
                         </div>
                         <div class="flex justify-between text-[10px] text-gray-600 dark:text-gray-400 px-1 mt-1">
-                            <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Plan:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${pType}</span></div>
+                            <div class="flex items-center 
+                            gap-1"><span class="font-bold uppercase opacity-75">Plan:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${pType}</span></div>
                             <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Exp Ratio:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${expRatio}</span></div>
                         </div>
                     </div>`;
-
                     html += `
                     <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                         <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center gap-2 border-b dark:border-gray-700 text-left active:bg-gray-100 dark:active:bg-gray-600 transition-colors">
-                            <div class="flex flex-col w-2/3">
+                            <div class="flex flex-col 
+                            w-2/3">
                                 <div class="flex items-center flex-wrap gap-x-2 gap-y-1">
                                     <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${fund.fund}</span>
+                     
                                     ${starsHtml}
                                 </div>
                             </div>
+                         
                             <span class="font-bold text-[#5D6B7F] dark:text-gray-200 bg-gray-200/50 dark:bg-gray-700 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-gray-300 dark:border-gray-600">
                                 ${displayMoney(fund.totalAmount)}
                             </span>
+                        
                         </button>
                         
                         <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar flex flex-col">
                             ${detailsHtml}
+                 
                             <table class="w-full text-[10px] dark:text-gray-300">
                                 <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">
                                     <tr>
+            
                                         <th class="p-2 text-left whitespace-nowrap">Plan</th>
                                         <th class="p-2 text-center whitespace-nowrap">Start</th>
+                          
                                         <th class="p-2 text-center whitespace-nowrap">End</th>
                                         <th class="p-2 text-right whitespace-nowrap">Amt</th>
                                     </tr>
-                                </thead>
+    
+                                    </thead>
                                 <tbody class="divide-y dark:divide-gray-700">
                                     ${sipsHtml}
+  
                                 </tbody>
                             </table>
                         </div>
+                  
                     </div>`;
                 });
                 return html;
@@ -1000,36 +1172,39 @@
                     let t = item.tier || "Tier 1";
                     if (!acc[t]) acc[t] = [];
                     acc[t].push(item);
+       
                     return acc;
                 }, {});
-
                 let html = ``;
                 const btnText = isEditingNPS ? "Save" : "Edit";
-                const btnColor = isEditingNPS ? "bg-green-600 hover:bg-green-700" : "bg-brand hover:bg-gray-700";
+                const btnColor = isEditingNPS ?
+                "bg-green-600 hover:bg-green-700" : "bg-brand hover:bg-gray-700";
 
                 Object.keys(tiers).sort().forEach(tierName => {
                     let latestTimeMs = 0;
                     let tierTimestampStr = "Never";
 
                     tiers[tierName].forEach(item => {
-                        if (item.lastUpdated && item.lastUpdated !== "") {
+                        if 
+                        (item.lastUpdated && item.lastUpdated !== "") {
                             let d = new Date(item.lastUpdated).getTime();
                             if (!isNaN(d) && d > latestTimeMs) {
+                             
                                 latestTimeMs = d;
                                 tierTimestampStr = new Date(item.lastUpdated).toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'});
                             } else if (latestTimeMs === 0) {
+                      
                                 tierTimestampStr = item.lastUpdated; 
                             }
                         }
                     });
 
+               
                     let tbodyHtml = tiers[tierName].map((item, idx) => {
                         let globalIdx = activeData.indexOf(item); 
                         if (globalIdx === -1) globalIdx = idx;
-
                         let uDisplay = item.units !== undefined && item.units !== null ? item.units : 0;
                         let nDisplay = item.nav !== undefined && item.nav !== null ? item.nav : 0;
-
                         if (isEditingNPS) {
                             uDisplay = `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${uDisplay}" class="w-[65px] px-1 py-1 text-center mx-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold text-xs" />`;
                         } else if (isPrivacyMode) {
@@ -1042,7 +1217,8 @@
                             percentStr = Number((percentStr * 100).toFixed(2)) + '%';
                         } else if (typeof percentStr === 'string' && percentStr !== "" && !percentStr.includes('%')) {
                             let n = parseFloat(percentStr);
-                            if (!isNaN(n)) percentStr = (n > 0 && n < 1) ? Number((n * 100).toFixed(2)) + '%' : n + '%';
+                            if (!isNaN(n)) percentStr = (n > 0 && n < 1) ?
+                            Number((n * 100).toFixed(2)) + '%' : n + '%';
                         }
 
                         let maskedPercent = displayMoney(percentStr);
@@ -1059,11 +1235,14 @@
                         }
 
                         return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-xs">
-                            <td class="px-1 py-2 text-center font-bold text-gray-800 dark:text-white align-middle leading-tight min-w-[70px] break-words whitespace-normal">${item.fund || '-'}</td>
-                            <td class="px-1 py-2 text-center text-gray-700 dark:text-gray-300 align-middle leading-tight min-w-[80px] break-words whitespace-normal">${item.scheme || '-'}</td>
+                            <td class="px-1 py-2 text-center font-bold text-gray-800 dark:text-white align-middle leading-tight min-w-[70px] break-words whitespace-normal">${item.fund ||
+                            '-'}</td>
+                            <td class="px-1 py-2 text-center text-gray-700 dark:text-gray-300 align-middle leading-tight min-w-[80px] break-words whitespace-normal">${item.scheme ||
+                            '-'}</td>
                             <td class="px-1 py-2 text-center text-gray-500 dark:text-gray-400 align-middle">${maskedPercent}</td>
                             <td class="px-1 py-2 text-center font-bold text-blue-600 dark:text-blue-400 align-middle">${uDisplay}</td>
-                            <td class="px-1 py-2 text-center text-gray-700 dark:text-gray-300 align-middle">${nDisplay}</td>
+                            <td class="px-1 py-2 
+                            text-center text-gray-700 dark:text-gray-300 align-middle">${nDisplay}</td>
                             <td class="px-1 py-2 text-center text-gray-500 dark:text-gray-400 whitespace-nowrap align-middle text-[10px]">${navDateDisplay}</td>
                             <td class="px-1 py-2 text-center font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap align-middle">${totalDisplay}</td>
                         </tr>`;
@@ -1072,39 +1251,47 @@
                     html += `
                         <div class="flex justify-between items-end mt-4 mb-2 ml-1 pr-1">
                             <h3 class="font-bold text-gray-700 dark:text-gray-300 uppercase text-xs tracking-wider">${tierName}</h3>
-                            <div class="text-[9px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider">
+                            <div class="text-[9px] text-gray-500 dark:text-gray-400 
+                            font-bold uppercase tracking-wider">
                                 Updated: <span class="text-gray-800 dark:text-gray-200">${tierTimestampStr}</span>
                             </div>
                         </div>
+           
                         <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 overflow-hidden">
                             <div class="overflow-x-auto hide-scrollbar">
                                 <table class="w-full text-xs">
+               
                                     <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
                                         <tr>
+                              
                                             <th class="px-1 py-2 text-center">Fund</th>
                                             <th class="px-1 py-2 text-center">Scheme</th>
+                                    
                                             <th class="px-1 py-2 text-center">%</th>
                                             <th class="px-1 py-2 text-center">Units</th>
+                                          
                                             <th class="px-1 py-2 text-center">NAV</th>
                                             <th class="px-1 py-2 text-center">Date</th>
                                             <th class="px-1 py-2 text-center">Total</th>
+ 
                                         </tr>
                                     </thead>
+                         
                                     <tbody>${tbodyHtml}</tbody>
                                 </table>
                             </div>
                         </div>
+     
                     `;
                 });
-
                 html += `
                     <div class="flex justify-end px-1 mb-8">
                         <button id="nps-action-btn" onclick="handleNPSAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
                             ${btnText}
+    
                         </button>
                     </div>
                 `;
-
                 container.innerHTML = html;
             } catch (error) {
                 container.innerHTML = `<div class="p-6 m-4 text-red-500 bg-red-50 rounded-lg text-sm font-bold border border-red-200">NPS Render Error:<br>${error.message}</div>`;
@@ -1127,19 +1314,19 @@
 
                 const updates = [];
                 let inputsFound = false;
-
                 activeData.forEach((item, index) => {
                     const input = document.getElementById('nps-input-' + index);
                     if(input) {
                         inputsFound = true;
-                        const newVal = parseFloat(input.value) || 0;
+                        const 
+                        newVal = parseFloat(input.value) || 0;
                         if (item.units !== newVal) {
                             item.units = newVal; 
-                            updates.push({ row: item.row, col: item.col, dtCol: item.dtCol, units: newVal });
+                            updates.push({ row: item.row, col: item.col, dtCol: item.dtCol, units: newVal 
+                            });
                         }
                     }
                 });
-
                 if (inputsFound && updates.length === 0) {
                     isEditingNPS = false;
                     if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
@@ -1147,23 +1334,25 @@
                     return;
                 }
 
-                const targetKeyword = currentUser === 'HT' ? "HT NPS" : "NCT NPS";
+                const targetKeyword = currentUser === 'HT' ?
+                "HT NPS" : "NCT NPS";
 
                 try {
                     const response = await fetch(API_URL, {
                         method: "POST",
                         body: JSON.stringify({ action: "UPDATE_NPS", keyword: targetKeyword, updates: updates })
+            
                     });
                     const result = await response.json();
 
                     if(result.error) throw new Error(result.error);
-
                     isEditingNPS = false;
 
                     if (result.timestamp) {
                         updates.forEach(u => {
                             let match = activeData.find(a => a.row === u.row);
                             if (match) match.lastUpdated = result.timestamp;
+  
                         });
                     }
 
@@ -1174,7 +1363,6 @@
                     caches.open('ai-tracker-data-v1').then(cache => {
                         cache.put(reqUrl, new Response(JSON.stringify(freshData)));
                     });
-
                     if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
 
                     updateStats();
@@ -1190,7 +1378,8 @@
         function renderCash(container) {
             let tbodyHtml = activeData.map((item, index) => {
                 let amountDisplay = isEditingCash 
-                    ? `<input type="number" id="cash-input-${index}" value="${item.amount}" class="w-full max-w-[120px] px-2 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
+                    ? `<input type="number" id="cash-input-${index}" value="${item.amount}" class="w-full 
+                    max-w-[120px] px-2 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold" />`
                     : `${displayMoney(item.amount)}`;
 
                 let formattedRate = item.interest;
@@ -1203,7 +1392,6 @@
                 }
 
                 formattedRate = displayMoney(formattedRate);
-
                 return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <td class="p-3 text-left font-bold text-gray-800 dark:text-white align-middle">${item.bank}</td>
                     <td class="p-3 text-right font-bold text-gray-900 dark:text-gray-200 align-middle">${amountDisplay}</td>
@@ -1213,27 +1401,31 @@
 
             const btnText = isEditingCash ? "Save" : "Edit";
             const btnColor = isEditingCash ? "bg-green-600 hover:bg-green-700" : "bg-brand hover:bg-gray-700";
-
             container.innerHTML = `
                 <div class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2 px-1">
                     Last Updated: <span class="text-gray-800 dark:text-gray-200">${cashTimestamp}</span>
                 </div>
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 overflow-hidden">
+          
                     <table class="w-full text-sm">
                         <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
                             <tr>
+                           
                                 <th class="p-3 text-left">Bank</th>
                                 <th class="p-3 text-right">Amount</th>
                                 <th class="p-3 text-right">Interest</th>
+                         
                             </tr>
                         </thead>
                         <tbody>${tbodyHtml}</tbody>
                     </table>
                 </div>
+             
                 <div class="flex justify-end px-1 mb-8">
                     <button id="cash-action-btn" onclick="handleCashAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
                         ${btnText}
                     </button>
+           
                 </div>
             `;
         }
@@ -1256,17 +1448,17 @@
                     const input = document.getElementById('cash-input-' + index);
                     if(input) {
                         const newVal = parseFloat(input.value) || 0;
+                      
                         item.amount = newVal; 
                         updates.push({ row: item.row, col: item.col, amount: newVal });
                     }
                 });
-
                 const targetKeyword = currentUser === 'HT' ? "HT Cash" : "NCT Cash";
-
                 try {
                     const response = await fetch(API_URL, {
                         method: "POST",
                         body: JSON.stringify({ action: "UPDATE_CASH", keyword: targetKeyword, updates: updates })
+                 
                     });
                     const result = await response.json();
 
@@ -1274,15 +1466,12 @@
 
                     cashTimestamp = result.timestamp;
                     isEditingCash = false;
-
                     const freshData = { items: activeData, lastUpdated: cashTimestamp };
                     memoryCache[reqTabKey] = { rawData: freshData };
-
                     const reqUrl = `${API_URL}?user=${targetKeyword === 'HT Cash' ? 'CASH_HT' : 'CASH_NCT'}`;
                     caches.open('ai-tracker-data-v1').then(cache => {
                         cache.put(reqUrl, new Response(JSON.stringify(freshData)));
                     });
-
                     if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
 
                     updateStats();
@@ -1331,23 +1520,21 @@
 
         function saveAssetSnapshot(assetsArray) {
             if (!assetsArray || assetsArray.length === 0) return;
-            
             const classSnapshotKey = 'asset_snapshot_' + currentUser;
             const iSnapshotKey = 'indiv_asset_snapshot_' + currentUser;
             
             const currentClassSnapshot = {};
             const currentIndivSnapshot = {};
-
             assetsArray.forEach(item => {
                 const aClass = item.assetClass && item.assetClass !== '-' ? item.assetClass.trim() : 'Others';
                 currentClassSnapshot[aClass] = (currentClassSnapshot[aClass] || 0) + item.amount;
                 
                 if (item.asset) {
+               
                     const aName = item.asset.trim();
                     currentIndivSnapshot[aName] = (currentIndivSnapshot[aName] || 0) + item.amount;
                 }
             });
-
             localStorage.setItem(classSnapshotKey, JSON.stringify(currentClassSnapshot));
             localStorage.setItem(iSnapshotKey, JSON.stringify(currentIndivSnapshot));
         }
@@ -1362,17 +1549,17 @@
             const chartData = sortedClasses.map(key => classTotals[key]);
             const bgColors = ['#9D4EDD', '#22C55E', '#F59E0B', '#3B82F6', '#EC4899', '#EF4444', '#8B5CF6'];
 
-            const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
+            const reqTabKey = currentTab === 'home' ?
+            currentTab : currentTab + '_' + currentUser;
             const canvasId = `chart-${reqTabKey}-${currentSubView}`;
-
             let html = `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
                     <h2 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Asset Allocation</h2>
                     <div class="relative w-full max-w-[240px] aspect-square"><canvas id="${canvasId}"></canvas></div>
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
+ 
+               <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
                     <ul class="divide-y dark:divide-gray-700">`;
-
             sortedClasses.forEach((label, i) => {
                 const amount = classTotals[label]; 
                 const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
@@ -1380,17 +1567,21 @@
                 const deltaBadge = getAssetDeltaBadge(label, amount);
 
                 html += `
+        
                 <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <div class="flex items-center gap-2 flex-1 min-w-0">
                         <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
-                        <span class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
+                        <span 
+                        class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
                     </div>
                     <div class="text-right flex flex-col flex-shrink-0 items-end justify-center">
                         <span class="font-bold text-sm text-gray-900 dark:text-white leading-tight">${displayMoney(amount)}</span>
-                        
+                   
+                     
                         <div class="flex items-center gap-1.5 mt-0.5 leading-none">
                             ${deltaBadge}
                             <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
+      
                         </div>
                     </div>
                 </li>`;
@@ -1408,23 +1599,26 @@
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 overflow-hidden">
                 <div class="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center dark:text-white border-b dark:border-gray-600 gap-2">
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5">Asset</h3>
-                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-1/5 text-center">Class</h3>
+                    <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs 
+                    w-1/5 text-center">Class</h3>
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5 text-right">Allocation</h3>
                 </div><ul class="divide-y dark:divide-gray-700">`;
-
             sortedData.forEach(item => {
                 const percent = totalAmount > 0 ? (item.amount / totalAmount * 100).toFixed(2) + '%' : '0.00%';
                 
                 const assetNameClean = item.asset ? item.asset.trim() : '';
                 const deltaBadge = getIndividualAssetDeltaBadge(assetNameClean, item.amount);
 
+        
                 html += `<li class="p-3 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors gap-2">
                     <div class="font-semibold text-gray-800 dark:text-white w-2/5 leading-tight break-words">${item.asset}</div>
                     <div class="text-[10px] font-bold text-[#5D6B7F] dark:text-gray-400 w-1/5 text-center leading-tight uppercase tracking-wide break-words">${item.assetClass || '-'}</div>
-                    <div class="w-2/5 text-right flex flex-col justify-center items-end">
+                    <div class="w-2/5 
+                    text-right flex flex-col justify-center items-end">
                         <span class="font-bold text-sm leading-tight text-gray-900 dark:text-white">${displayMoney(item.amount)}</span>
                         <div class="flex items-center gap-1.5 mt-0.5 leading-none">
                             ${deltaBadge}
+          
                             <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
                         </div>
                     </div>
@@ -1437,7 +1631,7 @@
 
        function renderTickers(container) {
             if (!tickerData || !tickerData.rows || tickerData.rows.length === 0) { 
-                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No ticker data found.</p>'; 
+                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No ticker data found.</p>';
                 return; 
             }
 
@@ -1446,35 +1640,38 @@
                 currency: 'INR', 
                 minimumFractionDigits: 2, 
                 maximumFractionDigits: 2 
+         
             });
 
             let theadHtml = `<tr><th class="px-2 py-2 text-left whitespace-nowrap">TICKER</th>`;
             for (let i = 1; i < tickerData.headers.length; i++) { 
-                theadHtml += `<th class="px-2 py-2 text-right whitespace-nowrap">${String(tickerData.headers[i]).toUpperCase()}</th>`; 
+                theadHtml += `<th class="px-2 py-2 text-right whitespace-nowrap">${String(tickerData.headers[i]).toUpperCase()}</th>`;
             }
             theadHtml += `</tr>`;
-
             let tbodyHtml = tickerData.rows.map(row => {
                 let rowHtml = `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"><td class="px-2 py-2 text-left font-bold text-gray-800 dark:text-white align-middle whitespace-nowrap">${row.ticker}</td>`;
 
                 row.values.forEach((val, idx) => {
                     const headerName = String(tickerData.headers[idx + 1]).toUpperCase(); 
+                    
                     let displayVal = val; 
                     let colorClass = "text-gray-800 dark:text-gray-200 font-semibold";
 
                     if (headerName.includes('%')) { 
                         let num = parseFloat(val); 
+                    
                         if (!isNaN(num)) {
                             if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) { 
                                 displayVal = (num * 100).toFixed(2) + '%'; 
+              
                             }
                             if (num > 0) { 
-                                colorClass = "text-green-600 dark:text-green-400 font-bold"; 
+                                colorClass = "text-green-600 dark:text-green-400 font-bold";
                                 if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal;
                             } else if (num < 0) { 
-                                colorClass = "text-red-600 dark:text-red-400 font-bold"; 
+                                colorClass = "text-red-600 dark:text-red-400 font-bold";
                             } else { 
-                                colorClass = "text-gray-500 font-bold"; 
+                                colorClass = "text-gray-500 font-bold";
                             }
                         }
                     } else { 
@@ -1497,23 +1694,21 @@
             const groups = activeData.reduce((acc, item) => {
                 const d = new Date(item.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
                 if(!acc[y]) acc[y] = { months: {}, total: 0 }; if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
-                acc[y].months[m].items.push(item); acc[y].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount); acc[y].months[m].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount);
+                acc[y].months[m].items.push(item); acc[y].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount); acc[y].months[m].total += (currentTab === 'ncd' 
+                ? item.amount : item.maturityAmount);
                 return acc;
             }, {});
-
             const chartLabels = []; const chartData = [];
             Object.keys(groups).sort().forEach(y => { chartLabels.push(y); chartData.push(groups[y].total); });
-
             const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
             const canvasId = `chart-${reqTabKey}-${currentSubView}`;
-
             let html = `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center"><h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Maturity Timeline</h2><div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div></div>`;
-
             Object.keys(groups).sort().forEach(y => {
                 const yearlyTotal = groups[y].total; const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg"><span>${y}</span> <span>${displayMoney(yearPercent + '%')}, ${displayMoney(yearlyTotal)}</span></button><div class="accordion-content">`;
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
-                    groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+ 
+                   groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
                     const monthlyTotal = groups[y].months[m].total; const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
                     html += `<div class="border-l-4 border-brand ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${displayMoney(percent + '%')}, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
                 });
@@ -1528,26 +1723,25 @@
                 const groupKey = currentTab === 'ncd' ? item.company : item.bank;
                 if(!acc[groupKey]) { acc[groupKey] = { items: [], total: 0, inv: 0, weightedRateSum: 0, weightedInv: 0 }; }
                 acc[groupKey].items.push(item); acc[groupKey].inv += item.amount;
-                let rateNum = parseFloat(String(item.rate).replace('%', ''));
+                let rateNum 
+                = parseFloat(String(item.rate).replace('%', ''));
                 if (!isNaN(rateNum)) { acc[groupKey].weightedRateSum += (item.amount * rateNum); acc[groupKey].weightedInv += item.amount; }
                 if (currentTab !== 'ncd') acc[groupKey].total += item.maturityAmount;
                 return acc;
             }, {});
-
             const sortedBanks = Object.keys(groups).sort((a, b) => groups[b].inv - groups[a].inv);
             const chartLabels = sortedBanks; 
             const chartData = sortedBanks.map(k => groups[k].inv);
-
             const reqTabKey = currentTab === 'home' ? currentTab : currentTab + '_' + currentUser;
             const canvasId = `chart-${reqTabKey}-${currentSubView}`;
-
             let html = '';
 
             if (currentTab !== 'ncd') {
                 html += `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-4 p-4 flex flex-col items-center">
                     <h2 class="text-xs font-bold text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wider">Bank Allocation</h2>
-                    <div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div>
+                   
+                 <div class="relative w-full max-w-[200px] aspect-square"><canvas id="${canvasId}"></canvas></div>
                 </div>`;
             }
 
@@ -1556,26 +1750,29 @@
                 const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
                 const percentOfTotal = (grandTotalInv > 0) ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%' : '0.0%';
 
-                const mRate = displayMoney(weightedAvgRate);
+   
+                 const mRate = displayMoney(weightedAvgRate);
                 const mPercent = displayMoney(percentOfTotal);
 
                 let statsHtml = currentTab === 'ncd' 
                     ? `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>` 
+            
                     : `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Inv: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].inv)}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
-
                 let pillAmount = currentTab === 'ncd' ? displayMoney(groups[key].inv) : displayMoney(groups[key].total);
-
                 html += `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
                     <button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 bg-gray-50 dark:bg-gray-700/50 flex justify-between items-center gap-2 border-b dark:border-gray-700 text-left active:bg-gray-100 dark:active:bg-gray-600 transition-colors">
                         <div class="flex flex-col w-2/3">
+            
                             <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${key}</span>
                             <span class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 leading-tight">${statsHtml}</span>
                         </div>
+                     
                         <span class="font-bold text-[#5D6B7F] dark:text-gray-200 bg-gray-200/50 dark:bg-gray-700 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-gray-300 dark:border-gray-600">
                             ${pillAmount}
                         </span>
                     </button>
+            
                     <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">
                         ${renderTable(groups[key].items)}
                     </div>
@@ -1594,13 +1791,14 @@
             const isMaturity = currentSubView === 'maturity';
 
             let theadHtml = `<tr>
-                ${isMaturity ? `<th class="px-1 py-2 text-center w-[25%]">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}
+                ${isMaturity ?
+                `<th class="px-1 py-2 text-center w-[25%]">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}
                 <th class="px-1 py-2 text-center">Amt</th>
-                ${!isNCD ? `<th class="px-1 py-2 text-center">Mat.Amt</th>` : ''}
+                ${!isNCD ?
+                `<th class="px-1 py-2 text-center">Mat.Amt</th>` : ''}
                 <th class="px-1 py-2 text-center">Date</th>
                 <th class="px-1 py-2 text-center w-[15%]">Rate</th>
             </tr>`;
-
             let tbodyHtml = items.map(item => {
                 let formattedRate = String(item.rate); 
                 if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
@@ -1608,10 +1806,12 @@
 
                 let compactDate = new Date(item.maturityDate).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
 
+          
                 return `<tr>
                     ${isMaturity ? `<td class="px-1 py-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto text-[9px]">${isNCD ? item.company : item.bank}</span></td>` : ''}
                     <td class="px-1 py-2 text-center font-semibold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.amount)}</td>
-                    ${!isNCD ? `<td class="px-1 py-2 text-center font-bold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.maturityAmount)}</td>` : ''}
+                    ${!isNCD ? `<td class="px-1 
+                    py-2 text-center font-bold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.maturityAmount)}</td>` : ''}
                     <td class="px-1 py-2 text-center font-medium text-gray-600 dark:text-gray-400 align-middle text-[9px] break-words">${compactDate}</td>
                     <td class="px-1 py-2 text-center align-middle font-medium text-[9px] break-words">${formattedRate}</td>
                 </tr>`;
@@ -1621,7 +1821,8 @@
         }
 
         function toggleUser() {
-            const newUser = currentUser === 'HT' ? 'NCT' : 'HT';
+            const newUser = currentUser === 'HT' ?
+            'NCT' : 'HT';
             switchUser(newUser);
         }
 
@@ -1639,12 +1840,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
 
         fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rows}`)
-            .then(response => response.json())
+            .then(response => 
+            response.json())
             .then(data => {
                 if(data.success) {
                     console.log("✅ Success: Tasks marked as completed in Google Sheets.");
                 } else {
-                    console.error("❌ Failed: Backend did not return success status.");
+                    console.error("❌ Failed: Backend 
+                    did not return success status.");
                 }
             })
             .catch(error => {
