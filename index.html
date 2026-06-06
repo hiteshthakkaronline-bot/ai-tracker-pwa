@@ -44,12 +44,12 @@
         /* Dynamic Theme Colors */
         :root {
             /* HT Colors (Deep Slate) */
-            --brand-color: #334155;
+            --brand-color: #334155; 
             --brand-dark: #1e293b;  
         }
         body.theme-nct {
             /* NCT Colors (Rich Berry) */
-            --brand-color: #be185d;
+            --brand-color: #be185d; 
             --brand-dark: #831843;  
         }
         /* 1. Splash Screen & Base Loaders */
@@ -68,26 +68,25 @@
         *, ::before, ::after { border-color: #e5e7eb; }
         .dark *, .dark ::before, .dark ::after { border-color: #374151; }
 
-        /* ADD YOUR NEW CODE HERE */
         #sub-nav { 
-            border-bottom-color: var(--brand-color) !important;
+            border-bottom-color: var(--brand-color) !important; 
         }
         .dark #sub-nav { 
-            border-bottom-color: var(--brand-dark) !important;
+            border-bottom-color: var(--brand-dark) !important; 
         }
 
         /* 3. Explicit Layout Boundaries (The TRUE Gap Fix) */
         body { 
-            overflow-x: hidden;
+            overflow-x: hidden; 
             -webkit-text-size-adjust: 100%; 
             touch-action: manipulation; /* ADD THIS: Disables native double-tap to zoom */
         }
 
         #app-content { 
             /* Let the sticky header do the work! Just a tiny 10px buffer for breathing room */
-            padding-top: 10px !important;
+            padding-top: 10px !important; 
             /* Keep bottom padding so content doesn't hide behind the fixed bottom nav bar */
-            padding-bottom: 90px !important;
+            padding-bottom: 90px !important; 
         }
 
         /* Kill accidental margins from Tailwind's space-y-4 on the first element */
@@ -254,12 +253,20 @@
         let touchstartX = 0;
         let touchendX = 0; let touchstartY = 0; let touchendY = 0;
 
-        // --- PIN CRYPTOGRAPHY ENGINE ---
+        // --- PIN CRYPTOGRAPHY ENGINE (HTTPS boundaries fallback ready) ---
         async function hashPin(pin) {
-            const msgUint8 = new TextEncoder().encode(pin);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            try {
+                if (!window.crypto || !crypto.subtle) {
+                    return pin; // Fallback to plain text if secure context (HTTPS) is missing
+                }
+                const msgUint8 = new TextEncoder().encode(pin);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {
+                console.warn("Crypto API fallback activated:", e.message);
+                return pin;
+            }
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -416,14 +423,14 @@
             enteredPin = '';
             const overlay = document.getElementById('pin-overlay');
             overlay.style.display = 'flex';
-            void overlay.offsetWidth; // Force a reflow
+            void overlay.offsetWidth; 
             overlay.classList.remove('opacity-0', 'pointer-events-none');
             document.getElementById('pin-title').innerText = "Enter Current PIN";
             document.getElementById('pin-error').classList.add('hidden');
             updatePinDisplay();
         }
 
-        // --- NEW BIOMETRIC WEBAUTHN ENGINES (OPTION 1) ---
+        // --- BIOMETRIC WEBAUTHN ENGINES (OPTION 1) ---
         let shouldRegisterBioNext = false;
 
         function textToBuffer(text) {
@@ -1258,8 +1265,7 @@ text-center whitespace-nowrap">Start</th>
                         
                                 latestTimeMs = d;
                                 tierTimestampStr = new Date(item.lastUpdated).toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'});
-   
-                         } else if (latestTimeMs === 0) {
+                           } else if (latestTimeMs === 0) {
                       
                                 tierTimestampStr = item.lastUpdated; 
             
@@ -1423,7 +1429,6 @@ py-2 text-center">Fund</th>
                     const response = await fetch(API_URL, {
                         method: "POST",
                         body: JSON.stringify({ action: "UPDATE_NPS", keyword: targetKeyword, updates: updates })
-            
                     });
                     const result = await response.json();
 
@@ -1433,8 +1438,6 @@ py-2 text-center">Fund</th>
                         updates.forEach(u => {
                             let match = activeData.find(a => a.row === u.row);
                             if (match) match.lastUpdated = result.timestamp;
-  
-   
                      });
                     }
 
@@ -1547,7 +1550,6 @@ py-2 text-center">Fund</th>
                     const response = await fetch(API_URL, {
                         method: "POST",
                         body: JSON.stringify({ action: "UPDATE_CASH", keyword: targetKeyword, updates: updates })
-                 
                     });
                     const result = await response.json();
 
@@ -1773,7 +1775,7 @@ py-2 text-center">Fund</th>
                     } else { 
                         let num = parseFloat(val);
                         if (!isNaN(num)) {
-                            displayVal = fmt.format(num);
+                            displayVal = tickerFmt.format(num);
                         }
                     }
 
@@ -1852,7 +1854,6 @@ py-2 text-center">Fund</th>
 
                 let statsHtml = currentTab === 'ncd' 
                     ? `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>` 
-        
             
                     : `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Inv: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].inv)}</span> |
 Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
@@ -1879,6 +1880,7 @@ Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
   </div>
                 </div>`;
             });
+
             container.innerHTML = html; 
 
             if (currentTab !== 'ncd') {
@@ -1941,15 +1943,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
 
         fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rows}`)
-            .then(response => 
-            response.json())
+            .then(response => response.json())
             .then(data => {
                 if(data.success) {
                     console.log("✅ Success: Tasks marked as completed in Google Sheets.");
                 } else {
-           
-         console.error("❌ Failed: Backend 
-                    did not return success status.");
+                    console.error("❌ Failed: Backend did not return success status.");
                 }
             })
             .catch(error => {
