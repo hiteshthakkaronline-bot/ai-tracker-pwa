@@ -44,12 +44,12 @@
         /* Dynamic Theme Colors */
         :root {
             /* HT Colors (Deep Slate) */
-            --brand-color: #334155; 
+            --brand-color: #334155;
             --brand-dark: #1e293b;  
         }
         body.theme-nct {
             /* NCT Colors (Rich Berry) */
-            --brand-color: #be185d; 
+            --brand-color: #be185d;
             --brand-dark: #831843;  
         }
         /* 1. Splash Screen & Base Loaders */
@@ -68,25 +68,26 @@
         *, ::before, ::after { border-color: #e5e7eb; }
         .dark *, .dark ::before, .dark ::after { border-color: #374151; }
 
+        /* ADD YOUR NEW CODE HERE */
         #sub-nav { 
-            border-bottom-color: var(--brand-color) !important; 
+            border-bottom-color: var(--brand-color) !important;
         }
         .dark #sub-nav { 
-            border-bottom-color: var(--brand-dark) !important; 
+            border-bottom-color: var(--brand-dark) !important;
         }
 
         /* 3. Explicit Layout Boundaries (The TRUE Gap Fix) */
         body { 
-            overflow-x: hidden; 
+            overflow-x: hidden;
             -webkit-text-size-adjust: 100%; 
             touch-action: manipulation; /* ADD THIS: Disables native double-tap to zoom */
         }
 
         #app-content { 
             /* Let the sticky header do the work! Just a tiny 10px buffer for breathing room */
-            padding-top: 10px !important; 
+            padding-top: 10px !important;
             /* Keep bottom padding so content doesn't hide behind the fixed bottom nav bar */
-            padding-bottom: 90px !important; 
+            padding-bottom: 90px !important;
         }
 
         /* Kill accidental margins from Tailwind's space-y-4 on the first element */
@@ -115,18 +116,20 @@
         <div id="pin-overlay" class="fixed inset-0 bg-[#F8F9FA] dark:bg-gray-900 z-[99999] flex flex-col px-4 pb-8 transition-opacity duration-500">
             <div class="flex flex-col items-center justify-center flex-1 w-full">
            
-                <h2 id="pin-title" class="text-xl font-bold text-[#344755] dark:text-gray-300 mb-8 tracking-wide">Enter PIN</h2>
+                <h2 class="text-xl font-bold text-[#344755] dark:text-gray-300 mb-8 tracking-wide">Enter PIN</h2>
 
                 <div class="flex gap-5 h-4 items-center justify-center w-full">
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
+          
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
                     <div class="pin-indicator w-3 h-3 rounded-full bg-gray-300 dark:bg-gray-600 transition-colors duration-200"></div>
                 </div>
 
-                <div id="pin-error" class="text-red-500 font-bold text-sm mt-6 hidden h-5">Incorrect PIN.</div>
+                <div id="pin-error" class="text-red-500 font-bold text-sm mt-6 hidden h-5">Incorrect PIN Ley.</div>
             </div>
 
+ 
             <div class="grid grid-cols-3 gap-x-5 gap-y-2 max-w-[260px] w-full mx-auto place-items-center mb-2">
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('1')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">1</span>
@@ -136,6 +139,7 @@
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">2</span>
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('3')">
+             
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">3</span>
                 </button>
 
@@ -147,11 +151,13 @@
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">5</span>
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('6')">
+      
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">6</span>
                 </button>
 
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('7')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">7</span>
+             
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('8')">
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">8</span>
@@ -166,10 +172,12 @@
                     </svg>
                 </button> 
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex flex-col items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800" onclick="handlePinInput('0')">
+             
                     <span class="text-4xl font-light text-[#344755] dark:text-gray-100">0</span>
                 </button>
                 <button class="keypad-btn w-[70px] h-[70px] rounded-full bg-transparent flex items-center justify-center transition-all active:bg-gray-200 dark:active:bg-gray-800 text-[#344755] dark:text-gray-400" onclick="handlePinInput('clear')">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.2">
+              
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9.75L14.25 12m0 0l2.25 2.25M14.25 12l2.25-2.25M14.25 12L12 14.25m-2.58 4.92l-6.375-6.375a1.125 1.125 0 010-1.59L9.42 4.83c.211-.211.498-.33.796-.33H19.5a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-9.284c-.298 0-.585-.119-.796-.33z" />
                     </svg>
                 </button>
@@ -178,19 +186,15 @@
 
         <div class="sticky top-0 z-50 shadow-md">
             <header class="bg-brand dark:bg-branddark text-white transition-colors duration-300">
-                <div class="p-4 grid grid-cols-[40px_1fr_80px] items-center text-center">
+                <div class="p-4 grid grid-cols-[40px_1fr_40px] items-center text-center">
                     <button onclick="toggleTheme()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="theme-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
                     <div>
+    
                         <h1 id="header-title" class="text-lg font-bold uppercase tracking-tight">Home</h1>
                         <div id="global-stats" class="text-[10px] opacity-90">Initializing...</div>
                     </div>
-                    <div class="flex justify-end items-center gap-1">
-                        <button onclick="startPinChange()" class="p-2 hover:bg-white/10 rounded-full flex justify-center" title="Change PIN">
-                            <svg class="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4v-3.252a1 1 0 01.293-.707l8.96-8.96A6 6 0 0121 9z"></path></svg>
-                        </button>
-                        <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
-                    </div>
-                </div>          
+                    <button onclick="togglePrivacy()" class="p-2 hover:bg-white/10 rounded-full flex justify-center"><svg id="privacy-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"></svg></button>
+                </div>           
             </header>
             <div id="sub-nav" class="flex border-b border-brand dark:border-branddark bg-white dark:bg-gray-800 text-[11px] sm:text-sm shadow-sm transition-colors duration-300">
                 </div>
@@ -205,6 +209,7 @@
 
         <div class="fixed bottom-24 right-4 flex flex-col items-center gap-3 z-40">
             <button id="fab-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="w-12 h-12 bg-brand dark:bg-branddark text-white rounded-full flex items-center justify-center shadow border border-white/20 active:scale-95 transition-all duration-300 opacity-0 pointer-events-none translate-y-4">
+   
                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </button>
 
@@ -220,6 +225,7 @@
         <nav class="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 h-20 flex justify-around items-center z-50 shadow-2xl transition-colors">
             <button onclick="switchMainTab('home')" id="nav-home" class="flex flex-col items-center text-gray-400 flex-1 px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011-1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+              
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">HOME</span>
             </button>
             <button onclick="switchMainTab('fds')" id="nav-fds" class="flex flex-col items-center text-gray-400 flex-1 px-1">
@@ -236,53 +242,36 @@
             </button>
             <button onclick="switchMainTab('cash')" id="nav-cash" class="flex flex-col items-center text-gray-400 flex-1 px-1">
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          
                     <path d="M6 3h12"/><path d="M6 8h12"/><path d="M6 13l8.5 8"/><path d="M6 13a3 3 0 0 0 0-5"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">CASH</span>
             </button>
             <button onclick="switchMainTab('nps')" id="nav-nps" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+        
                 <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NPS</span>
             </button>
+  
         </nav>
     </div>
 
     <script>
         let touchstartX = 0;
         let touchendX = 0; let touchstartY = 0; let touchendY = 0;
-
-        // --- PIN CRYPTOGRAPHY ENGINE (HTTPS boundaries fallback ready) ---
-        async function hashPin(pin) {
-            try {
-                if (!window.crypto || !crypto.subtle) {
-                    return pin; // Fallback to plain text if secure context (HTTPS) is missing
-                }
-                const msgUint8 = new TextEncoder().encode(pin);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            } catch (e) {
-                console.warn("Crypto API fallback activated:", e.message);
-                return pin;
-            }
-        }
-
         window.addEventListener('DOMContentLoaded', () => {
-                    // Seed the default PIN hash on first ever boot if missing
-                    if (!localStorage.getItem('app_pin_hash')) {
-                        hashPin("1549").then(hash => localStorage.setItem('app_pin_hash', hash));
-                    }
-
                     applyInitialTheme();
                     const root = document.getElementById('app-root');
                     const splash = document.getElementById('native-splash');
                     
+           
                     // --- SECURITY GATEKEEPER ---
                     if (!window.tailwind) {
                         const splashText = document.querySelector('.splash-text');
                         if (splashText) {
+            
                             splashText.innerHTML = "OFFLINE BOOT FAILURE<br><span style='font-size:10px; font-weight:normal; opacity:0.75; display:block; margin-top:5px;'>Style library missing. Clear cache and try again.</span>";
                             splashText.style.color = "#ef4444";
                         }
@@ -313,9 +302,11 @@
                         const currentTime = new Date().getTime();
                         const tapLength = currentTime - lastTapTime;
 
+            
                         if (tapLength < 300 && tapLength > 0) {
                             togglePrivacy(); 
                             e.preventDefault(); 
+                      
                         }
                         lastTapTime = currentTime;
                     }, { passive: false });
@@ -327,16 +318,19 @@
                         touchendX = e.changedTouches[0].screenX; touchendY = e.changedTouches[0].screenY;
                         const isScrollableTable = e.target.closest('.overflow-x-auto');
                         if (isScrollableTable && isScrollableTable.scrollWidth > isScrollableTable.clientWidth) return; 
+          
                         handleSwipeDirection();
                     }, {passive: true});
                     window.addEventListener('scroll', () => {
                         const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
                         if (window.scrollY > 150) {
+                
                             fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
                             fabTop.classList.add('opacity-100', 'translate-y-0');
                         } else {
                             fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+ 
                             fabTop.classList.remove('opacity-100', 'translate-y-0');
                         }
                     }, { passive: true });
@@ -368,6 +362,7 @@
         }
 
         const API_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
+        const SECRET_PIN = "1549";
 
         let currentUser = 'HT';
         let activeData = [];
@@ -383,9 +378,6 @@
         let chartInstances = {}; 
 
         let enteredPin = "";
-        let pinMode = 'UNLOCK';
-        let tempNewPin = '';
-
         function handlePinInput(val) {
             const errorMsg = document.getElementById('pin-error');
             errorMsg.classList.add('hidden');
@@ -418,19 +410,7 @@
             });
         }
 
-        function startPinChange() {
-            pinMode = 'CHANGE_OLD';
-            enteredPin = '';
-            const overlay = document.getElementById('pin-overlay');
-            overlay.style.display = 'flex';
-            void overlay.offsetWidth; 
-            overlay.classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('pin-title').innerText = "Enter Current PIN";
-            document.getElementById('pin-error').classList.add('hidden');
-            updatePinDisplay();
-        }
-
-        // --- BIOMETRIC WEBAUTHN ENGINES (OPTION 1) ---
+        // --- NEW BIOMETRIC WEBAUTHN ENGINES (OPTION 1) ---
         let shouldRegisterBioNext = false;
 
         function textToBuffer(text) {
@@ -521,68 +501,23 @@
             }
         }
 
-        async function validatePin() {
-            const storedHash = localStorage.getItem('app_pin_hash');
-            const enteredHash = await hashPin(enteredPin);
-
-            if (pinMode === 'UNLOCK') {
-                if (enteredHash === storedHash) {
-                    sessionStorage.setItem('isUnlocked', 'true');
-                    const overlay = document.getElementById('pin-overlay');
-                    overlay.classList.add('opacity-0', 'pointer-events-none');
-                    setTimeout(() => { overlay.style.display = 'none'; }, 500);
-                    init();
-                    
-                    if (shouldRegisterBioNext) {
-                        shouldRegisterBioNext = false;
-                        setTimeout(registerLocalBiometrics, 600);
-                    }
-                } else {
-                    document.getElementById('pin-error').innerText = "Incorrect PIN.";
-                    document.getElementById('pin-error').classList.remove('hidden');
-                    enteredPin = "";
-                    updatePinDisplay();
+        function validatePin() {
+            if (enteredPin === SECRET_PIN) {
+                sessionStorage.setItem('isUnlocked', 'true');
+                const overlay = document.getElementById('pin-overlay');
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => { overlay.style.display = 'none'; }, 500);
+                init();
+                
+                if (shouldRegisterBioNext) {
                     shouldRegisterBioNext = false;
+                    setTimeout(registerLocalBiometrics, 600);
                 }
-            } else if (pinMode === 'CHANGE_OLD') {
-                if (enteredHash === storedHash) {
-                    pinMode = 'CHANGE_NEW';
-                    enteredPin = '';
-                    document.getElementById('pin-title').innerText = "Enter New PIN";
-                    document.getElementById('pin-error').classList.add('hidden');
-                    updatePinDisplay();
-                } else {
-                    document.getElementById('pin-error').innerText = "Incorrect Current PIN.";
-                    document.getElementById('pin-error').classList.remove('hidden');
-                    enteredPin = "";
-                    updatePinDisplay();
-                }
-            } else if (pinMode === 'CHANGE_NEW') {
-                tempNewPin = enteredPin;
-                pinMode = 'CHANGE_CONFIRM';
-                enteredPin = '';
-                document.getElementById('pin-title').innerText = "Confirm New PIN";
+            } else {
+                document.getElementById('pin-error').classList.remove('hidden');
+                enteredPin = "";
                 updatePinDisplay();
-            } else if (pinMode === 'CHANGE_CONFIRM') {
-                if (enteredPin === tempNewPin) {
-                    const newHash = await hashPin(enteredPin);
-                    localStorage.setItem('app_pin_hash', newHash);
-                    alert("✅ PIN changed successfully!");
-                    pinMode = 'UNLOCK';
-                    enteredPin = '';
-                    document.getElementById('pin-title').innerText = "Enter PIN";
-                    
-                    const overlay = document.getElementById('pin-overlay');
-                    overlay.classList.add('opacity-0', 'pointer-events-none');
-                    setTimeout(() => { overlay.style.display = 'none'; }, 500);
-                } else {
-                    document.getElementById('pin-error').innerText = "PINs do not match. Try again.";
-                    document.getElementById('pin-error').classList.remove('hidden');
-                    pinMode = 'CHANGE_NEW';
-                    enteredPin = '';
-                    document.getElementById('pin-title').innerText = "Enter New PIN";
-                    updatePinDisplay();
-                }
+                shouldRegisterBioNext = false;
             }
         }
 
@@ -945,6 +880,7 @@
                         const percentage = total > 0 ? (value / total) : 0;
 
                         if (percentage > 0.05) {
+       
                              const centerPoint = element.tooltipPosition();
 
                             ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
@@ -958,6 +894,7 @@
 
                             let labelText = data.labels[index];
                             if (labelText.length > 12) {
+                      
                                 labelText = labelText.substring(0, 10) + '..';
                             }
 
@@ -972,15 +909,18 @@
                 data: { 
                     labels: labels, 
                     datasets: [{ 
+               
                         data: data, 
                         backgroundColor: bgColors.slice(0, labels.length), 
                         borderWidth: 0, 
                         hoverOffset: 4 
+          
                     }] 
                 },
                 plugins: [sliceLabelPlugin], 
                 options: { 
                     responsive: true, 
+               
                     maintainAspectRatio: true, 
                     cutout: '65%', 
                     plugins: { 
@@ -989,6 +929,7 @@
                         tooltip: { 
                             callbacks: { 
                                 label: function(context) {
+                              
                                     const val = context.raw; 
                                     const pct = totalValue > 0 ? (val / totalValue * 100).toFixed(1) + '%' : '0%';
                                     return ` ${context.label}: ${displayMoney(val)} (${displayMoney(pct)})`;
@@ -997,6 +938,7 @@
                         }
                     }
                 }
+       
              });
         }
 
@@ -1117,15 +1059,14 @@
                      
                             <td class="p-2 text-left font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight min-w-[60px]">${sip.plan}</span></td>
                             <td class="p-2 text-center text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${sip.startDate}</td>
-                           
- <td class="p-2 text-center text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${sip.endDate}</td>
+                            <td class="p-2 text-center text-gray-600 dark:text-gray-400 whitespace-nowrap align-middle">${sip.endDate}</td>
               
                             <td class="p-2 text-right font-bold text-gray-900 dark:text-white align-middle">${displayMoney(sip.amount)}</td>
                         </tr>`;
                     }).join('');
 
- 
-                   let starsHtml = '';
+                    let starsHtml = '';
+             
                     if (fund.rating && !isNaN(fund.rating)) {
                         let rating = parseInt(fund.rating);
                         let starColor = 'text-green-500 dark:text-green-400'; 
@@ -1155,17 +1096,14 @@
                             <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 
                             font-bold uppercase">Large</div><div class="font-bold text-gray-800 dark:text-gray-200">${lPct}</div></div>
                             <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Mid</div><div class="font-bold text-gray-800 dark:text-gray-200">${mPct}</div></div>
-                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 
-font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gray-200">${sPct}</div></div>
+                            <div><div class="text-gray-500 dark:text-gray-400 mb-0.5 font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gray-200">${sPct}</div></div>
                         
                             <div><div class="text-purple-500 dark:text-purple-400 mb-0.5 font-bold uppercase">Alpha</div><div class="font-bold text-gray-800 dark:text-gray-200 truncate" title="${alphaVal}">${alphaVal}</div></div>
                         </div>
-          
-              <div class="flex justify-between text-[10px] text-gray-600 dark:text-gray-400 px-1 mt-1">
+                        <div class="flex justify-between text-[10px] text-gray-600 dark:text-gray-400 px-1 mt-1">
                             <div class="flex items-center 
                             gap-1"><span class="font-bold uppercase opacity-75">Plan:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${pType}</span></div>
-             
-                <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Exp Ratio:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${expRatio}</span></div>
+                            <div class="flex items-center gap-1"><span class="font-bold uppercase opacity-75">Exp Ratio:</span> <span class="font-bold text-gray-800 dark:text-gray-200">${expRatio}</span></div>
                         </div>
                     </div>`;
                     html += `
@@ -1174,48 +1112,38 @@ font-bold uppercase">Small</div><div class="font-bold text-gray-800 dark:text-gr
                             <div class="flex flex-col 
                             w-2/3">
                                 <div class="flex items-center flex-wrap gap-x-2 gap-y-1">
-                                   
-  <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${fund.fund}</span>
+                                    <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${fund.fund}</span>
                      
                                     ${starsHtml}
                                 </div>
-    
-                        </div>
+                            </div>
                          
                             <span class="font-bold text-[#5D6B7F] dark:text-gray-200 bg-gray-200/50 dark:bg-gray-700 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-gray-300 dark:border-gray-600">
-          
-                      ${displayMoney(fund.totalAmount)}
+                                ${displayMoney(fund.totalAmount)}
                             </span>
                         
                         </button>
-  
-                      
+                        
                         <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar flex flex-col">
                             ${detailsHtml}
                  
-  
-                          <table class="w-full text-[10px] dark:text-gray-300">
+                            <table class="w-full text-[10px] dark:text-gray-300">
                                 <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600">
-                                 
-   <tr>
+                                    <tr>
             
                                         <th class="p-2 text-left whitespace-nowrap">Plan</th>
-                                        <th class="p-2 
-text-center whitespace-nowrap">Start</th>
+                                        <th class="p-2 text-center whitespace-nowrap">Start</th>
                           
                                         <th class="p-2 text-center whitespace-nowrap">End</th>
-                              
-          <th class="p-2 text-right whitespace-nowrap">Amt</th>
+                                        <th class="p-2 text-right whitespace-nowrap">Amt</th>
                                     </tr>
     
                                     </thead>
-           
-                     <tbody class="divide-y dark:divide-gray-700">
+                                <tbody class="divide-y dark:divide-gray-700">
                                     ${sipsHtml}
   
                                 </tbody>
-       
-                     </table>
+                            </table>
                         </div>
                   
                     </div>`;
@@ -1261,25 +1189,21 @@ text-center whitespace-nowrap">Start</th>
                         (item.lastUpdated && item.lastUpdated !== "") {
                             let d = new Date(item.lastUpdated).getTime();
                             if (!isNaN(d) && d > latestTimeMs) {
-     
-                        
+                             
                                 latestTimeMs = d;
                                 tierTimestampStr = new Date(item.lastUpdated).toLocaleString('en-IN', {dateStyle: 'medium', timeStyle: 'short'});
-                           } else if (latestTimeMs === 0) {
+                            } else if (latestTimeMs === 0) {
                       
                                 tierTimestampStr = item.lastUpdated; 
-            
-                }
+                            }
                         }
                     });
 
                
-                    let tbodyHtml = tiers[tierName].map((item, idx) 
-=> {
-                        let globalIdx = activeData.indexOf(item);
+                    let tbodyHtml = tiers[tierName].map((item, idx) => {
+                        let globalIdx = activeData.indexOf(item); 
                         if (globalIdx === -1) globalIdx = idx;
-                        let uDisplay = item.units !== undefined && item.units !== null ?
-                        item.units : 0;
+                        let uDisplay = item.units !== undefined && item.units !== null ? item.units : 0;
                         let nDisplay = item.nav !== undefined && item.nav !== null ? item.nav : 0;
                         if (isEditingNPS) {
                             uDisplay = `<input type="number" step="0.001" id="nps-input-${globalIdx}" value="${uDisplay}" class="w-[65px] px-1 py-1 text-center mx-auto bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold text-xs" />`;
@@ -1331,44 +1255,34 @@ text-center whitespace-nowrap">Start</th>
                             font-bold uppercase tracking-wider">
                                 Updated: <span class="text-gray-800 dark:text-gray-200">${tierTimestampStr}</span>
                             </div>
-       
-                 </div>
+                        </div>
            
                         <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 overflow-hidden">
                             <div class="overflow-x-auto hide-scrollbar">
-          
-                      <table class="w-full text-xs">
+                                <table class="w-full text-xs">
                
                                     <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
-                
-                        <tr>
+                                        <tr>
                               
-                                            <th class="px-1 
-py-2 text-center">Fund</th>
+                                            <th class="px-1 py-2 text-center">Fund</th>
                                             <th class="px-1 py-2 text-center">Scheme</th>
                                     
-                
-                            <th class="px-1 py-2 text-center">%</th>
+                                            <th class="px-1 py-2 text-center">%</th>
                                             <th class="px-1 py-2 text-center">Units</th>
-                      
-                    
+                                          
                                             <th class="px-1 py-2 text-center">NAV</th>
-                                 
-           <th class="px-1 py-2 text-center">Date</th>
+                                            <th class="px-1 py-2 text-center">Date</th>
                                             <th class="px-1 py-2 text-center">Total</th>
  
-                                      
-  </tr>
+                                        </tr>
                                     </thead>
                          
                                     <tbody>${tbodyHtml}</tbody>
- 
-                               </table>
+                                </table>
                             </div>
                         </div>
      
-            
-        `;
+                    `;
                 });
                 html += `
                     <div class="flex justify-end px-1 mb-8">
@@ -1408,13 +1322,11 @@ py-2 text-center">Fund</th>
                         newVal = parseFloat(input.value) || 0;
                         if (item.units !== newVal) {
                             item.units = newVal; 
-             
-               updates.push({ row: item.row, col: item.col, dtCol: item.dtCol, units: newVal 
+                            updates.push({ row: item.row, col: item.col, dtCol: item.dtCol, units: newVal 
                             });
                         }
                     }
-    
-            });
+                });
                 if (inputsFound && updates.length === 0) {
                     isEditingNPS = false;
                     if(domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
@@ -1429,16 +1341,19 @@ py-2 text-center">Fund</th>
                     const response = await fetch(API_URL, {
                         method: "POST",
                         body: JSON.stringify({ action: "UPDATE_NPS", keyword: targetKeyword, updates: updates })
+            
                     });
                     const result = await response.json();
 
                     if(result.error) throw new Error(result.error);
                     isEditingNPS = false;
+
                     if (result.timestamp) {
                         updates.forEach(u => {
                             let match = activeData.find(a => a.row === u.row);
                             if (match) match.lastUpdated = result.timestamp;
-                     });
+  
+                        });
                     }
 
                     const freshData = { items: activeData };
@@ -1469,12 +1384,10 @@ py-2 text-center">Fund</th>
 
                 let formattedRate = item.interest;
                 if (typeof formattedRate === 'number') {
-    
-                formattedRate = Number((formattedRate * 100).toFixed(2)) + '%';
+                    formattedRate = Number((formattedRate * 100).toFixed(2)) + '%';
                 } else if (typeof formattedRate === 'string' && formattedRate !== "" && formattedRate !== "N/A" && !formattedRate.includes('%')) {
                     let num = parseFloat(formattedRate);
-                    if (!isNaN(num) 
-                        && num > 0 && num < 1) formattedRate = Number((num * 100).toFixed(2)) + '%';
+                    if (!isNaN(num) && num > 0 && num < 1) formattedRate = Number((num * 100).toFixed(2)) + '%';
                     else if (!isNaN(num)) formattedRate = num + '%';
                 }
 
@@ -1497,29 +1410,24 @@ py-2 text-center">Fund</th>
                     <table class="w-full text-sm">
                         <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
                             <tr>
-                 
-          
+                           
                                 <th class="p-3 text-left">Bank</th>
                                 <th class="p-3 text-right">Amount</th>
-                      
-          <th class="p-3 text-right">Interest</th>
+                                <th class="p-3 text-right">Interest</th>
                          
                             </tr>
                         </thead>
-           
-             <tbody>${tbodyHtml}</tbody>
+                        <tbody>${tbodyHtml}</tbody>
                     </table>
                 </div>
              
                 <div class="flex justify-end px-1 mb-8">
-                  
-  <button id="cash-action-btn" onclick="handleCashAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
+                    <button id="cash-action-btn" onclick="handleCashAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
                         ${btnText}
                     </button>
            
                 </div>
-         
-   `;
+            `;
         }
 
         async function handleCashAction() {
@@ -1550,6 +1458,7 @@ py-2 text-center">Fund</th>
                     const response = await fetch(API_URL, {
                         method: "POST",
                         body: JSON.stringify({ action: "UPDATE_CASH", keyword: targetKeyword, updates: updates })
+                 
                     });
                     const result = await response.json();
 
@@ -1662,28 +1571,25 @@ py-2 text-center">Fund</th>
                 <li class="p-3 flex items-center justify-between text-sm dark:text-gray-200 gap-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                     <div class="flex items-center gap-2 flex-1 min-w-0">
                         <span class="w-3 h-3 rounded-full flex-shrink-0" style="background-color: ${bgColors[i % bgColors.length]}"></span>
-                 
-       <span 
+                        <span 
                         class="font-bold text-gray-800 dark:text-white uppercase tracking-wide truncate text-xs">${label}</span>
                     </div>
                     <div class="text-right flex flex-col flex-shrink-0 items-end justify-center">
-                
-         <span class="font-bold text-sm text-gray-900 dark:text-white leading-tight">${displayMoney(amount)}</span>
+                        <span class="font-bold text-sm text-gray-900 dark:text-white leading-tight">${displayMoney(amount)}</span>
                    
                      
                         <div class="flex items-center gap-1.5 mt-0.5 leading-none">
-                  
-           ${deltaBadge}
+                            ${deltaBadge}
                             <span class="text-[10px] font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
       
                         </div>
                     </div>
-        
-         </li>`;
+                </li>`;
             });
             html += `</ul></div>`; 
             container.innerHTML = html;
             renderSharedChart(canvasId, sortedClasses, chartData, grandTotal);
+
             saveAssetSnapshot(activeData);
         }
 
@@ -1707,18 +1613,15 @@ py-2 text-center">Fund</th>
                 html += `<li class="p-3 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors gap-2">
                     <div class="font-semibold text-gray-800 dark:text-white w-2/5 leading-tight break-words">${item.asset}</div>
                     <div class="text-[10px] font-bold text-[#5D6B7F] dark:text-gray-400 w-1/5 text-center leading-tight uppercase tracking-wide break-words">${item.assetClass || '-'}</div>
-              
-      <div class="w-2/5 
+                    <div class="w-2/5 
                     text-right flex flex-col justify-center items-end">
                         <span class="font-bold text-sm leading-tight text-gray-900 dark:text-white">${displayMoney(item.amount)}</span>
                         <div class="flex items-center gap-1.5 mt-0.5 leading-none">
-          
-                  ${deltaBadge}
+                            ${deltaBadge}
           
                             <span class="text-xs font-medium text-[#5D6B7F] dark:text-gray-400">${displayMoney(percent)}</span>
                         </div>
-                
-    </div>
+                    </div>
                 </li>`;
             });
             container.innerHTML = html + `</ul></div>`;
@@ -1739,6 +1642,7 @@ py-2 text-center">Fund</th>
                 maximumFractionDigits: 2 
          
             });
+
             let theadHtml = `<tr><th class="px-2 py-2 text-left whitespace-nowrap">TICKER</th>`;
             for (let i = 1; i < tickerData.headers.length; i++) { 
                 theadHtml += `<th class="px-2 py-2 text-right whitespace-nowrap">${String(tickerData.headers[i]).toUpperCase()}</th>`;
@@ -1758,12 +1662,10 @@ py-2 text-center">Fund</th>
                     
                         if (!isNaN(num)) {
                             if (typeof val === 'number' || (typeof val === 'string' && !val.includes('%'))) { 
-             
-                   displayVal = (num * 100).toFixed(2) + '%'; 
+                                displayVal = (num * 100).toFixed(2) + '%'; 
               
                             }
-                            if (num > 0) 
-{ 
+                            if (num > 0) { 
                                 colorClass = "text-green-600 dark:text-green-400 font-bold";
                                 if (!displayVal.toString().startsWith('+')) displayVal = "+" + displayVal;
                             } else if (num < 0) { 
@@ -1775,7 +1677,7 @@ py-2 text-center">Fund</th>
                     } else { 
                         let num = parseFloat(val);
                         if (!isNaN(num)) {
-                            displayVal = tickerFmt.format(num);
+                            displayVal = fmt.format(num);
                         }
                     }
 
@@ -1855,8 +1757,7 @@ py-2 text-center">Fund</th>
                 let statsHtml = currentTab === 'ncd' 
                     ? `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>` 
             
-                    : `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Inv: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].inv)}</span> |
-Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
+                    : `<span class="text-gray-900 dark:text-white font-bold">${mPercent}</span> | Inv: <span class="text-gray-900 dark:text-white font-bold">${displayMoney(groups[key].inv)}</span> | Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
                 let pillAmount = currentTab === 'ncd' ? displayMoney(groups[key].inv) : displayMoney(groups[key].total);
                 html += `
                 <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden">
@@ -1866,18 +1767,15 @@ Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
                             <span class="font-bold text-gray-800 dark:text-white text-sm break-words leading-tight">${key}</span>
                             <span class="text-[10px] text-gray-500 dark:text-gray-400 mt-1 leading-tight">${statsHtml}</span>
                         </div>
-         
-            
+                     
                         <span class="font-bold text-[#5D6B7F] dark:text-gray-200 bg-gray-200/50 dark:bg-gray-700 px-3 py-1 rounded-full whitespace-nowrap text-sm border border-gray-300 dark:border-gray-600">
                             ${pillAmount}
-                       
- </span>
+                        </span>
                     </button>
             
                     <div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">
                         ${renderTable(groups[key].items)}
-                  
-  </div>
+                    </div>
                 </div>`;
             });
 
@@ -1894,10 +1792,10 @@ Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
 
             let theadHtml = `<tr>
                 ${isMaturity ?
-`<th class="px-1 py-2 text-center w-[25%]">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}
+                `<th class="px-1 py-2 text-center w-[25%]">${isNCD ? 'NBFC' : 'BANK'}</th>` : ''}
                 <th class="px-1 py-2 text-center">Amt</th>
                 ${!isNCD ?
-`<th class="px-1 py-2 text-center">Mat.Amt</th>` : ''}
+                `<th class="px-1 py-2 text-center">Mat.Amt</th>` : ''}
                 <th class="px-1 py-2 text-center">Date</th>
                 <th class="px-1 py-2 text-center w-[15%]">Rate</th>
             </tr>`;
@@ -1912,14 +1810,13 @@ Rate: <span class="text-gray-900 dark:text-white font-bold">${mRate}</span>`;
                 return `<tr>
                     ${isMaturity ? `<td class="px-1 py-2 text-center font-medium text-gray-800 dark:text-gray-200 align-middle"><span class="block whitespace-normal break-words leading-tight mx-auto text-[9px]">${isNCD ? item.company : item.bank}</span></td>` : ''}
                     <td class="px-1 py-2 text-center font-semibold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.amount)}</td>
-              
-      ${!isNCD ? `<td class="px-1 
+                    ${!isNCD ? `<td class="px-1 
                     py-2 text-center font-bold text-gray-900 dark:text-white align-middle text-[10px]">${displayMoney(item.maturityAmount)}</td>` : ''}
                     <td class="px-1 py-2 text-center font-medium text-gray-600 dark:text-gray-400 align-middle text-[9px] break-words">${compactDate}</td>
                     <td class="px-1 py-2 text-center align-middle font-medium text-[9px] break-words">${formattedRate}</td>
-      
-          </tr>`;
+                </tr>`;
             }).join('');
+
             return `<table class="w-full text-[10px] dark:text-gray-300"><thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 uppercase border-y dark:border-gray-600 text-[9px]">${theadHtml}</thead><tbody class="divide-y dark:divide-gray-700">${tbodyHtml}</tbody></table>`;
         }
 
@@ -1943,18 +1840,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzk4LUBXFiVq3U-8ojdCe5Xni9_yYqlPCBb_4X-F6afbJM9S-lV1-2N_ukVxUYYzQytTg/exec";
 
         fetch(`${GOOGLE_SCRIPT_URL}?action=markCompleted&rows=${rows}`)
-            .then(response => response.json())
+            .then(response => 
+            response.json())
             .then(data => {
                 if(data.success) {
                     console.log("✅ Success: Tasks marked as completed in Google Sheets.");
                 } else {
-                    console.error("❌ Failed: Backend did not return success status.");
+                    console.error("❌ Failed: Backend 
+                    did not return success status.");
                 }
             })
             .catch(error => {
                 console.error("❌ Network Error: Failed to contact Google Script backend.", error);
             });
-        }
+    }
 });
 </script>
 </body>
