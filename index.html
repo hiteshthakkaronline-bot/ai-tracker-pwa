@@ -321,19 +321,28 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
-                    window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
-                        if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
-                        }
-                    }, { passive: true });
+
+                    // Bolt Optimization: Cache DOM element and throttle scroll event using requestAnimationFrame
+                    const fabTop = document.getElementById('fab-top');
+                    let isTicking = false;
+
+                    if (fabTop) {
+                        window.addEventListener('scroll', () => {
+                            if (!isTicking) {
+                                window.requestAnimationFrame(() => {
+                                    if (window.scrollY > 150) {
+                                        fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                        fabTop.classList.add('opacity-100', 'translate-y-0');
+                                    } else {
+                                        fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                        fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                    }
+                                    isTicking = false;
+                                });
+                                isTicking = true;
+                            }
+                        }, { passive: true });
+                    }
         });
 
         function handleSwipeDirection() {
