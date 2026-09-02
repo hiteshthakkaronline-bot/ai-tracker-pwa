@@ -1,0 +1,3 @@
+## 2026-09-02 - Hoist Canvas and Throttle Scroll DOM Updates
+**Learning:** High-frequency event listeners (like scroll) that continuously modify the DOM layout without state checks or requestAnimationFrame throttling will cause continuous layouts and repaints. Reassigning unchanged properties on `canvas.ctx` inside a render loop adds unnecessary overhead, as the properties persist until explicitly changed or restored.
+**Action:** Always throttle scroll/resize listeners using `requestAnimationFrame`, track state to avoid unnecessary DOM class updates, and hoist invariant properties out of render loops.

@@ -321,17 +321,29 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
+                    const fabTop = document.getElementById('fab-top');
+                    let isFabVisible = false;
+                    let scrollTicking = false;
+
+                    // Optimize: Throttle scroll event with requestAnimationFrame to prevent excessive DOM updates
                     window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
+                        if (!scrollTicking) {
+                            window.requestAnimationFrame(() => {
+                                const shouldShow = window.scrollY > 150;
+                                if (shouldShow !== isFabVisible) {
+                                    isFabVisible = shouldShow;
+                                    if (shouldShow) {
+                                        fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                        fabTop.classList.add('opacity-100', 'translate-y-0');
+                                    } else {
+                                        fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                        fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                    }
+                                }
+                                scrollTicking = false;
+                            });
+                            scrollTicking = true;
                         }
                     }, { passive: true });
         });
@@ -875,26 +887,23 @@
                     ctx.save();
                     const meta = chart.getDatasetMeta(0);
                     const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+
+                    // Set common canvas styles outside the loop
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                    ctx.font = '600 10px system-ui, -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                    ctx.shadowBlur = 4;
+
                     meta.data.forEach((element, index) => {
                         const value = data.datasets[0].data[index];
                         const percentage = total > 0 ? (value / total) : 0;
 
                         if (percentage > 0.05) {
-       
                              const centerPoint = element.tooltipPosition();
-
-                            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)'; 
-                            ctx.font = '600 10px system-ui, -apple-system, sans-serif';
-        
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'middle';
-                            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-               
-                            ctx.shadowBlur = 4;
-
                             let labelText = data.labels[index];
                             if (labelText.length > 12) {
-                      
                                 labelText = labelText.substring(0, 10) + '..';
                             }
 
