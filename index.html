@@ -321,17 +321,27 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
+                    // ⚡ Bolt: Cache DOM query outside high-frequency scroll listener to avoid layout thrashing
+                    const fabTop = document.getElementById('fab-top');
+
+                    // ⚡ Bolt: Use state flag to prevent redundant class list modifications on every scroll frame.
+                    // 📊 Impact: Eliminates DOM writes during scrolling (except when threshold is crossed).
+                    let isFabVisible = false;
+
                     window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
                         if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
+                            if (!isFabVisible) {
+                                fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                fabTop.classList.add('opacity-100', 'translate-y-0');
+                                isFabVisible = true;
+                            }
                         } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
+                            if (isFabVisible) {
+                                fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                isFabVisible = false;
+                            }
                         }
                     }, { passive: true });
         });
