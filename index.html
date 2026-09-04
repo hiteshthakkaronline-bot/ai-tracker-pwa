@@ -608,6 +608,20 @@
                 activeData = data;
                 tickerData = { headers: [], rows: [] };
             }
+
+            // ⚡ Bolt Performance Optimization:
+            // Pre-calculate date-derived values (timestamps, year, formatted string)
+            // to turn O(N log N) or repetitive O(N) Date parsing into O(1) property access
+            if (Array.isArray(activeData)) {
+                activeData.forEach(item => {
+                    if (item.maturityDate && item._ts === undefined) {
+                        const d = new Date(item.maturityDate);
+                        item._ts = d.getTime();
+                        item._y = d.getFullYear();
+                        item._m = d.toLocaleString('default', { month: 'long' });
+                    }
+                });
+            }
         }
 
         async function switchMainTab(tab) {
@@ -1692,7 +1706,9 @@
         function renderMaturity(container) {
             const grandTotalVal = activeData.reduce((sum, item) => sum + (currentTab === 'ncd' ? item.amount : item.maturityAmount), 0);
             const groups = activeData.reduce((acc, item) => {
-                const d = new Date(item.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
+                // ⚡ Bolt Performance Optimization: Use pre-calculated values to avoid Date instantiation in loop
+                const y = item._y !== undefined ? item._y : new Date(item.maturityDate).getFullYear();
+                const m = item._m !== undefined ? item._m : new Date(item.maturityDate).toLocaleString('default', { month: 'long' });
                 if(!acc[y]) acc[y] = { months: {}, total: 0 }; if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
                 acc[y].months[m].items.push(item); acc[y].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount); acc[y].months[m].total += (currentTab === 'ncd' 
                 ? item.amount : item.maturityAmount);
@@ -1707,8 +1723,9 @@
                 const yearlyTotal = groups[y].total; const yearPercent = grandTotalVal > 0 ? (yearlyTotal / grandTotalVal * 100).toFixed(1) : '0.0';
                 html += `<div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-2 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-4 bg-gray-50 dark:bg-gray-700/50 flex justify-between font-bold dark:text-white text-lg"><span>${y}</span> <span>${displayMoney(yearPercent + '%')}, ${displayMoney(yearlyTotal)}</span></button><div class="accordion-content">`;
                 Object.keys(groups[y].months).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b)).forEach(m => {
- 
-                   groups[y].months[m].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+
+                   // ⚡ Bolt Performance Optimization: Sort using pre-calculated timestamps for efficiency
+                   groups[y].months[m].items.sort((a, b) => (a._ts !== undefined && b._ts !== undefined) ? a._ts - b._ts : new Date(a.maturityDate) - new Date(b.maturityDate));
                     const monthlyTotal = groups[y].months[m].total; const percent = yearlyTotal > 0 ? (monthlyTotal / yearlyTotal * 100).toFixed(1) : '0.0';
                     html += `<div class="border-l-4 border-brand ml-2"><button onclick="this.nextElementSibling.classList.toggle('open')" class="w-full p-3 border-b dark:border-gray-700 flex justify-between text-sm font-semibold dark:text-gray-200"><span>${m}</span> <span>${displayMoney(percent + '%')}, ${displayMoney(monthlyTotal)}</span></button><div class="accordion-content bg-gray-50 dark:bg-gray-800/50 overflow-x-auto hide-scrollbar">${renderTable(groups[y].months[m].items)}</div></div>`;
                 });
@@ -1746,7 +1763,8 @@
             }
 
             sortedBanks.forEach(key => {
-                groups[key].items.sort((a, b) => new Date(a.maturityDate) - new Date(b.maturityDate));
+                // ⚡ Bolt Performance Optimization: Sort using pre-calculated timestamps for efficiency
+                groups[key].items.sort((a, b) => (a._ts !== undefined && b._ts !== undefined) ? a._ts - b._ts : new Date(a.maturityDate) - new Date(b.maturityDate));
                 const weightedAvgRate = (groups[key].weightedInv > 0) ? (groups[key].weightedRateSum / groups[key].weightedInv).toFixed(2) + '%' : 'N/A';
                 const percentOfTotal = (grandTotalInv > 0) ? (groups[key].inv / grandTotalInv * 100).toFixed(1) + '%' : '0.0%';
 
