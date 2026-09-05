@@ -1,0 +1,3 @@
+## 2024-12-05 - Throttle Scroll Events to Prevent Main Thread Blocking
+**Learning:** Attaching continuous DOM queries and layout checks directly to `window.addEventListener('scroll')` causes unnecessary main thread CPU load and layout thrashing. Because scroll events fire rapidly, querying `document.getElementById('fab-top')` continuously leads to performance degradation on mobile devices.
+**Action:** When binding scroll events, always cache DOM elements outside the listener and wrap the layout manipulation (and visibility toggling) logic inside a `requestAnimationFrame` guard with a boolean flag. This ensures operations only occur once per visual frame, significantly improving scroll performance.
