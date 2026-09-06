@@ -1,0 +1,3 @@
+## 2024-11-20 - Synchronous I/O within Render Loops
+**Learning:** Calling `localStorage.getItem` and `JSON.parse` inside a `.forEach` loop during the render phase (e.g. `renderDashboard` and `renderHome`) forces the main thread to synchronously block on disk read and JSON deserialization multiple times. This is a common performance bottleneck specific to SPAs that heavily rely on localStorage for state without in-memory caching.
+**Action:** Always hoist `localStorage.getItem` and `JSON.parse` outside of loops and pass the resulting object as a parameter to the iterating function to preload state in a single operation.

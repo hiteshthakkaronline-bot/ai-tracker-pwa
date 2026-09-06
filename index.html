@@ -1484,9 +1484,12 @@
             }
         }
 
-        function getAssetDeltaBadge(assetName, currentAmount) {
-            const snapshotKey = 'asset_snapshot_' + currentUser;
-            const snapshot = JSON.parse(localStorage.getItem(snapshotKey) || '{}');
+        function getAssetDeltaBadge(assetName, currentAmount, snapshotParam = null) {
+            let snapshot = snapshotParam;
+            if (!snapshot) {
+                const snapshotKey = 'asset_snapshot_' + currentUser;
+                snapshot = JSON.parse(localStorage.getItem(snapshotKey) || '{}');
+            }
 
             if (snapshot[assetName] === undefined) return '';
 
@@ -1501,9 +1504,12 @@
             return '';
         }
 
-        function getIndividualAssetDeltaBadge(assetName, currentAmount) {
-            const snapshotKey = 'indiv_asset_snapshot_' + currentUser;
-            const snapshot = JSON.parse(localStorage.getItem(snapshotKey) || '{}');
+        function getIndividualAssetDeltaBadge(assetName, currentAmount, snapshotParam = null) {
+            let snapshot = snapshotParam;
+            if (!snapshot) {
+                const snapshotKey = 'indiv_asset_snapshot_' + currentUser;
+                snapshot = JSON.parse(localStorage.getItem(snapshotKey) || '{}');
+            }
 
             if (snapshot[assetName] === undefined) return '';
 
@@ -1560,11 +1566,15 @@
  
                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 overflow-hidden mb-8">
                     <ul class="divide-y dark:divide-gray-700">`;
+
+            const snapshotKey = 'asset_snapshot_' + currentUser;
+            const snapshot = JSON.parse(localStorage.getItem(snapshotKey) || '{}');
+
             sortedClasses.forEach((label, i) => {
                 const amount = classTotals[label]; 
                 const percent = grandTotal > 0 ? (amount / grandTotal * 100).toFixed(1) + '%' : '0.0%';
 
-                const deltaBadge = getAssetDeltaBadge(label, amount);
+                const deltaBadge = getAssetDeltaBadge(label, amount, snapshot);
 
                 html += `
         
@@ -1603,11 +1613,15 @@
                     w-1/5 text-center">Class</h3>
                     <h3 class="font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider text-xs w-2/5 text-right">Allocation</h3>
                 </div><ul class="divide-y dark:divide-gray-700">`;
+
+            const iSnapshotKey = 'indiv_asset_snapshot_' + currentUser;
+            const indivSnapshot = JSON.parse(localStorage.getItem(iSnapshotKey) || '{}');
+
             sortedData.forEach(item => {
                 const percent = totalAmount > 0 ? (item.amount / totalAmount * 100).toFixed(2) + '%' : '0.00%';
                 
                 const assetNameClean = item.asset ? item.asset.trim() : '';
-                const deltaBadge = getIndividualAssetDeltaBadge(assetNameClean, item.amount);
+                const deltaBadge = getIndividualAssetDeltaBadge(assetNameClean, item.amount, indivSnapshot);
 
         
                 html += `<li class="p-3 flex justify-between items-center text-sm dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors gap-2">
