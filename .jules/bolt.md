@@ -1,0 +1,3 @@
+## 2026-09-08 - [Throttling Scroll Listeners & Chart Recomputations]
+**Learning:** The PWA scroll event was writing to the DOM (classList adds/removes) on every scroll tick without checking prior state. This caused layout thrashing. Additionally, the Chart.js plugin recalculated `data.datasets[0].data.reduce` on every render frame for labels when it could simply inherit `totalValue` from its parent closure.
+**Action:** Always wrap scroll/resize listeners in `requestAnimationFrame` with a ticking state flag, and check DOM state before manipulating classes. Further, avoid `reduce` calculations inside `afterDatasetsDraw` or similar high-frequency loop calls by pulling computations out to a higher scope.
