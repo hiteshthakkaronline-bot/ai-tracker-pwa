@@ -1,0 +1,3 @@
+## 2024-06-11 - Optimize Unthrottled Scroll Event Listeners for DOM Queries
+**Learning:** Found a scroll event listener causing a query to `document.getElementById('fab-top')` and multiple `classList` modifications unthrottled on every scroll tick. Redundant DOM queries inside high-frequency listeners like scroll cause unnecessary overhead in Vanilla JS PWAs.
+**Action:** Extract static DOM queries outside of event listeners. Always throttle continuous event listeners like `scroll` or `resize` using `requestAnimationFrame` (or a debounce/throttle utility function) to limit execution to the browser's refresh rate and avoid main thread jank.
