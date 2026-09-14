@@ -1,0 +1,3 @@
+## 2024-05-18 - Unthrottled Scroll Listeners with DOM Queries
+**Learning:** Scroll events fire at a very high frequency (often 60 times per second or more). If a scroll event listener performs synchronous DOM queries (like `document.getElementById`) or applies layout-thrashing class changes without throttling or debouncing, it can cause severe jank and block the main thread.
+**Action:** Always cache DOM elements outside the scroll event listener if they don't change dynamically. Wrap DOM mutations (like `classList` manipulation) inside `window.requestAnimationFrame()` and use a state flag (e.g., `isScrolling`) to prevent queueing redundant animation frames.
