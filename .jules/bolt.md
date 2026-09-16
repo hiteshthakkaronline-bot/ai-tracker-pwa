@@ -1,0 +1,3 @@
+## 2024-05-24 - [Scroll Event Layout Thrashing Fix]
+**Learning:** Found a synchronous DOM modification on every scroll event causing layout thrashing because it kept querying the DOM repeatedly to `getElementById('fab-top')`. This is an anti-pattern as scroll events fire at high frequency and DOM writes block the main thread.
+**Action:** Always cache elements outside of the scroll listener, implement a state tracker so styles are only mutated when the actual state changes, and wrap the mutation in a `window.requestAnimationFrame()` to sync the execution with the screen refresh rate and offload heavy layout calculations.
