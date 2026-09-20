@@ -1,0 +1,3 @@
+## 2025-05-18 - Unoptimized Scroll Listeners
+**Learning:** Attaching scroll listeners that perform DOM queries and un-guarded class modifications on every scroll tick causes unnecessary layout thrashing and high CPU usage, degrading frontend performance.
+**Action:** Always cache DOM elements outside the listener, use `requestAnimationFrame` to throttle updates, and track the state to ensure DOM updates only occur when the state actually changes.
