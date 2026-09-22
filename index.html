@@ -321,17 +321,26 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
+                    // ⚡ Bolt: Cache DOM query outside of high-frequency scroll event to prevent repeated querying
+                    const fabTop = document.getElementById('fab-top');
+                    let isScrolling = false;
                     window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
+                        if (!isScrolling) {
+                            // ⚡ Bolt: Throttle style recalculations using requestAnimationFrame.
+                            // This ensures we only modify the DOM once per browser paint cycle,
+                            // significantly reducing main-thread blocking and scroll jank.
+                            window.requestAnimationFrame(() => {
+                                if (window.scrollY > 150) {
+                                    fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                    fabTop.classList.add('opacity-100', 'translate-y-0');
+                                } else {
+                                    fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                    fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                }
+                                isScrolling = false;
+                            });
+                            isScrolling = true;
                         }
                     }, { passive: true });
         });
