@@ -1,0 +1,3 @@
+## 2024-11-23 - Throttling Scroll Listeners and Caching DOM Lookups
+**Learning:** Attaching a scroll listener that directly manipulates the DOM and re-queries the document for elements (e.g. `document.getElementById('fab-top')`) causes unnecessary reflows/repaints and can block the main thread, leading to janky scrolling performance.
+**Action:** Always cache DOM elements outside of high-frequency event listeners (like scroll or mousemove). Throttle the actual style/class updates inside the listener using `requestAnimationFrame` so that changes happen efficiently right before the browser repaints.
