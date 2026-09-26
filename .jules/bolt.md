@@ -1,0 +1,3 @@
+## 2026-09-26 - [Performance Optimization: Cache Intl API Formatters]
+**Learning:** Re-instantiating formatting APIs like `Intl.DateTimeFormat` or calling `.toLocaleString()` / `.toLocaleDateString()` inside loops (like `Array.prototype.reduce` and `Array.prototype.map`) is extremely expensive and causes noticeable render stutter when displaying large lists of data or calculating timelines.
+**Action:** Always instantiate `Intl.DateTimeFormat` outside of loops for frequently used format options, then reuse the `.format(date)` method. Also prefer mapping array lookups (e.g., `monthOrder[date.getMonth()]`) over locale string resolution when translating native date properties.
