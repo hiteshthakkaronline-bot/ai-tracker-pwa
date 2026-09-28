@@ -1,0 +1,3 @@
+## 2024-08-01 - Unthrottled DOM Queries in Scroll Listeners
+**Learning:** The application uses an unthrottled `scroll` event listener on `window` to toggle the visibility of the back-to-top FAB (`#fab-top`), and queries the DOM (`document.getElementById('fab-top')`) on every single scroll tick. This is a common performance anti-pattern that can block the main thread and lead to janky scrolling, particularly on mobile devices where scroll events fire at a high frequency.
+**Action:** When implementing scroll or resize listeners, always cache DOM references outside the event handler and use `requestAnimationFrame` (or throttling/debouncing) to decouple visual updates from the high-frequency event firing rate.
