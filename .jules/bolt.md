@@ -1,0 +1,3 @@
+## 2024-11-20 - Avoid `toLocaleString`/`toLocaleDateString` in large loops
+**Learning:** Instantiating `Intl` formats implicitly through `Date.prototype.toLocaleString` or `Date.prototype.toLocaleDateString` within loops (like `reduce` or `map` across large lists) adds significant CPU overhead. This can cause visible sluggishness on mobile PWAs where data arrays might be hundreds of items long.
+**Action:** Instead, statically define a single `Intl.DateTimeFormat` object outside the loop and use `fmt.format(date)`, or better yet, use a simple O(1) array lookup (`monthOrder[date.getMonth()]`) when localized month strings aren't strictly required.

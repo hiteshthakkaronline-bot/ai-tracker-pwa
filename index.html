@@ -523,6 +523,8 @@
 
         const fmt = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 });
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const compactDateFmt = new Intl.DateTimeFormat('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
+        const navDateFmt = new Intl.DateTimeFormat('en-IN', {day:'2-digit', month:'short', year:'2-digit'});
         function applyInitialTheme() {
             const stored = localStorage.getItem('theme');
             const hour = new Date().getHours();
@@ -1228,7 +1230,7 @@
                         if (item.navDate) {
                             let d = new Date(item.navDate);
                             if (!isNaN(d.getTime())) {
-                                navDateDisplay = d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'2-digit'});
+                                navDateDisplay = navDateFmt.format(d);
                             } else {
                                 navDateDisplay = item.navDate;
                             }
@@ -1692,7 +1694,7 @@
         function renderMaturity(container) {
             const grandTotalVal = activeData.reduce((sum, item) => sum + (currentTab === 'ncd' ? item.amount : item.maturityAmount), 0);
             const groups = activeData.reduce((acc, item) => {
-                const d = new Date(item.maturityDate), y = d.getFullYear(), m = d.toLocaleString('default', { month: 'long' });
+                const d = new Date(item.maturityDate), y = d.getFullYear(), m = monthOrder[d.getMonth()];
                 if(!acc[y]) acc[y] = { months: {}, total: 0 }; if(!acc[y].months[m]) acc[y].months[m] = { items: [], total: 0 };
                 acc[y].months[m].items.push(item); acc[y].total += (currentTab === 'ncd' ? item.amount : item.maturityAmount); acc[y].months[m].total += (currentTab === 'ncd' 
                 ? item.amount : item.maturityAmount);
@@ -1804,7 +1806,7 @@
                 if (!formattedRate.includes('%') && formattedRate !== 'N/A') formattedRate += '%';
                 formattedRate = displayMoney(formattedRate);
 
-                let compactDate = new Date(item.maturityDate).toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
+                let compactDate = compactDateFmt.format(new Date(item.maturityDate));
 
           
                 return `<tr>
