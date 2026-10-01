@@ -321,17 +321,28 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
+                    const fabTop = document.getElementById('fab-top');
+                    let isFabTopVisible = false;
+                    let ticking = false;
+
                     window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
+                        if (!ticking) {
+                            window.requestAnimationFrame(() => {
+                                const shouldShow = window.scrollY > 150;
+                                if (shouldShow !== isFabTopVisible) {
+                                    isFabTopVisible = shouldShow;
+                                    if (shouldShow) {
+                                        fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                        fabTop.classList.add('opacity-100', 'translate-y-0');
+                                    } else {
+                                        fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                        fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                    }
+                                }
+                                ticking = false;
+                            });
+                            ticking = true;
                         }
                     }, { passive: true });
         });
