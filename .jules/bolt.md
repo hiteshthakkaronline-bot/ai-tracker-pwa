@@ -1,0 +1,3 @@
+## 2024-05-24 - Unoptimized Scroll Event Listener
+**Learning:** Found a common Vanilla JS anti-pattern in `index.html` where a scroll event listener continually queried the DOM for the `fabTop` element (`document.getElementById`) and modified its classList without checking if the visibility state had actually changed or throttling the event. This causes layout thrashing and unnecessary CPU load.
+**Action:** Always cache DOM elements outside the event listener. Implement a visibility state tracker boolean (`isFabVisible` or similar) to ensure classList updates only occur on state change boundaries. Use `requestAnimationFrame` with a ticking flag to throttle the DOM updates and sync them with the browser's paint cycle.
