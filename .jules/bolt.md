@@ -1,0 +1,3 @@
+## 2024-05-24 - Optimizing Scroll Listeners in Vanilla JS
+**Learning:** In a Vanilla JS PWA like this, naive `window.addEventListener('scroll')` handlers that constantly read/write to the DOM (like adding/removing Tailwind classes on every scroll event) can cause severe layout thrashing and drop frames, especially on low-end mobile devices.
+**Action:** When adding or modifying scroll event listeners, always cache DOM elements outside the listener, wrap DOM updates in `requestAnimationFrame`, and use a simple visibility state tracker (e.g., `let isFabVisible = false`) to prevent redundant class manipulation if the state hasn't changed.
