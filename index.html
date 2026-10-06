@@ -321,17 +321,32 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
+                    // ⚡ Bolt: Cache DOM element and visibility state outside the scroll listener
+                    const fabTop = document.getElementById('fab-top');
+                    let fabVisible = false;
+                    let scrollTicking = false;
+
                     window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
                         if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
+
+                        // ⚡ Bolt: Use requestAnimationFrame to prevent layout thrashing on fast scrolls
+                        if (!scrollTicking) {
+                            window.requestAnimationFrame(() => {
+                                const shouldShow = window.scrollY > 150;
+
+                                // ⚡ Bolt: Only update DOM if state actually changed
+                                if (shouldShow && !fabVisible) {
+                                    fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                    fabTop.classList.add('opacity-100', 'translate-y-0');
+                                    fabVisible = true;
+                                } else if (!shouldShow && fabVisible) {
+                                    fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                    fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                    fabVisible = false;
+                                }
+                                scrollTicking = false;
+                            });
+                            scrollTicking = true;
                         }
                     }, { passive: true });
         });
