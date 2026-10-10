@@ -1,0 +1,3 @@
+## 2024-05-18 - Prevent Layout Thrashing in Vanilla JS Scroll Listeners
+**Learning:** Attaching DOM queries and updates directly within an unthrottled `scroll` event listener can cause layout thrashing and jank, particularly when multiple UI components depend on the scroll position (like a floating action button).
+**Action:** When adding or modifying scroll event listeners in Vanilla JS projects, always cache DOM elements outside the listener, use `requestAnimationFrame` to decouple DOM reads/writes from the scroll event itself, and implement a local visibility state tracker (e.g., `isVisible` boolean) to avoid redundant DOM updates when the state hasn't changed.
