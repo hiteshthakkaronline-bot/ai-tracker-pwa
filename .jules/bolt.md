@@ -1,0 +1,3 @@
+## 2026-10-16 - Scroll Event Listener Optimization
+**Learning:** This Vanilla JS frontend heavily relies on `window.addEventListener('scroll')` to toggle the visibility of the FAB button (`#fab-top`). Direct DOM lookups (`document.getElementById`) inside high-frequency scroll listeners lead to layout thrashing and performance degradation, especially without rate limiting (e.g., `requestAnimationFrame`).
+**Action:** When adding or modifying scroll event listeners in this Vanilla JS project, always cache DOM elements outside the listener and wrap DOM updates in `requestAnimationFrame` with a visibility state tracker to prevent layout thrashing.
