@@ -321,19 +321,35 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
-                    window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
-                        if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
-                        }
-                    }, { passive: true });
+                    // ⚡ Bolt Performance Optimization:
+                    // 1. Caching DOM element outside scroll handler
+                    // 2. State tracking to prevent redundant class DOM writes
+                    // 3. requestAnimationFrame for rendering throttling
+                    const fabTop = document.getElementById('fab-top');
+                    let isFabVisible = false;
+                    let scrollTicking = false;
+
+                    if (fabTop) {
+                        window.addEventListener('scroll', () => {
+                            if (!scrollTicking) {
+                                window.requestAnimationFrame(() => {
+                                    const shouldShow = window.scrollY > 150;
+                                    if (shouldShow !== isFabVisible) {
+                                        if (shouldShow) {
+                                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                            fabTop.classList.add('opacity-100', 'translate-y-0');
+                                        } else {
+                                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                            fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                        }
+                                        isFabVisible = shouldShow;
+                                    }
+                                    scrollTicking = false;
+                                });
+                                scrollTicking = true;
+                            }
+                        }, { passive: true });
+                    }
         });
 
         function handleSwipeDirection() {
