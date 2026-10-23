@@ -321,18 +321,29 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
+                    // ⚡ Bolt Optimization: Cache DOM element, use RAF, and track state to avoid layout thrashing on scroll
+                    const fabTop = document.getElementById('fab-top');
+                    let isFabVisible = false;
+                    let scrollTicking = false;
+
                     window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
-                        if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
-                        }
+                        if (!fabTop || scrollTicking) return;
+
+                        scrollTicking = true;
+                        window.requestAnimationFrame(() => {
+                            const shouldBeVisible = window.scrollY > 150;
+
+                            if (shouldBeVisible && !isFabVisible) {
+                                fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                fabTop.classList.add('opacity-100', 'translate-y-0');
+                                isFabVisible = true;
+                            } else if (!shouldBeVisible && isFabVisible) {
+                                fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                isFabVisible = false;
+                            }
+                            scrollTicking = false;
+                        });
                     }, { passive: true });
         });
 
