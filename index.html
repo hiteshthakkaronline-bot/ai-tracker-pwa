@@ -321,18 +321,32 @@
           
                         handleSwipeDirection();
                     }, {passive: true});
+                    // ⚡ Bolt: Cache DOM element outside scroll listener to avoid repeated lookups
+                    const fabTop = document.getElementById('fab-top');
+                    // ⚡ Bolt: Track visibility state to avoid redundant class mutations
+                    let isFabVisible = false;
+                    // ⚡ Bolt: Throttle scroll events with requestAnimationFrame to prevent layout thrashing
+                    let ticking = false;
+
                     window.addEventListener('scroll', () => {
-                        const fabTop = document.getElementById('fab-top');
-                        if (!fabTop) return;
-                        if (window.scrollY > 150) {
-                
-                            fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-                            fabTop.classList.add('opacity-100', 'translate-y-0');
-                        } else {
-                            fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
- 
-                            fabTop.classList.remove('opacity-100', 'translate-y-0');
-                        }
+                        if (!fabTop || ticking) return;
+
+                        ticking = true;
+                        window.requestAnimationFrame(() => {
+                            const shouldBeVisible = window.scrollY > 150;
+
+                            if (shouldBeVisible !== isFabVisible) {
+                                isFabVisible = shouldBeVisible;
+                                if (shouldBeVisible) {
+                                    fabTop.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                    fabTop.classList.add('opacity-100', 'translate-y-0');
+                                } else {
+                                    fabTop.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+                                    fabTop.classList.remove('opacity-100', 'translate-y-0');
+                                }
+                            }
+                            ticking = false;
+                        });
                     }, { passive: true });
         });
 
