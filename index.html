@@ -254,6 +254,13 @@
                 </svg>
                 <span class="text-[8px] sm:text-[9px] mt-1 font-bold">NPS</span>
             </button>
+            <button onclick="switchMainTab('gold')" id="nav-gold" class="flex flex-col items-center text-gray-400 flex-1 px-1">
+                <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 18h12l-1.5-5h-9L6 18z"/>
+                    <path d="M8.5 13h7l-1.5-5h-4L8.5 13z"/>
+                </svg>
+                <span class="text-[8px] sm:text-[9px] mt-1 font-bold">GOLD</span>
+            </button>
   
         </nav>
     </div>
@@ -348,7 +355,7 @@
             let activeViews = [];
             if (currentTab === 'home') activeViews = homeViews;
             else if (currentTab === 'mf') activeViews = mfViews;
-            else if (currentTab !== 'cash' && currentTab !== 'nps') activeViews = otherViews;
+            else if (currentTab !== 'cash' && currentTab !== 'nps' && currentTab !== 'gold') activeViews = otherViews;
 
             if(activeViews.length === 0) return;
 
@@ -372,6 +379,7 @@
         let cashTimestamp = "Never";
         let isEditingCash = false;
         let isEditingNPS = false;
+        let isEditingGold = false;
 
         let memoryCache = {}; 
         let domCache = {};
@@ -597,7 +605,7 @@
                 activeData = data.items ||
                 []; 
                 cashTimestamp = data.lastUpdated || "Never";
-            } else if (tab === 'nps') {
+            } else if (tab === 'nps' || tab === 'gold') {
                 activeData = data.items ||
                 []; 
             } else if (tab === 'mf') {
@@ -614,7 +622,8 @@
             currentTab = tab;
             localStorage.setItem('lastActiveTab', tab);
             isEditingCash = false; 
-            isEditingNPS = false; 
+            isEditingNPS = false;
+            isEditingGold = false;
 
             const titles = { 
                 'home': 'Net Worth', 
@@ -626,7 +635,8 @@
                 'cash': currentUser === 'HT' ?
                 'HT Cash' : 'NCT Cash', 
                 'nps': currentUser === 'HT' ?
-                'HT NPS' : 'NCT NPS' 
+                'HT NPS' : 'NCT NPS', 
+                'gold': 'HT Gold'
             };
             document.getElementById('header-title').innerText = titles[tab];
 
@@ -634,7 +644,7 @@
             const profileToggle = document.getElementById('profile-toggle');
             // Safely hide the user flip button on the Home tab
             if (profileToggle) {
-                profileToggle.style.display = (tab === 'home' || tab === 'ncd') ?
+                profileToggle.style.display = (tab === 'home' || tab === 'ncd' || tab === 'gold') ?
                 'none' : 'flex';
             }
             subNav.style.display = 'flex';
@@ -658,7 +668,7 @@
                     <button onclick="showSubView('dashboard')" class="${currentSubView === 'dashboard' ? activeClass : inactiveClass}" id="btn-dashboard">Market Cap Allocation</button>
                     <button onclick="showSubView('details')" class="${currentSubView === 'details' ? activeClass : inactiveClass}" id="btn-details">SIP Details</button>
                 `;
-            } else if (tab === 'cash' || tab === 'nps') {
+            } else if (tab === 'cash' || tab === 'nps' || tab === 'gold') {
                 currentSubView = tab;
                 subNav.style.display = 'none'; 
             } else {
@@ -675,11 +685,11 @@
 
             const backBtn = document.getElementById('fab-back');
             if (backBtn) backBtn.style.display = tab === 'home' ? 'none' : 'flex';
-            ['home', 'fds', 'ncd', 'mf', 'cash', 'nps'].forEach(t => {
+            ['home', 'fds', 'ncd', 'mf', 'cash', 'nps', 'gold'].forEach(t => {
                 const el = document.getElementById('nav-' + t);
                 if(el) el.className = `flex flex-col items-center flex-1 px-1 transition-colors ${t === tab ? 'text-gray-900 dark:text-white' : 'text-gray-400'}`;
             });
-            const reqTabKey = tab === 'home' ? tab : (tab === 'mf' ? 'mf_data' : tab + '_' + currentUser);
+            const reqTabKey = (tab === 'home' || tab === 'gold') ? tab : (tab === 'mf' ? 'mf_data' : tab + '_' + currentUser);
             if (memoryCache[reqTabKey]) {
                 applyData(tab, memoryCache[reqTabKey].rawData);
                 updateStats();
@@ -699,7 +709,8 @@
                 'cash': currentUser === 'HT' ?
                 'CASH_HT' : 'CASH_NCT', 
                 'nps': currentUser === 'HT' ?
-                'NPS_HT' : 'NPS_NCT' 
+                'NPS_HT' : 'NPS_NCT',
+                'gold': 'GOLD'
             };
 
             let networkDataReceived = false;
@@ -752,7 +763,7 @@
                 }
 
                 if (currentTab === tab) {
-                    if (!isEditingCash && !isEditingNPS) {
+                    if (!isEditingCash && !isEditingNPS && !isEditingGold) {
                         applyData(tab, data);
                         updateStats();
 
@@ -799,7 +810,7 @@
                 document.getElementById('btn-dashboard').className = view === 'dashboard' ?
                 active : inactive;
                 document.getElementById('btn-details').className = view === 'details' ? active : inactive;
-            } else if (currentTab !== 'cash' && currentTab !== 'nps') {
+            } else if (currentTab !== 'cash' && currentTab !== 'nps' && currentTab !== 'gold') {
                 document.getElementById('btn-maturity').className = view === 'maturity' ?
                 active : inactive;
                 document.getElementById('btn-bank').className = view === 'bank' ? active : inactive;
@@ -819,12 +830,11 @@
         }
 
         function displayMoney(amt) {
+            const shouldMask = isPrivacyMode && !isEditingCash && !isEditingNPS && !isEditingGold;
             if (typeof amt === 'string' && amt.includes('%')) {
-                return isPrivacyMode && !isEditingCash && !isEditingNPS ?
-                amt.replace(/[0-9]/g, '●') : amt;
+                return shouldMask ? amt.replace(/[0-9]/g, '●') : amt;
             }
-            return isPrivacyMode && !isEditingCash && !isEditingNPS ?
-                fmt.format(amt).replace(/[0-9]/g, '●') : fmt.format(amt); 
+            return shouldMask ? fmt.format(amt).replace(/[0-9]/g, '●') : fmt.format(amt);
         }
 
         function init() { 
@@ -845,7 +855,7 @@
                 total = activeData.reduce((s, item) => s + (item.totalAmount !== undefined ? item.totalAmount : (item.total !== undefined ? parseFloat(item.total) || 0 : item.amount)), 0);
             }
 
-            if (currentTab === 'home' || currentTab === 'cash' || currentTab === 'nps') {
+            if (currentTab === 'home' || currentTab === 'cash' || currentTab === 'nps' || currentTab === 'gold') {
                 document.getElementById('global-stats').innerHTML = `Total: ${displayMoney(total)}`;
             } else if (currentTab === 'mf') {
                 document.getElementById('global-stats').innerHTML = `Active SIPs: ${displayMoney(total)}`;
@@ -947,8 +957,7 @@
             const container = document.getElementById('app-content');
             container.style.display = 'block';
 
-            const reqTabKey = currentTab === 'home' ?
-                currentTab : (currentTab === 'mf' ? 'mf_data_' + currentUser : currentTab + '_' + currentUser);
+            const reqTabKey = (currentTab === 'home' || currentTab === 'gold') ? currentTab : (currentTab === 'mf' ? 'mf_data_' + currentUser : currentTab + '_' + currentUser);
             const viewKey = reqTabKey + '_' + currentSubView;
 
             Array.from(container.children).forEach(child => {
@@ -983,6 +992,8 @@
             } else if (currentTab === 'mf') {
                 if (currentSubView === 'dashboard') renderMFDashboard(viewDiv);
                 else renderMFDetails(viewDiv);
+            } else if (currentTab === 'gold') {
+                renderGold(viewDiv);
             } else {
                 if (currentSubView === 'maturity') renderMaturity(viewDiv);
                 else renderBankOrCompany(viewDiv);
@@ -1477,6 +1488,159 @@
                     updateStats();
                     renderView();
                 } catch(e) {
+                    alert("Save failed: " + e.message);
+                    btn.innerHTML = 'Save';
+                    btn.disabled = false;
+                }
+            }
+        }
+
+        function renderGold(container) {
+            if (!activeData || activeData.length === 0) {
+                container.innerHTML = '<p class="text-center p-10 dark:text-gray-400">No Gold ETF records found.</p>';
+                return;
+            }
+
+            let tbodyHtml = activeData.map((item, index) => {
+                let invDisplay = isEditingGold
+                    ? `<input type="number" step="any" id="gold-inv-${index}" value="${item.investedAmount}" class="w-[85px] px-1.5 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold text-xs" />`
+                    : `${displayMoney(item.investedAmount)}`;
+
+                let unitsDisplay = item.units !== undefined && item.units !== null ? item.units : 0;
+                if (isEditingGold) {
+                    unitsDisplay = `<input type="number" step="any" id="gold-units-${index}" value="${unitsDisplay}" class="w-[65px] px-1.5 py-1 text-right bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-white outline-none focus:border-blue-500 font-bold text-xs" />`;
+                } else if (isPrivacyMode) {
+                    unitsDisplay = String(unitsDisplay).replace(/[0-9]/g, '●');
+                }
+
+                let navDisplay = item.nav !== undefined && item.nav !== null ? Number(item.nav).toFixed(2) : '-';
+                if (!isEditingGold && isPrivacyMode && navDisplay !== '-') {
+                    navDisplay = String(navDisplay).replace(/[0-9]/g, '●');
+                }
+
+                let navDateDisplay = '-';
+                if (item.navDate) {
+                    let d = new Date(item.navDate);
+                    navDateDisplay = !isNaN(d.getTime())
+                        ? d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: '2-digit' })
+                        : item.navDate;
+                }
+
+                let totalDisplay = displayMoney(item.total || 0);
+
+                return `<tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors text-xs">
+                    <td class="px-2 py-3 text-left font-bold text-gray-800 dark:text-white align-middle min-w-[110px] leading-tight">${item.fundName}</td>
+                    <td class="px-2 py-3 text-right font-bold text-gray-900 dark:text-gray-200 align-middle whitespace-nowrap">${invDisplay}</td>
+                    <td class="px-2 py-3 text-right font-bold text-blue-600 dark:text-blue-400 align-middle whitespace-nowrap">${unitsDisplay}</td>
+                    <td class="px-2 py-3 text-right text-gray-700 dark:text-gray-300 align-middle whitespace-nowrap">${navDisplay}</td>
+                    <td class="px-2 py-3 text-center text-gray-500 dark:text-gray-400 align-middle whitespace-nowrap text-[10px]">${navDateDisplay}</td>
+                    <td class="px-2 py-3 text-right font-bold text-gray-900 dark:text-gray-100 align-middle whitespace-nowrap">${totalDisplay}</td>
+                </tr>`;
+            }).join('');
+
+            const btnText = isEditingGold ? "Save" : "Edit";
+            const btnColor = isEditingGold ? "bg-green-600 hover:bg-green-700" : "bg-brand hover:bg-gray-700";
+
+            container.innerHTML = `
+                <h3 class="font-bold text-gray-700 dark:text-gray-300 uppercase text-xs tracking-wider mt-2 mb-2 px-1">
+                    Exchange Traded ETF's
+                </h3>
+                <div class="bg-white dark:bg-gray-800 rounded shadow-sm border dark:border-gray-700 mb-6 overflow-hidden">
+                    <div class="overflow-x-auto hide-scrollbar">
+                        <table class="w-full text-xs">
+                            <thead class="bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 uppercase tracking-wider text-[10px] border-b dark:border-gray-600">
+                                <tr>
+                                    <th class="px-2 py-2.5 text-left">Fund Name</th>
+                                    <th class="px-2 py-2.5 text-right whitespace-nowrap">Invested Amt</th>
+                                    <th class="px-2 py-2.5 text-right">Units</th>
+                                    <th class="px-2 py-2.5 text-right">NAV</th>
+                                    <th class="px-2 py-2.5 text-center whitespace-nowrap">NAV Date</th>
+                                    <th class="px-2 py-2.5 text-right">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>${tbodyHtml}</tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="flex justify-end px-1 mb-8">
+                    <button id="gold-action-btn" onclick="handleGoldAction()" class="px-8 py-3 w-full sm:w-auto min-w-[140px] justify-center ${btnColor} text-white text-base font-extrabold rounded-lg shadow-md transition-colors active:scale-95 flex items-center">
+                        ${btnText}
+                    </button>
+                </div>
+            `;
+        }
+
+        async function handleGoldAction() {
+            const reqTabKey = 'gold';
+            const viewKey = reqTabKey + '_' + currentSubView;
+
+            if (!isEditingGold) {
+                isEditingGold = true;
+                if (domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
+                renderView();
+            } else {
+                const btn = document.getElementById('gold-action-btn');
+                btn.innerHTML = '<span class="loader"></span> Saving';
+                btn.disabled = true;
+
+                const updates = [];
+                activeData.forEach((item, index) => {
+                    const invInput = document.getElementById('gold-inv-' + index);
+                    const unitsInput = document.getElementById('gold-units-' + index);
+                    if (invInput && unitsInput) {
+                        const newInv = parseFloat(invInput.value) || 0;
+                        const newUnits = parseFloat(unitsInput.value) || 0;
+                        if (item.investedAmount !== newInv || item.units !== newUnits) {
+                            item.investedAmount = newInv;
+                            item.units = newUnits;
+                            updates.push({
+                                row: item.row,
+                                invCol: item.invCol,
+                                unitsCol: item.unitsCol,
+                                totalCol: item.totalCol,
+                                investedAmount: newInv,
+                                units: newUnits
+                            });
+                        }
+                    }
+                });
+
+                if (updates.length === 0) {
+                    isEditingGold = false;
+                    if (domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
+                    renderView();
+                    return;
+                }
+
+                try {
+                    const response = await fetch(API_URL, {
+                        method: "POST",
+                        body: JSON.stringify({ action: "UPDATE_GOLD", updates: updates })
+                    });
+                    const result = await response.json();
+                    if (result.error) throw new Error(result.error);
+
+                    // Sync recalculated Totals returned by Google Sheets
+                    if (result.updatedTotals) {
+                        result.updatedTotals.forEach(ut => {
+                            const match = activeData.find(a => a.row === ut.row);
+                            if (match && ut.total !== null) match.total = ut.total;
+                        });
+                    }
+
+                    isEditingGold = false;
+                    const freshData = { items: activeData };
+                    memoryCache[reqTabKey] = { rawData: freshData };
+
+                    const reqUrl = `${API_URL}?user=GOLD`;
+                    caches.open('ai-tracker-data-v1').then(cache => {
+                        cache.put(reqUrl, new Response(JSON.stringify(freshData)));
+                    });
+
+                    if (domCache[viewKey]) { domCache[viewKey].remove(); delete domCache[viewKey]; }
+                    updateStats();
+                    renderView();
+                } catch (e) {
                     alert("Save failed: " + e.message);
                     btn.innerHTML = 'Save';
                     btn.disabled = false;
