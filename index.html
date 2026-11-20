@@ -376,6 +376,7 @@
         let tickerData = { headers: [], rows: [] };
         let currentTab = 'home', currentSubView = 'dashboard', isPrivacyMode = true;
         let cashTimestamp = "Never";
+        let goldTimestamp = "Never";
         let isEditingCash = false;
         let isEditingNPS = false;
         let isEditingGold = false;
@@ -604,9 +605,12 @@
                 activeData = data.items ||
                 []; 
                 cashTimestamp = data.lastUpdated || "Never";
-            } else if (tab === 'nps' || tab === 'gold') {
+            } else if (tab === 'nps') {
                 activeData = data.items ||
                 []; 
+            } else if (tab === 'gold') {
+                activeData = data.items || [];
+                goldTimestamp = data.lastUpdated || "Never";
             } else if (tab === 'mf') {
                 activeData = currentUser === 'HT' ?
                 (data.ht || []) : (data.nct || []);
@@ -1541,6 +1545,9 @@
             const btnColor = isEditingGold ? "bg-green-600 hover:bg-green-700" : "bg-brand hover:bg-gray-700";
 
             container.innerHTML = `
+                <div class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-2 px-1">
+                    Last Updated: <span class="text-gray-800 dark:text-gray-200">${goldTimestamp}</span>
+                </div>        
                 <h3 class="font-bold text-gray-700 dark:text-gray-300 uppercase text-xs tracking-wider mt-2 mb-2 px-1">
                     Exchange Traded ETF's
                 </h3>
@@ -1618,7 +1625,9 @@
                     });
                     const result = await response.json();
                     if (result.error) throw new Error(result.error);
-
+                    if (result.timestamp) {
+                        goldTimestamp = result.timestamp;
+                    }
                     // Sync recalculated Totals returned by Google Sheets
                     if (result.updatedTotals) {
                         result.updatedTotals.forEach(ut => {
@@ -1628,7 +1637,7 @@
                     }
 
                     isEditingGold = false;
-                    const freshData = { items: activeData };
+                    const freshData = { items: activeData, lastUpdated: goldTimestamp };
                     memoryCache[reqTabKey] = { rawData: freshData };
 
                     const reqUrl = `${API_URL}?user=GOLD`;
